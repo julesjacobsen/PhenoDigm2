@@ -124,8 +124,17 @@ public class DiseaseDaoImplTest {
 
     }
 
+    
     @Test
-    public void getHumanOrthologIdentifierForMgiGeneId() {
+    public void testGetGeneIdentifierForMgiGeneId() {
+        String mgiGeneId = "MGI:95523";
+        GeneIdentifier expResult = new GeneIdentifier("Fgfr2", "MGI:95523");
+        GeneIdentifier result = TestDiseaseDao.getInstance().getGeneIdentifierForMgiGeneId(mgiGeneId);
+//        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void testGetHumanOrthologIdentifierForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
         GeneIdentifier expResult = new GeneIdentifier("FGFR2", "OMIM:176943");
         GeneIdentifier result = TestDiseaseDao.getInstance().getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);

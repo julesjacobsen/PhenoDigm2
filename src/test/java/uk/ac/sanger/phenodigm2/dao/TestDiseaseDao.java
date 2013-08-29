@@ -37,11 +37,11 @@ public class TestDiseaseDao implements DiseaseDao {
     private static TestDiseaseDao instance;
     private static final Logger logger = Logger.getLogger(TestDiseaseDao.class.getName());
     
-    private Map<String, String> mgiToOmimOrthologMap;
-    private Map<String, Disease> omimDiseaseIdToDiseaseMap;
-    //add caches for diseases, mouse models and orthologous genes
-    
-    private Map<String, Set<Disease>> omimGeneIdToDiseasesMap;
+    //caches these are constantly cross-referenced when building objects
+    private static OrthologCache orthologCache;
+    private static DiseaseCache diseaseCache;
+    private static MouseModelCache mouseModelCache;
+       
     private Map<String, Set<DiseaseAssociation>> diseaseAssociationMap;
     private Map<String, Set<DiseaseAssociation>> predictedDiseaseAssociationsMap;
     
@@ -60,7 +60,7 @@ public class TestDiseaseDao implements DiseaseDao {
     
     @Override
     public Set<Disease> getDiseasesByOmimGeneId(String omimGeneId){
-        Set<Disease> diseases = omimGeneIdToDiseasesMap.get(omimGeneId);
+        Set<Disease> diseases = diseaseCache.getDiseasesByOmimGeneId(omimGeneId);
         if (diseases == null){ 
             logger.warning(omimGeneId + " not mapped to any diseases" );
             return new TreeSet<Disease>();
@@ -70,19 +70,15 @@ public class TestDiseaseDao implements DiseaseDao {
     
     @Override
     public Disease getDiseaseByOmimDiseaseId(String omimDiseaseId) {
-        for (Map.Entry<String, Disease> entry : omimDiseaseIdToDiseaseMap.entrySet()) {
-            String string = entry.getKey();
-            Disease diseaseId = entry.getValue();
-            System.out.println(string + " : " + diseaseId);     
-        }
-        return omimDiseaseIdToDiseaseMap.get(omimDiseaseId);
+   
+        return diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
     }
 
     @Override
     public Set<Disease> getDiseasesByMgiGeneId(String geneSymbol) {
-        String humanOrtholog = mgiToOmimOrthologMap.get(geneSymbol);
+        GeneIdentifier humanOrtholog = orthologCache.getHumanOrthologOfMouseGene(geneSymbol);
         logger.info(String.format("%s maps to human ortholog %s", geneSymbol, humanOrtholog));
-        return omimGeneIdToDiseasesMap.get(humanOrtholog);
+        return diseaseCache.getDiseasesByOmimGeneId(humanOrtholog.getCompoundIdentifier());
     }
 
     @Override
@@ -108,7 +104,7 @@ public class TestDiseaseDao implements DiseaseDao {
         
         //the disease data should come from a cache
         for (String omimDiseaseId : predictedDiseaseAssociationsMap.keySet()) {
-            Disease disease = omimDiseaseIdToDiseaseMap.get(omimDiseaseId);
+            Disease disease = diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
             if (disease == null) {
                 disease = new Disease();
                 disease.setOmimId(omimDiseaseId);
@@ -120,22 +116,10 @@ public class TestDiseaseDao implements DiseaseDao {
         return diseaseAssociations;
     }
 
-    
-    public Map<Disease, Set<DiseaseAssociation>> getDiseaseAssociationsByOmimGeneId(String omimGeneId){
-        Map<Disease, Set<DiseaseAssociation>> diseaseAssociations = new TreeMap<Disease, Set<DiseaseAssociation>>();
-        
-        for (Disease disease : omimGeneIdToDiseasesMap.get(omimGeneId)) {
-            diseaseAssociations.put(disease, diseaseAssociationMap.get(omimGeneId));
-        }
-        
-        return diseaseAssociations;
-    }
-
     private void populateDiseases() {
-        
-        mgiToOmimOrthologMap = new HashMap<String, String>();
-        omimDiseaseIdToDiseaseMap = new HashMap<String, Disease>();
-        omimGeneIdToDiseasesMap = new HashMap<String, Set<Disease>>();
+
+        Map<GeneIdentifier, GeneIdentifier> mgiToOmimOrthologMap = new HashMap<GeneIdentifier, GeneIdentifier>();
+        Map<String, Disease> omimDiseaseIdToDiseaseMap = new HashMap<String, Disease>();
         
         //String diseaseStubData = "src/test/resources/data/fgfr2KnownDiseaseAssociationTestData.dsv";
         String diseaseStubData = "src/test/resources/data/diseaseGeneCache.dsv";
@@ -150,24 +134,28 @@ public class TestDiseaseDao implements DiseaseDao {
                 if (currentLine != headerLine) {
                     //there could be multiple genes associated with a single disease
                     //so there could be several lines for a single disease
-                    makeDiseaseAndGeneOrthologs(line);
+                    makeDiseaseAndGeneOrthologs(line, mgiToOmimOrthologMap, omimDiseaseIdToDiseaseMap);
                 }
                 currentLine++; 
             }
         } catch (IOException ex) {
             Logger.getLogger(TestDiseaseDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        logger.info(String.format("Made %d genes: %s mapping to %d diseases: %s ", omimGeneIdToDiseasesMap.keySet().size(), omimGeneIdToDiseasesMap.keySet(), omimDiseaseIdToDiseaseMap.keySet().size(), omimDiseaseIdToDiseaseMap.keySet()));
+        
+        orthologCache = new OrthologCache(mgiToOmimOrthologMap);
+        diseaseCache = new DiseaseCache(omimDiseaseIdToDiseaseMap);
+        
+        logger.info(String.format("Mapped %d gene orthologs to %d diseases", mgiToOmimOrthologMap.keySet().size(), omimDiseaseIdToDiseaseMap.keySet().size()));
     }
 
     /**
      * Handles logic for linking diseases with genes and orthologs
      * @param line 
      */
-    private void makeDiseaseAndGeneOrthologs(String line){
+    private void makeDiseaseAndGeneOrthologs(String line, Map<GeneIdentifier, GeneIdentifier> orthologMap, Map<String, Disease> diseaseMap){
         String[] fields = line.split("\\t");
         String omimDiseaseId = fields[5];
-        Disease disease = omimDiseaseIdToDiseaseMap.get(omimDiseaseId);
+        Disease disease = diseaseMap.get(omimDiseaseId);
         
         if (disease == null) {
             String type = fields[6];
@@ -178,18 +166,17 @@ public class TestDiseaseDao implements DiseaseDao {
                 altTerms = fields[9];
             } 
             disease = makeDisease(omimDiseaseId, type, fullOmimId, term, altTerms);
-            omimDiseaseIdToDiseaseMap.put(disease.getOmimId(), disease);
+            diseaseMap.put(disease.getOmimId(), disease);
         }
         
         if (!fields[0].isEmpty()) {
             GeneIdentifier humanGene = new GeneIdentifier(fields[2], fields[3]);
             GeneIdentifier mouseGene = new GeneIdentifier(fields[1], fields[0]);
-            mgiToOmimOrthologMap.put(mouseGene.getCompoundIdentifier(), humanGene.getCompoundIdentifier());
+            orthologMap.put(mouseGene, humanGene);
             disease.getAssociatedHumanGenes().add(humanGene);
             disease.getAssociatedMouseGenes().add(mouseGene);
         }
         
-        addDiseaseToOmimGeneIdToDiseaseMap(disease);    
     }
     
     private Disease makeDisease(String omimId, String type, String fullOmimId, String term, String altTerms){
@@ -220,23 +207,7 @@ public class TestDiseaseDao implements DiseaseDao {
             }
             return alternativeTerms;
     }
-    
-    private void addDiseaseToOmimGeneIdToDiseaseMap(Disease disease) {
         
-        for (GeneIdentifier humanGeneIdentifier : disease.getAssociatedHumanGenes()) {
-        
-            String omimGeneId = humanGeneIdentifier.getCompoundIdentifier();
-            if (!omimGeneIdToDiseasesMap.containsKey(omimGeneId)) {
-                Set<Disease> diseases = new TreeSet<Disease>();
-                diseases.add(disease);
-                omimGeneIdToDiseasesMap.put(omimGeneId, diseases);
-            }
-            else {
-                omimGeneIdToDiseasesMap.get(omimGeneId).add(disease);
-            }    
-        }
-    }
-    
     private void populatePhenotypeMatches() {
         
         //this will contain all the known disease associations
@@ -329,18 +300,14 @@ public class TestDiseaseDao implements DiseaseDao {
         }
     }
 
-    //TODO!!
     @Override
     public GeneIdentifier getGeneIdentifierForMgiGeneId(String acc) {
-        return null;
+        return orthologCache.getMouseGeneIdentifier(acc);
     }
     
-    //TODO!!
     @Override
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc) {
-        return null;
+        return orthologCache.getHumanOrthologOfMouseGene(acc);
     }
-
-
         
 }
