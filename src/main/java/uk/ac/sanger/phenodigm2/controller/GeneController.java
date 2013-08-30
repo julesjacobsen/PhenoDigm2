@@ -58,7 +58,7 @@ public class GeneController {
         Map<Disease, Set<DiseaseAssociation>> predictedDiseaseAssociations = diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiId);
         model.addAttribute("predictedDiseaseAssociations", predictedDiseaseAssociations);
         
-        return "test";
+        return "geneTabulatedDiseaseView";
     }
     
 }

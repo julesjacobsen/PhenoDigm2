@@ -12,8 +12,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>${mgiId}</title>
 
-        <link rel="stylesheet" type="text/css" href="${baseUrl}/css/ui.dropdownchecklist.themeroller.css"/>
-        <link rel="stylesheet" type="text/css" href="${baseUrl}/css/custom.css"/>
+        <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/bootstrap.css"/>
+        <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/custom.css"/>
     </head>
     <body>
         <h1>${geneIdentifier.geneSymbol} Disease Associations</h1>
@@ -35,7 +35,7 @@
                                 <th>Alternative Terms</th>
                                 <tr>
                                     <td><a href="http://omim.org/entry/${diseaseAssociationsMap.key.omimId}">${diseaseAssociationsMap.key.omimId}</a></td>
-                                    <td>${knownDisease.key.term}</td>                                        
+                                    <td>${diseaseAssociationsMap.key.term}</td>                                        
                                     <td><c:forEach var="omimGene" items="${diseaseAssociationsMap.key.associatedHumanGenes}" varStatus="loop"><a href="http://www.ensembl.org/Homo_sapiens/Search/Details?db=core;end=1;idx=Gene;q=${omimGene.geneSymbol};species=Homo_sapiens">${omimGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>
                                     <td><c:forEach var="mgiGene" items="${diseaseAssociationsMap.key.associatedMouseGenes}" varStatus="loop"><a href="http://www.informatics.jax.org/marker/${mgiGene.databaseCode}:${mgiGene.databaseAcc}">${mgiGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>                                    
                                     <td><c:forEach var="diseaseAlt" items ="${diseaseAssociationsMap.key.alternativeTerms}" varStatus="loop">${diseaseAlt}<c:if test="${!loop.last}">, </c:if></c:forEach></td>
@@ -56,7 +56,7 @@
                         <!--                        These are a subset of the Predicted Disease Associations panel below, but only containing the models which have been linked to this disease OmimId
                                                 show table of data using model data from MGI and link out to them from here.            -->
                         <div class="accordion-inner" id="litDisPhenotypesAccordion">
-                            <c:forEach var="diseaseAssociation" items="${knownDisease.value}" varStatus="loop">
+                            <c:forEach var="diseaseAssociation" items="${diseaseAssociationsMap.value}" varStatus="loop">
                                 ${diseaseAssociation.diseaseToModelScore} | ${diseaseAssociation.mouseModel.mgiModelId} | ${diseaseAssociation.mouseModel.allelicCompositionLink}<br/>
                                 Fgfr1tm1Led/Fgfr1tm1Led
                                 Model | HP | MP | IC | SimJ

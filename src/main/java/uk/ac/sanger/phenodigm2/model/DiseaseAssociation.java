@@ -123,9 +123,9 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
             return 0;
         }
         else if (this.diseaseToModelScore > t.diseaseToModelScore) {
-            return 1;
+            return -1;
         }
-        return -1;
+        return 1;
     }
     
     
