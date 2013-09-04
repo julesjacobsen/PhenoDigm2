@@ -5,11 +5,9 @@
 package uk.ac.sanger.phenodigm2.dao;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +67,7 @@ public class TestDiseaseDao implements DiseaseDao {
     }
     
     @Override
-    public Disease getDiseaseByOmimDiseaseId(String omimDiseaseId) {
+    public Disease getDiseaseByDiseaseId(String omimDiseaseId) {
    
         return diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
     }
@@ -308,6 +306,21 @@ public class TestDiseaseDao implements DiseaseDao {
     @Override
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc) {
         return orthologCache.getHumanOrthologOfMouseGene(acc);
+    }
+
+    @Override
+    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
         
 }

@@ -62,7 +62,7 @@ public class DiseaseDaoImplTest {
         
         String omimId = "OMIM:101200";
         
-        Disease result = testDiseaseDao.getDiseaseByOmimDiseaseId(omimId);
+        Disease result = testDiseaseDao.getDiseaseByDiseaseId(omimId);
         System.out.println(result);
         assertEquals("APERT SYNDROME", result.getTerm());
     }

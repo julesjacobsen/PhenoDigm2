@@ -15,6 +15,7 @@ import uk.ac.sanger.phenodigm2.dao.DiseaseDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.MouseModel;
 
 /**
  *
@@ -52,13 +53,38 @@ public class GeneController {
         //Diseases 
         //known
         Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = diseaseDao.getKnownDiseaseAssociationsForMgiGeneId(mgiId);
-        
+        //INTERFACE TESTING ONLY!!! This should be an AJAX call.
+        populatePhenotypeTerms(knownDiseaseAssociations);
+
         model.addAttribute("knownDiseaseAssociations", knownDiseaseAssociations);
         //predicted
         Map<Disease, Set<DiseaseAssociation>> predictedDiseaseAssociations = diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiId);
+        //INTERFACE TESTING ONLY!!! This should be an AJAX call.
+        populatePhenotypeTerms(predictedDiseaseAssociations);
+        
         model.addAttribute("predictedDiseaseAssociations", predictedDiseaseAssociations);
         
         return "geneTabulatedDiseaseView";
+    }
+    
+    /**
+     * Populates the PhenotypeTerms for all  
+     * @param diseaseAssociationsMap 
+     */
+    private void populatePhenotypeTerms(Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap){
+        
+        for (Disease disease : diseaseAssociationsMap.keySet()) {
+            if (disease.getPhenotypeTerms() == null) {
+                disease.setPhenotypeTerms(diseaseDao.getDiseasePhenotypeTerms(disease.getOmimId()));                
+            }
+            Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationsMap.get(disease);
+            for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+                MouseModel mouseModel = diseaseAssociation.getMouseModel();
+                if (mouseModel.getPhenotypeTerms().isEmpty()) {
+                    mouseModel.setPhenotypeTerms(diseaseDao.getMouseModelPhenotypeTerms(mouseModel.getMgiModelId()));
+                }
+            }
+        }
     }
     
 }

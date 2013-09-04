@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 public class PhenotypeMatch {
     //information content
-    private float ic;
+    private double ic;
     //Jaccard similarity score
     private double simJ;
     private PhenotypeTerm mousePhenotype;
@@ -23,11 +23,11 @@ public class PhenotypeMatch {
     public PhenotypeMatch() {
     }
 
-    public float getIc() {
+    public double getIc() {
         return ic;
     }
 
-    public void setIc(float ic) {
+    public void setIc(double ic) {
         this.ic = ic;
     }
 
@@ -57,11 +57,11 @@ public class PhenotypeMatch {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Float.floatToIntBits(this.ic);
-        hash = 53 * hash + (int) (Double.doubleToLongBits(this.simJ) ^ (Double.doubleToLongBits(this.simJ) >>> 32));
-        hash = 53 * hash + Objects.hashCode(this.mousePhenotype);
-        hash = 53 * hash + Objects.hashCode(this.humanPhenotype);
+        int hash = 3;
+        hash = 59 * hash + (int) (Double.doubleToLongBits(this.ic) ^ (Double.doubleToLongBits(this.ic) >>> 32));
+        hash = 59 * hash + (int) (Double.doubleToLongBits(this.simJ) ^ (Double.doubleToLongBits(this.simJ) >>> 32));
+        hash = 59 * hash + (this.mousePhenotype != null ? this.mousePhenotype.hashCode() : 0);
+        hash = 59 * hash + (this.humanPhenotype != null ? this.humanPhenotype.hashCode() : 0);
         return hash;
     }
 
@@ -74,16 +74,16 @@ public class PhenotypeMatch {
             return false;
         }
         final PhenotypeMatch other = (PhenotypeMatch) obj;
-        if (Float.floatToIntBits(this.ic) != Float.floatToIntBits(other.ic)) {
+        if (Double.doubleToLongBits(this.ic) != Double.doubleToLongBits(other.ic)) {
             return false;
         }
         if (Double.doubleToLongBits(this.simJ) != Double.doubleToLongBits(other.simJ)) {
             return false;
         }
-        if (!Objects.equals(this.mousePhenotype, other.mousePhenotype)) {
+        if (this.mousePhenotype != other.mousePhenotype && (this.mousePhenotype == null || !this.mousePhenotype.equals(other.mousePhenotype))) {
             return false;
         }
-        if (!Objects.equals(this.humanPhenotype, other.humanPhenotype)) {
+        if (this.humanPhenotype != other.humanPhenotype && (this.humanPhenotype == null || !this.humanPhenotype.equals(other.humanPhenotype))) {
             return false;
         }
         return true;

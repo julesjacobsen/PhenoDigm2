@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
@@ -100,7 +99,7 @@ public class JdbcDiseaseDaoImpl implements DiseaseDao, InitializingBean {
     }
 
     @Override
-    public Disease getDiseaseByOmimDiseaseId(String omimDiseaseId) {
+    public Disease getDiseaseByDiseaseId(String omimDiseaseId) {
         return diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
     }
 
@@ -155,7 +154,43 @@ public class JdbcDiseaseDaoImpl implements DiseaseDao, InitializingBean {
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String mgiGeneId) {
         return orthologCache.getHumanOrthologOfMouseGene(mgiGeneId);
     }
+    
+    @Override
+    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId) {
+        List<PhenotypeTerm> phenotypeList;
+        String sql = "select d.evidence, hp.term_id as term_id, hp.name as name, hp.definition as definition, hp.comment as comment from hp_term_infos hp join disease_hp d on d.hp_id = hp.term_id where d.disease_id = ?;";
+        
+        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId, sql);
 
+        phenotypeList = this.jdbcTemplate.query(prepStatmentCreator, new DiseasePhenotypesResultSetExtractor());
+        
+        return phenotypeList;    
+    }
+    
+    @Override
+    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId) {
+        List<PhenotypeTerm> phenotypeList;
+        String sql = "select mp.term_id as term_id, mp.name as name, mp.definition as definition, mp.comment as comment from mp_mouse_models mm join mp_term_infos mp on mp.term_id = mm.mp_id where mm.mouse_model_id = ?;";
+        
+        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mouseModelId, sql);
+
+        phenotypeList = this.jdbcTemplate.query(prepStatmentCreator, new DiseasePhenotypesResultSetExtractor());
+        
+        return phenotypeList;    
+    }
+
+    @Override
+    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId) {
+        List<PhenotypeMatch> phenotypeMatchList;
+        String sql = "select phenomap.disease_id as disease, phenomap.mouse_model_id as mouse_model_id, phenomap.ic as ic, phenomap.simJ as simJ, phenomap.mp_id as mp_term_id, phenomap.mp_term as mp_term, phenomap.hp_id as hp_term_id, phenomap.hp_term as hp_term from disease_mouse_genotype_mappings phenomap where disease_id = ? and mouse_model_id = ?;";
+        
+        PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId, sql);
+        
+        phenotypeMatchList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeMatchesResultSetExtractor());
+        
+        return phenotypeMatchList;
+    }
+    
     private static class OrthologResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, GeneIdentifier>> {
 
         private Map<GeneIdentifier, GeneIdentifier> resultsMap;
@@ -268,7 +303,28 @@ public class JdbcDiseaseDaoImpl implements DiseaseDao, InitializingBean {
         }
         
     }
+
+    private static class TwoValuePreparedStatementCreator implements PreparedStatementCreator {
+
+        private String sql;
+        private String diseaseId;
+        private String mouseModelId;
         
+        public TwoValuePreparedStatementCreator(String diseaseId, String mouseModelId, String sql) {
+            this.sql = sql;
+            this.diseaseId = diseaseId;
+            this.mouseModelId = mouseModelId;
+        }
+        
+        @Override
+        public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, diseaseId);
+            preparedStatement.setString(2, mouseModelId);
+            return preparedStatement;
+        }
+    }
+
     private static class MouseModelResultSetExtractor implements ResultSetExtractor<Map<String, MouseModel>> {
 
         private Map<String, MouseModel> mouseModelMap;
@@ -330,4 +386,63 @@ public class JdbcDiseaseDaoImpl implements DiseaseDao, InitializingBean {
             return results;
         }
     }
+    
+        private static class DiseasePhenotypesResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
+
+        public DiseasePhenotypesResultSetExtractor() {
+        }
+
+        @Override
+        public List<PhenotypeTerm> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            List<PhenotypeTerm> phenotypes = new ArrayList<PhenotypeTerm>();
+        
+            while(rs.next()) {
+                PhenotypeTerm term = new PhenotypeTerm();
+                term.setTermId(rs.getString("term_id"));
+                term.setName(rs.getString("name"));
+                term.setDefinition(rs.getString("definition"));
+                term.setComment(rs.getString("comment"));
+                phenotypes.add(term);
+            }
+            
+            return phenotypes;
+        }
+    }
+        
+    private static class PhenotypeMatchesResultSetExtractor implements ResultSetExtractor<List<PhenotypeMatch>> {
+                
+        public PhenotypeMatchesResultSetExtractor() {
+        }
+
+        @Override
+        public List<PhenotypeMatch> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            List<PhenotypeMatch> results = new ArrayList<PhenotypeMatch>();
+            
+            while (rs.next()) {
+                PhenotypeMatch phenoMatch = new PhenotypeMatch();
+                phenoMatch.setSimJ(rs.getDouble("simJ"));
+                phenoMatch.setIc(rs.getDouble("ic"));
+                
+                //TODO: There are only around 20K PhenotypeTerms so these might
+                //be best pulled from a cache as they are static objects from 
+                //the HPO (human phenotype ontology) and MP (mammalian phenotype ontology)
+                
+                PhenotypeTerm mouseTerm = new PhenotypeTerm();
+                mouseTerm.setTermId(rs.getString("mp_term_id"));
+                mouseTerm.setName(rs.getString("mp_term"));
+                phenoMatch.setMousePhenotype(mouseTerm);
+                
+                PhenotypeTerm humanTerm = new PhenotypeTerm();
+                humanTerm.setTermId(rs.getString("hp_term_id"));
+                humanTerm.setName(rs.getString("hp_term"));
+                phenoMatch.setHumanPhenotype(humanTerm);
+                
+                
+                results.add(phenoMatch);
+            }
+            return results;
+        }
+    }
+
+
 }

@@ -12,6 +12,7 @@ import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
+import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 
 /**
  * Disease data access manager interface.
@@ -20,7 +21,7 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
  */
 public interface DiseaseDao {
     
-    public Disease getDiseaseByOmimDiseaseId(String omimDiseaseId);
+    public Disease getDiseaseByDiseaseId(String diseaseId);
     
     public Set<Disease> getDiseasesByOmimGeneId(String omimGeneId);
     
@@ -38,4 +39,10 @@ public interface DiseaseDao {
     public GeneIdentifier getGeneIdentifierForMgiGeneId(String acc);
 
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc);
+    
+    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId);
+    
+    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId);
+    
+    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
 }

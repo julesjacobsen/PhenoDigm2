@@ -15,9 +15,11 @@ public class PhenotypeTerm {
     private String termId;
     private String name;
     //bit of overkill so for sanity issues 
-    //private String description;
-
-    //do we really need an HPO/MPO Enum too? I don't think so.
+    private String definition;
+    //comments on the definition.
+    private String comment;
+    
+    //do we need an HPO/MP Enum too? I don't think so.
     public PhenotypeTerm() {
     }
 
@@ -37,14 +39,22 @@ public class PhenotypeTerm {
         this.name = name;
     }
 
-//    public String getDescription() {
-//        return description;
-//    }
+    public String getDefinition() {
+        return definition;
+    }
 
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 7;
@@ -73,7 +83,7 @@ public class PhenotypeTerm {
 
     @Override
     public String toString() {
-        return "PhenotypeTerm{" + termId + ", " + name + '}';
+        return termId + " " + name;
     }
       
 }

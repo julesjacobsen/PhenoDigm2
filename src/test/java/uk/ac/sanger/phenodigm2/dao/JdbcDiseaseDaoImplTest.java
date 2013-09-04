@@ -5,10 +5,10 @@
 package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.sql.DataSource;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,13 +17,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
+import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
+import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 
 /**
  *
@@ -69,14 +70,14 @@ public class JdbcDiseaseDaoImplTest {
     }
     
     /**
-     * Test of getDiseaseByOmimDiseaseId method, of class JdbcDiseaseDAOImpl.
+     * Test of getDiseaseByDiseaseId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetDiseaseByOmimDiseaseId() {
         System.out.println("getDiseaseByOmimDiseaseId");
         String omimDiseaseId = "OMIM:101600";
 
-        Disease result = instance.getDiseaseByOmimDiseaseId(omimDiseaseId);
+        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
         assertEquals("PFEIFFER SYNDROME", result.getTerm());
 
     }
@@ -155,6 +156,51 @@ public class JdbcDiseaseDaoImplTest {
         assertTrue(result.keySet().size() > 290);
     }
 
+    @Test
+    public void testGetDiseasePhenotypeTerms() {
+        String diseaseId = "OMIM:101200";
+        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setTermId("HP:0000175");
+        expectedTerm.setName("Cleft palate");
+        expectedTerm.setDefinition("Cleft palate is a developmental defect of the `palate` (FMA:54549) resulting from a failure of fusion of the palatine processes and manifesting as a spearation of the roof of the mouth (soft and hard palate).");
+        expectedTerm.setComment("Cleft palate is a developmental defect that occurs between the 7th and 12th week of pregnancy. Normally, the palatine processes fuse during this time to form the soft and hard palate. A failure of fusion results in a cleft palate. The clinical spectrum ranges from bifid uvula, to (incomplete or complete) cleft of the soft palate, up to (complete or incomplete) cleft of both the soft and hard palate.");
+        assertTrue(result.contains(expectedTerm));
+    }
+    
+    @Test
+    public void testGetMouseModelPhenotypeTerms() {
+        String mouseModelId = "1";
+        List<PhenotypeTerm> result = instance.getMouseModelPhenotypeTerms(mouseModelId);
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setTermId("MP:0000609");
+        expectedTerm.setName("abnormal liver physiology");
+        expectedTerm.setDefinition("any functional anomaly of the bile-secreting organ that is important for detoxification, for fat, carbohydrate, and protein metabolism, and for glycogen storage");
+        assertTrue(result.contains(expectedTerm));
+    }
+    
+    @Test
+    public void testGetDiseaseAssociationPhenotypeMatches() {
+        String diseaseId = "OMIM:101600";
+        String mouseModelId = "27680";
+        List<PhenotypeMatch> result = instance.getPhenotypeMatches(diseaseId, mouseModelId);
+        PhenotypeMatch expectedMatch = new PhenotypeMatch();
+        expectedMatch.setSimJ(0.853968);
+        expectedMatch.setIc(8.901661);
+        
+        PhenotypeTerm humanTerm = new PhenotypeTerm();
+        humanTerm.setTermId("HP:0005048");
+        humanTerm.setName("Synostosis of carpal bones");
+        expectedMatch.setHumanPhenotype(humanTerm);
+        
+        PhenotypeTerm mouseTerm = new PhenotypeTerm();
+        mouseTerm.setTermId("MP:0008915");
+        mouseTerm.setName("fused carpal bones");
+        expectedMatch.setMousePhenotype(mouseTerm);
+        
+        assertTrue(result.contains(expectedMatch));
+    }
+    
     @Test
     public void genePageIntegrationTest() {
         //this is a test of how the DAO will be used within the controller and

@@ -22,7 +22,8 @@ public class Disease implements Comparable<Disease>{
     private List<GeneIdentifier> associatedHumanGenes;
     private List<GeneIdentifier> associatedMouseGenes;
     private List<String> locations;
-
+    private List<PhenotypeTerm> phenotypeTerms;
+    
     public Disease() {
     }
     
@@ -88,6 +89,14 @@ public class Disease implements Comparable<Disease>{
 
     public void setLocations(List<String> locations) {
         this.locations = locations;
+    }
+
+    public List<PhenotypeTerm> getPhenotypeTerms() {
+        return phenotypeTerms;
+    }
+
+    public void setPhenotypeTerms(List<PhenotypeTerm> phenotypeTerms) {
+        this.phenotypeTerms = phenotypeTerms;
     }
 
     @Override
