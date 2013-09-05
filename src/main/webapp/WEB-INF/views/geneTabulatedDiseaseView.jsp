@@ -86,24 +86,24 @@
         <div class="row-fluid dataset">
             <div class="row-fluid">
                 <div class="container span12">
-                    <h4 class="caption">Orthologous Gene Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
+                    <h4 class="caption">Curated Gene Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
                     <table id="phenotypes" class="table table-striped">
-                        <caption>The following diseases are associated with ${geneIdentifier.geneSymbol} by gene orthology to ${humanOrtholog.geneSymbol}</caption>
+                        <caption>The following diseases are associated with ${geneIdentifier.geneSymbol} from external resources*</caption>
                         <thead>
                             <tr>
                                 <th>Disease Name</th>
                                 <th>Source</th>
                                 <th>Assoc. Human Genes</th>
-                                <th>Assoc. Mouse Genes</th>
-                                <th>Literature Evidence</th>
-                                <th>Phenotype Evidence</th>
+                                <th>Mouse Orthologs</th>
+                                <th>Mouse Literature Evidence</th>
+                                <th>Mouse Phenotype Evidence</th>
                                 <th></th>
                             </tr>
                         </thead>                        
                         <tbody>    
                             <c:forEach var="diseaseAssociationsMap" items="${knownDiseaseAssociations}" varStatus="loop">
                                 <c:set var="disease" value="${diseaseAssociationsMap.key}"></c:set>
-                                <c:set var="literatureDiseaseAssociation" value="${diseaseAssociationsMap.value}"></c:set>
+                                <c:set var="literatureDiseaseAssociation" value="${knownDiseaseAssociations[disease]}"></c:set>
                                 <c:set var="predictedDiseaseAssociation" value="${predictedDiseaseAssociations[disease]}"></c:set>
 
                                     <tr>
@@ -168,16 +168,17 @@
                                 <th>Disease Name</th>
                                 <th>Source</th>
                                 <th>Assoc. Human Genes</th>
-                                <th>Assoc. Mouse Genes</th>
-                                <th>Literature Evidence</th>
-                                <th>Phenotype Evidence</th>
+                                <th>Mouse Orthologs</th>
+                                <th>Mouse Literature Evidence</th>
+                                <th>Mouse Phenotype Evidence</th>
                                 <th></th>
                             </tr>
                         </thead>                        
                         <tbody>    
                             <c:forEach var="diseaseAssociationsMap" items="${predictedDiseaseAssociations}" varStatus="loop">
                                 <c:set var="disease" value="${diseaseAssociationsMap.key}"></c:set>
-                                <c:set var="literatureDiseaseAssociation" value="${diseaseAssociationsMap.value}"></c:set>
+                                <!--careful here... in this section the literatureDiseaseAssociation" value="${knownDiseaseAssociations[disease]}" as we're referring to the other data set-->
+                                <c:set var="literatureDiseaseAssociation" value="${knownDiseaseAssociations[disease]}"></c:set>
                                 <c:set var="predictedDiseaseAssociation" value="${predictedDiseaseAssociations[disease]}"></c:set>
 
                                     <tr>
