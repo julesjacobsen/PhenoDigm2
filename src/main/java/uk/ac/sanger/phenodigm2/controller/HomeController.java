@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.ac.sanger.phenodigm2.dao.DiseaseDao;
+import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;

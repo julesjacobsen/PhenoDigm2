@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.ac.sanger.phenodigm2.dao.DiseaseDao;
+import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 
 /**
  *
@@ -18,7 +18,7 @@ import uk.ac.sanger.phenodigm2.dao.DiseaseDao;
 public class DiseaseController {
     
     @Autowired
-    DiseaseDao diseaseDao;
+    PhenoDigmDao diseaseDao;
 
     @RequestMapping(value = "/disease")
     public String allDiseases(Model model) {
