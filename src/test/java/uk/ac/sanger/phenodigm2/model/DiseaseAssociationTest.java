@@ -27,11 +27,68 @@ public class DiseaseAssociationTest {
     }
     
     @Test
-    public void testCompareTo() {
+    public void testCompareToDifferentValues() {
         DiseaseAssociation first = new DiseaseAssociation();
         first.setDiseaseToModelScore(90.12);
         DiseaseAssociation second = new DiseaseAssociation();
         second.setDiseaseToModelScore(89.99);
+        List<DiseaseAssociation> associationsList = new ArrayList<DiseaseAssociation>();
+        associationsList.add(second);
+        associationsList.add(first);
+        
+        Collections.sort(associationsList);
+        
+        DiseaseAssociation firstElement = associationsList.get(0);
+        assertEquals(firstElement, first);
+        
+        
+    }
+    
+    @Test
+    public void testCompareToSameDiseaseToModelScores() {
+        DiseaseAssociation first = new DiseaseAssociation();
+        first.setDiseaseToModelScore(90.12);
+        first.setOmimDiseaseId("OMIM:1234");
+        MouseModel firstMouseModel = new MouseModel();
+        firstMouseModel.setMgiModelId("MGI:1234");
+        first.setMouseModel(firstMouseModel);
+        
+        DiseaseAssociation second = new DiseaseAssociation();
+        second.setDiseaseToModelScore(90.12);
+        second.setOmimDiseaseId("OMIM:1234");
+        MouseModel secondMouseModel = new MouseModel();
+        secondMouseModel.setMgiModelId("MGI:1235");
+        second.setMouseModel(secondMouseModel);
+        
+        List<DiseaseAssociation> associationsList = new ArrayList<DiseaseAssociation>();
+        associationsList.add(second);
+        associationsList.add(first);
+        
+        Collections.sort(associationsList);
+        
+        DiseaseAssociation firstElement = associationsList.get(0);
+        assertEquals(firstElement, first);
+        
+        
+    }
+    
+    
+    @Test
+    public void testCompareToSameModelToDiseaseScores() {
+        DiseaseAssociation first = new DiseaseAssociation();
+        first.setModelToDiseaseScore(90.12);
+        first.setOmimDiseaseId("OMIM:1234");
+        MouseModel firstMouseModel = new MouseModel();
+        firstMouseModel.setMgiModelId("MGI:1234");
+        first.setMouseModel(firstMouseModel);
+        
+        DiseaseAssociation second = new DiseaseAssociation();
+        second.setModelToDiseaseScore(90.12);
+        second.setOmimDiseaseId("OMIM:1234");
+        MouseModel secondMouseModel = new MouseModel();
+        secondMouseModel.setMgiModelId("MGI:1235");
+        second.setMouseModel(secondMouseModel);
+        
         List<DiseaseAssociation> associationsList = new ArrayList<DiseaseAssociation>();
         associationsList.add(second);
         associationsList.add(first);

@@ -78,6 +78,46 @@ public class MouseModel {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.mgiGeneId != null ? this.mgiGeneId.hashCode() : 0);
+        hash = 29 * hash + (this.mgiModelId != null ? this.mgiModelId.hashCode() : 0);
+        hash = 29 * hash + (this.allelicComposition != null ? this.allelicComposition.hashCode() : 0);
+        hash = 29 * hash + (this.geneticBackground != null ? this.geneticBackground.hashCode() : 0);
+        hash = 29 * hash + (this.allelicCompositionLink != null ? this.allelicCompositionLink.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MouseModel other = (MouseModel) obj;
+        if ((this.mgiGeneId == null) ? (other.mgiGeneId != null) : !this.mgiGeneId.equals(other.mgiGeneId)) {
+            return false;
+        }
+        if ((this.mgiModelId == null) ? (other.mgiModelId != null) : !this.mgiModelId.equals(other.mgiModelId)) {
+            return false;
+        }
+        if ((this.allelicComposition == null) ? (other.allelicComposition != null) : !this.allelicComposition.equals(other.allelicComposition)) {
+            return false;
+        }
+        if ((this.geneticBackground == null) ? (other.geneticBackground != null) : !this.geneticBackground.equals(other.geneticBackground)) {
+            return false;
+        }
+        if ((this.allelicCompositionLink == null) ? (other.allelicCompositionLink != null) : !this.allelicCompositionLink.equals(other.allelicCompositionLink)) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
+    @Override
     public String toString() {
         return "MouseModel{" + "mgiGeneId=" + mgiGeneId + ", mgiModelId=" + mgiModelId + ", allelicComposition=" + allelicComposition + ", geneticBackground=" + geneticBackground + ", phenotypeTerms=" + phenotypeTerms + '}';
     }

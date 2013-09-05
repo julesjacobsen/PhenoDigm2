@@ -5,7 +5,6 @@
 package uk.ac.sanger.phenodigm2.model;
 
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -116,16 +115,31 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     }
 
     
-    //need to specify comparator for fifferent sorting criteria 
+    //need to specify comparator for different sorting criteria 
     @Override
-    public int compareTo(DiseaseAssociation t) {
-        if (this.diseaseToModelScore == t.diseaseToModelScore) {
-            return 0;
+    public int compareTo(DiseaseAssociation that) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+    
+        if (this == that) {
+            return EQUAL;
         }
-        else if (this.diseaseToModelScore > t.diseaseToModelScore) {
-            return -1;
+        if (this.diseaseToModelScore == that.diseaseToModelScore) {
+            if (! this.omimDiseaseId.equals(that.omimDiseaseId)) {
+                return this.omimDiseaseId.compareTo(that.omimDiseaseId);                
+            } else {
+                return this.mouseModel.getMgiModelId().compareTo(that.mouseModel.getMgiModelId());
+            }
         }
-        return 1;
+        if (this.diseaseToModelScore > that.diseaseToModelScore) {
+            return BEFORE;
+        }
+        if (this.diseaseToModelScore < that.diseaseToModelScore) {
+            return AFTER;
+        }
+        
+        return AFTER;
     }
     
     
