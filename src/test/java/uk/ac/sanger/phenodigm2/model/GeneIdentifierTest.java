@@ -4,6 +4,9 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -57,4 +60,19 @@ public class GeneIdentifierTest {
         assertEquals(expResult, result);
     }
 
+    @Test
+    public void testCompareTo(){
+
+        GeneIdentifier gene1 = new GeneIdentifier("Fgfr1", "MGI:95523");
+        GeneIdentifier gene2 = new GeneIdentifier("Fgfr2", "MGI:95524");
+        
+        List<GeneIdentifier> genesList = new ArrayList<GeneIdentifier>();
+        
+        genesList.add(gene2);
+        genesList.add(gene1);
+        
+        Collections.sort(genesList);
+        
+        assertEquals(gene1, genesList.get(0));
+    }
 }

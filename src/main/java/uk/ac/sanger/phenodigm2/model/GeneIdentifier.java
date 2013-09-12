@@ -8,7 +8,7 @@ package uk.ac.sanger.phenodigm2.model;
  * 
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
-public class GeneIdentifier {
+public class GeneIdentifier implements Comparable<GeneIdentifier>{
     
     private String geneSymbol;
     private String databaseCode;
@@ -106,6 +106,11 @@ public class GeneIdentifier {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(GeneIdentifier other) {
+        return this.geneSymbol.compareTo(other.geneSymbol);
     }
 
     @Override
