@@ -322,5 +322,25 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-        
+
+    @Override
+    public Set<Disease> getAllDiseses() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+      
 }

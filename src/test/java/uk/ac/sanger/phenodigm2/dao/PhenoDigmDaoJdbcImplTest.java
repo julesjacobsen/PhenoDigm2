@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.sanger.phenodigm2.db.TestDatabase;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -34,11 +35,15 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 @ContextConfiguration(locations = {"classpath:/jdbc-test-services.xml"})
 public class PhenoDigmDaoJdbcImplTest {
 
+    private static TestDatabase database;
+    
     @Autowired
     PhenoDigmDao instance;
 
     @BeforeClass
     public static void setUpClass() {
+//        database = new TestDatabase();
+//        database.setUp("test");
     }
 
     @AfterClass
@@ -54,17 +59,48 @@ public class PhenoDigmDaoJdbcImplTest {
     }
 
     @Test
+    public void testDbSetup() {
+        String diseaseId = "OMIM:614298";
+        Disease disease = instance.getDiseaseByDiseaseId(diseaseId);
+        assertEquals(disease.getTerm(), "NEURODEGENERATION WITH BRAIN IRON ACCUMULATION 4; NBIA4");
+    }
+    
+    @Test public void getAllGeneIdentifiers() {
+        assertTrue(instance.getAllMouseGeneIdentifiers().size() > 9000);
+    }
+    
+    @Test public void getAllDiseases() {
+        assertTrue(instance.getAllDiseses().size() > 6700);
+    }
+    
+    @Test
     public void getGeneIdentifierForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
         GeneIdentifier expResult = new GeneIdentifier("Fgfr2", "MGI:95523");
         GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
-    
+   
     @Test
     public void getHumanOrthologIdentifierForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
         GeneIdentifier expResult = new GeneIdentifier("FGFR2", "OMIM:176943");
+        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void getGeneIdentifierForMgiGeneIdUnmappedInOMIM() {
+        String mgiGeneId = "MGI:2447348";
+        GeneIdentifier expResult = new GeneIdentifier("Phospho1", "MGI:2447348");
+        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+   
+    @Test
+    public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInOMIM() {
+        String mgiGeneId = "MGI:2447348";
+        GeneIdentifier expResult = new GeneIdentifier("PHOSPHO1", "OMIM", "");
         GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
@@ -162,6 +198,53 @@ public class PhenoDigmDaoJdbcImplTest {
         assertTrue(result.keySet().size() > 290);
     }
 
+    @Test 
+    public void testGetKnownDiseaseAssociationsForDiseaseId() {
+        System.out.println("testGetKnownDiseaseAssociationsForDiseaseId");
+        String diseaseId = "OMIM:101600";
+        
+        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+        
+        int resultSize = result.keySet().size();
+        int expectSize = 2;
+        String sizeErrorMessage = String.format("Expected %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+        assertEquals(sizeErrorMessage, resultSize, expectSize);
+        
+        GeneIdentifier fgfr1 = new GeneIdentifier("Fgfr1", "MGI:95522");
+        assertTrue("Expected gene " + fgfr1 + "to be in result set", result.keySet().contains(fgfr1));
+        
+        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+        
+        System.out.println(result);
+    }
+    
+    @Test 
+    public void testGetPredictedDiseaseAssociationsForDiseaseId() {
+        System.out.println("testGetPredictedDiseaseAssociationsForDiseaseId");
+        String diseaseId = "OMIM:101600";
+        
+        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
+
+        System.out.println(result);
+
+        int resultSize = result.keySet().size();
+        int expectSize = 46;
+        String sizeErrorMessage = String.format("Expected more than %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+        assertTrue(sizeErrorMessage, resultSize > expectSize);
+        
+        GeneIdentifier gja1 = new GeneIdentifier("Gja1", "MGI:95713");
+        assertTrue("Expected gene " + gja1 + "to be in result set", result.keySet().contains(gja1));
+        
+        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+        
+        GeneIdentifier fgfr3 = new GeneIdentifier("Fgfr3", "MGI:95524");
+        assertTrue("Expected gene " + fgfr3 + "to be in result set", result.keySet().contains(fgfr3));
+        
+             
+    }
+    
     @Test
     public void testGetDiseasePhenotypeTerms() {
         String diseaseId = "OMIM:101200";
@@ -266,4 +349,6 @@ public class PhenoDigmDaoJdbcImplTest {
         }
         return stringBuffer.toString();
     }
+    
+    
 }

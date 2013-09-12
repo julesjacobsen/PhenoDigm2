@@ -21,6 +21,8 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
  */
 public interface PhenoDigmDao {
     
+    public Set<Disease> getAllDiseses();
+    
     public Disease getDiseaseByDiseaseId(String diseaseId);
     
     public Set<Disease> getDiseasesByOmimGeneId(String omimGeneId);
@@ -31,11 +33,12 @@ public interface PhenoDigmDao {
 
     public Map<Disease, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId);
     
-//    public List<MouseDiseaseModel> getMouseModelsByOmimId(String omimId);
-//    
-//    public List<PhenotypeMatch> getPhenotypeMatchesForMouseModelsByGeneSymbol(String geneSymbol);
-//    
+    public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId);
+    
+    public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId);
 
+    public Set<GeneIdentifier> getAllMouseGeneIdentifiers();
+    
     public GeneIdentifier getGeneIdentifierForMgiGeneId(String acc);
 
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc);
