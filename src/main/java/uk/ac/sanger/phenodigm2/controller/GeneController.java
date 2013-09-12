@@ -6,11 +6,13 @@ package uk.ac.sanger.phenodigm2.controller;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
@@ -30,14 +32,20 @@ public class GeneController {
     
     @RequestMapping("/gene")
     public String allGenes(Model model) {
-        //TODO: get all genes from the phenoDigmDao
-        model.addAttribute("geneIdentifier", phenoDigmDao.getGeneIdentifierForMgiGeneId("MGI:95523"));
+        //Get all genes from the phenoDigmDao where we have a known disease association
+        Set<GeneIdentifier> genesWithKnownDiseaseAssociations = new TreeSet<GeneIdentifier>();
+        
+        for (Disease disease : phenoDigmDao.getAllDiseses()) {
+            genesWithKnownDiseaseAssociations.addAll(disease.getAssociatedMouseGenes());
+        }
+       
+        model.addAttribute("geneIdentifiers", genesWithKnownDiseaseAssociations);
         return "genes";
     }
     
     
-    @RequestMapping("/{acc}")
-    public String gene(@PathVariable String acc, Model model) {
+    @RequestMapping(value="/gene/{acc}", method=RequestMethod.GET)
+    public String gene(@PathVariable("acc") String acc, Model model) {
         String mgiId = acc;
         System.out.println("GeneController: Making gene page for " + mgiId);
         model.addAttribute("mgiId", mgiId);
@@ -49,7 +57,7 @@ public class GeneController {
         
         System.out.println("GeneController: Found GeneIdentifier: " + geneIdentifier);
         model.addAttribute("geneIdentifier", geneIdentifier);
-        model.addAttribute("humanOrtholog", phenoDigmDao.getHumanOrthologIdentifierForMgiGeneId(acc));
+        model.addAttribute("humanOrtholog", phenoDigmDao.getHumanOrthologIdentifierForMgiGeneId(mgiId));
         //Diseases 
         //known
         Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = phenoDigmDao.getKnownDiseaseAssociationsForMgiGeneId(mgiId);
