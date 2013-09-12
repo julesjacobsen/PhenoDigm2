@@ -6,6 +6,7 @@ package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -69,4 +70,8 @@ class OrthologCache {
         return mouseToHumanOrthologsMap.get(mouseGeneIdentifier);
     }
 
+    protected Set<GeneIdentifier> getAllMouseGenes() {
+        return mouseToHumanOrthologsMap.keySet();
+    }
+    
 }
