@@ -82,13 +82,13 @@
 
     </head>
     <body>
-        <h1>${geneIdentifier.geneSymbol} Disease Associations</h1>
+        <div class='topic'>${geneIdentifier.geneSymbol} Disease Associations</div><a href="../gene"><tiny>up</tiny></a> <a href="../home"><tiny> home</tiny></a>
         <div class="row-fluid dataset">
             <div class="row-fluid">
                 <div class="container span12">
-                    <h4 class="caption">Curated Gene Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
+                    <h4 class="topic">Curated Gene Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
                     <table id="phenotypes" class="table table-striped">
-                        <caption>The following diseases are associated with ${geneIdentifier.geneSymbol} from external resources*</caption>
+                        The following diseases are associated with ${geneIdentifier.geneSymbol} from external resources*
                         <thead>
                             <tr>
                                 <th>Disease Name</th>
@@ -107,7 +107,7 @@
                                 <c:set var="predictedDiseaseAssociation" value="${predictedDiseaseAssociations[disease]}"></c:set>
 
                                     <tr>
-                                        <td>${disease.term}</td>
+                                        <td><a href="../disease/${disease.omimId}">${disease.term}</a></td>
                                     <td><a href="http://omim.org/entry/${disease.omimId}">${disease.omimId}</a></td>
                                     <td><c:forEach var="omimGene" items="${disease.associatedHumanGenes}" varStatus="loop"><a href="http://www.ensembl.org/Homo_sapiens/Search/Details?db=core;end=1;idx=Gene;q=${omimGene.geneSymbol};species=Homo_sapiens">${omimGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>
                                     <td><c:forEach var="mgiGene" items="${disease.associatedMouseGenes}" varStatus="loop"><a href="http://www.informatics.jax.org/marker/${mgiGene.databaseCode}:${mgiGene.databaseAcc}">${mgiGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>                                    
@@ -132,7 +132,7 @@
                                         <h5>${disease.omimId} Associated Mouse Models (MGI curated)</h5>
                                         <c:forEach var="diseaseAssociation" items="${literatureDiseaseAssociation}" varStatus="loop">
                                             <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                            ${diseaseAssociation.diseaseToModelScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
+                                            ${diseaseAssociation.modelToDiseaseScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
                                             <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                 ${phenotypeTerm}<br/>
                                             </c:forEach>
@@ -141,7 +141,7 @@
                                         <h5>${disease.omimId} Associated Mouse Models (PhenoDigm predicted)</h5>
                                         <c:forEach var="diseaseAssociation" items="${predictedDiseaseAssociation}" varStatus="loop">
                                             <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                            ${diseaseAssociation.diseaseToModelScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
+                                            ${diseaseAssociation.modelToDiseaseScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
                                             <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                 ${phenotypeTerm}<br/>
                                             </c:forEach>
@@ -160,9 +160,9 @@
         <div class="row-fluid dataset">
             <div class="row-fluid">
                 <div class="container span12">
-                    <h4 class="caption">Phenotypic Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
+                    <h4 class="topic">Phenotypic Disease Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
                     <table id="predictedPhenotypes" class="table table-striped">
-                        <caption>The following diseases are associated with ${geneIdentifier.geneSymbol} by phenotypic similarity</caption>
+                        The following diseases are associated with ${geneIdentifier.geneSymbol} by phenotypic similarity
                         <thead>
                             <tr>
                                 <th>Disease Name</th>
@@ -182,14 +182,14 @@
                                 <c:set var="predictedDiseaseAssociation" value="${predictedDiseaseAssociations[disease]}"></c:set>
 
                                     <tr>
-                                        <td>${disease.term}</td>
+                                    <td><a href="../disease/${disease.omimId}">${disease.term}</a></td>
                                     <td><a href="http://omim.org/entry/${disease.omimId}">${disease.omimId}</a></td>
                                     <td><c:forEach var="omimGene" items="${disease.associatedHumanGenes}" varStatus="loop"><a href="http://www.ensembl.org/Homo_sapiens/Search/Details?db=core;end=1;idx=Gene;q=${omimGene.geneSymbol};species=Homo_sapiens">${omimGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>
                                     <td><c:forEach var="mgiGene" items="${disease.associatedMouseGenes}" varStatus="loop"><a href="http://www.informatics.jax.org/marker/${mgiGene.databaseCode}:${mgiGene.databaseAcc}">${mgiGene.geneSymbol}</a><c:if test="${!loop.last}">, </c:if></c:forEach></td>                                    
                                     <td><c:if test="${not empty literatureDiseaseAssociation}">Yes</c:if></td>
                                     <td><c:if test="${not empty predictedDiseaseAssociation}">
                                             <c:forEach var="diseaseAssociation" items="${predictedDiseaseAssociation}" begin="0" end="0" varStatus="loop">
-                                                ${diseaseAssociation.diseaseToModelScore}
+                                                <b style="color:#FF9000">${diseaseAssociation.diseaseToModelScore}</b>
                                             </c:forEach>
                                         </c:if>
                                     </td>                        
@@ -207,7 +207,7 @@
                                         <h5>${disease.omimId} Associated Mouse Models (MGI curated)</h5>
                                         <c:forEach var="diseaseAssociation" items="${literatureDiseaseAssociation}" varStatus="loop">
                                             <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                            ${diseaseAssociation.diseaseToModelScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
+                                            <b style="color:#FF9000">${diseaseAssociation.diseaseToModelScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
                                             <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                 ${phenotypeTerm}<br/>
                                             </c:forEach>
@@ -216,7 +216,7 @@
                                         <h5>${disease.omimId} Associated Mouse Models (PhenoDigm predicted)</h5>
                                         <c:forEach var="diseaseAssociation" items="${predictedDiseaseAssociation}" varStatus="loop">
                                             <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                            ${diseaseAssociation.diseaseToModelScore}: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
+                                            <b style="color:#FF9000">${diseaseAssociation.diseaseToModelScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
                                             <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                 ${phenotypeTerm}<br/>
                                             </c:forEach>
