@@ -156,4 +156,10 @@ public class DiseaseCacheTest {
         assertEquals(expResult, result);
     }
     
+    @Test
+    public void getAllDiseases() {
+        DiseaseCache instance = new DiseaseCache(diseaseMap);
+        
+        assertEquals(2, instance.getAllDiseses().size());
+    }
 }

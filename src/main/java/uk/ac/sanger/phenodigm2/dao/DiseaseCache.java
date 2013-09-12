@@ -93,4 +93,14 @@ class DiseaseCache {
         }
         return diseases;
     }
+    
+    /**
+     * Returns a Set of all Disease objects stored in the cache.
+     * @return Set of all diseases in PhenoDigm.
+     */
+    protected Set<Disease> getAllDiseses() {
+        Set<Disease> allDiseases = new TreeSet();
+        allDiseases.addAll(omimDiseaseIdToDiseaseMap.values());
+        return allDiseases;
+    }
 }
