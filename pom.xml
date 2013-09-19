@@ -79,6 +79,14 @@
             <artifactId>hsqldb</artifactId>
             <version>2.3.0</version>
         </dependency>
+        
+        <!--Neo4J is a graph database - hopefully will make it all nice for handling these complex relationships-->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>1.9.3</version>
+        </dependency>
+
         <!--liquibase is used for database schema/data deployment this is particularly useful for offline testing using in-memory HSQLDB -->
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -186,7 +194,7 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>3.0.3</version>
                 <configuration>
-                    <propertyFile>src/test/resources/liquibase/liquibase.properties</propertyFile>
+                    <propertyFile>src/test/resources/jdbc.properties</propertyFile>
                     <changeLogFile>src/main/resources/liquibase/master.xml</changeLogFile>
                 </configuration>
             </plugin>
