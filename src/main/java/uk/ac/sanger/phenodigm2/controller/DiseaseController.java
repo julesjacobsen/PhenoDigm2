@@ -18,6 +18,7 @@ import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.MouseModel;
 
 /**
  *
@@ -48,18 +49,20 @@ public class DiseaseController {
         
         Disease disease = diseaseDao.getDiseaseByDiseaseId(diseaseId);
         model.addAttribute("disease", disease);
-        logger.info(String.format("Found disease: %s %s", disease.getOmimId(), disease.getTerm()));
+        logger.info(String.format("Found disease: %s %s", disease.getDiseaseId(), disease.getTerm()));
         
         disease.setPhenotypeTerms(diseaseDao.getDiseasePhenotypeTerms(diseaseId));
         
         //add existing curated disease associations
         Map<GeneIdentifier, Set<DiseaseAssociation>> orthologAssociations =  diseaseDao.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+        populateGenePhenotypeTerms(orthologAssociations);
         logInfo("orthologous", disease, orthologAssociations);
 
         model.addAttribute("orthologAssociations", orthologAssociations);
         
         //also want to display the genes associated by phenotype similarity
         Map<GeneIdentifier, Set<DiseaseAssociation>> predictedAssociations = diseaseDao.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
+        populateGenePhenotypeTerms(predictedAssociations);
         logInfo("predicted", disease, predictedAssociations);
 
         model.addAttribute("predictedAssociations", predictedAssociations);
@@ -67,10 +70,27 @@ public class DiseaseController {
         return "disease";
     }
 
+    /**
+     * Populates the PhenotypeTerms for all DiseaseAssociation in the given map  
+     * @param geneAssociationsMap 
+     */
+    private void populateGenePhenotypeTerms(Map<GeneIdentifier, Set<DiseaseAssociation>> geneAssociationsMap){
+        
+        for (GeneIdentifier geneId : geneAssociationsMap.keySet()) {           
+            Set<DiseaseAssociation> diseaseAssociations = geneAssociationsMap.get(geneId);
+            for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+                MouseModel mouseModel = diseaseAssociation.getMouseModel();
+                if (mouseModel.getPhenotypeTerms().isEmpty()) {
+                    mouseModel.setPhenotypeTerms(diseaseDao.getMouseModelPhenotypeTerms(mouseModel.getMgiModelId()));
+                }
+            }
+        }
+    }
+    
     private void logInfo(String associationsType, Disease disease, Map<GeneIdentifier, Set<DiseaseAssociation>> geneAssociations) {
         Set<GeneIdentifier> genesWithMultipleDiseaseModels = new TreeSet<GeneIdentifier>();
         
-        logger.info(String.format("%s has %d %s gene associations:", disease.getOmimId(), geneAssociations.keySet().size(), associationsType));
+        logger.info(String.format("%s has %d %s gene associations:", disease.getDiseaseId(), geneAssociations.keySet().size(), associationsType));
         int num = 1;
         for (GeneIdentifier geneId : geneAssociations.keySet()) {
             Set<DiseaseAssociation> diseaseAssociations = geneAssociations.get(geneId);
@@ -82,7 +102,7 @@ public class DiseaseController {
             }
         }
         if (!genesWithMultipleDiseaseModels.isEmpty()) {
-            logger.info(String.format("Note the following genes have more than one mouse model which matches the %s disease phenotype: %s", disease.getOmimId(), genesWithMultipleDiseaseModels));
+            logger.info(String.format("Note the following genes have more than one mouse model which matches the %s disease phenotype: %s", disease.getDiseaseId(), genesWithMultipleDiseaseModels));
         }
     }
 

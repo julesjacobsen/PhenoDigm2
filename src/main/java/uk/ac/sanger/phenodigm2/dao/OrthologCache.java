@@ -56,7 +56,7 @@ class OrthologCache {
     
     /**
      * Returns the Human ortholog of a Mouse gene as identified by is MGI identifier.
-     * e.g. "MGI:95522" will return FGFR2{OMIM:176943}
+     * e.g. "MGI:95522" will return FGFR1{HGNC:3688}
      * @param mgiGeneId
      * @return 
      */

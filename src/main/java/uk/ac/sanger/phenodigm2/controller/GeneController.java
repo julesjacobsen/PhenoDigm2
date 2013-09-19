@@ -62,28 +62,28 @@ public class GeneController {
         //known
         Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = phenoDigmDao.getKnownDiseaseAssociationsForMgiGeneId(mgiId);
         //INTERFACE TESTING ONLY!!! This should be an AJAX call.
-        populatePhenotypeTerms(knownDiseaseAssociations);
+        populateDiseasePhenotypeTerms(knownDiseaseAssociations);
 
         model.addAttribute("knownDiseaseAssociations", knownDiseaseAssociations);
         //predicted
         Map<Disease, Set<DiseaseAssociation>> predictedDiseaseAssociations = phenoDigmDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiId);
         //INTERFACE TESTING ONLY!!! This should be an AJAX call.
-        populatePhenotypeTerms(predictedDiseaseAssociations);
+        populateDiseasePhenotypeTerms(predictedDiseaseAssociations);
         
         model.addAttribute("predictedDiseaseAssociations", predictedDiseaseAssociations);
         
         return "geneTabulatedDiseaseView";
     }
-    
+     
     /**
-     * Populates the PhenotypeTerms for all  
+     * Populates the PhenotypeTerms for all DiseaseAssociation in the given map  
      * @param diseaseAssociationsMap 
      */
-    private void populatePhenotypeTerms(Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap){
+    private void populateDiseasePhenotypeTerms(Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap){
         
         for (Disease disease : diseaseAssociationsMap.keySet()) {
             if (disease.getPhenotypeTerms() == null) {
-                disease.setPhenotypeTerms(phenoDigmDao.getDiseasePhenotypeTerms(disease.getOmimId()));                
+                disease.setPhenotypeTerms(phenoDigmDao.getDiseasePhenotypeTerms(disease.getDiseaseId()));                
             }
             Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationsMap.get(disease);
             for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
@@ -94,5 +94,5 @@ public class GeneController {
             }
         }
     }
-    
+
 }

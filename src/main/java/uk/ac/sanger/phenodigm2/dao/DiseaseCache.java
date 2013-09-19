@@ -14,8 +14,8 @@ import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 
 /**
- * An in-memory cache for storing Disease entities, indexed by OMIM disease id 
- * and OMIM gene id.
+ * An in-memory cache for storing Disease entities, indexed by disease id 
+ * and HGNC gene id.
  * 
  * There are a fixed number of about 7000 of these and they are referred to for 
  * every DiseaseAssociation request, hence the cache is used to store these in 
@@ -28,67 +28,67 @@ class DiseaseCache {
     private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
         
-    private Map<String, Disease> omimDiseaseIdToDiseaseMap;    
-    private Map<String, Set<Disease>> omimGeneIdToDiseasesMap;
+    private final Map<String, Disease> diseaseIdToDiseaseMap;    
+    private Map<String, Set<Disease>> hgncGeneIdToDiseasesMap;
 
-    protected DiseaseCache(Map<String, Disease> omimDiseaseIdToDiseaseMap) {
-        this.omimDiseaseIdToDiseaseMap = omimDiseaseIdToDiseaseMap;
+    protected DiseaseCache(Map<String, Disease> diseaseIdToDiseaseMap) {
+        this.diseaseIdToDiseaseMap = diseaseIdToDiseaseMap;
         init();
     }
     
     /**
-     * Sets up the cache using the omimDiseaseIdToDiseaseMap from the constructor.
+     * Sets up the cache using the diseaseIdToDiseaseMap from the constructor.
      */
     private void init(){
-        omimGeneIdToDiseasesMap = new HashMap<String, Set<Disease>>();
-        for (Disease disease : omimDiseaseIdToDiseaseMap.values()) {
-            mapDiseaseToOmimGeneId(disease);
+        hgncGeneIdToDiseasesMap = new HashMap<String, Set<Disease>>();
+        for (Disease disease : diseaseIdToDiseaseMap.values()) {
+            mapDiseaseToHgncGeneId(disease);
         }
-        System.out.println(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", omimDiseaseIdToDiseaseMap.size(), omimGeneIdToDiseasesMap.keySet().size()));
+        System.out.println(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", diseaseIdToDiseaseMap.size(), hgncGeneIdToDiseasesMap.keySet().size()));
     }
     
     /**
-     * Maps a disease to an OMIM gene identifier. Actually this is populating the 
-     * map of OMIM genes to the diseases which they are associated with. 
+     * Maps a disease to an HGNC gene identifier. Actually this is populating the 
+     * map of HGNC genes to the diseases which they are associated with. 
      * @param disease 
      */
-    private void mapDiseaseToOmimGeneId(Disease disease) {
+    private void mapDiseaseToHgncGeneId(Disease disease) {
         
         for (GeneIdentifier humanGeneIdentifier : disease.getAssociatedHumanGenes()) {
         
-            String omimGeneId = humanGeneIdentifier.getCompoundIdentifier();
-            if (!omimGeneIdToDiseasesMap.containsKey(omimGeneId)) {
+            String hgncGeneId = humanGeneIdentifier.getCompoundIdentifier();
+            if (!hgncGeneIdToDiseasesMap.containsKey(hgncGeneId)) {
                 Set<Disease> diseases = new TreeSet<Disease>();
                 diseases.add(disease);
-                omimGeneIdToDiseasesMap.put(omimGeneId, diseases);
+                hgncGeneIdToDiseasesMap.put(hgncGeneId, diseases);
             }
             else {
-                omimGeneIdToDiseasesMap.get(omimGeneId).add(disease);
+                hgncGeneIdToDiseasesMap.get(hgncGeneId).add(disease);
             }    
         }
     }
     
     /**
-     * Returns the Disease for a given OMIM disease id.
+     * Returns the Disease for a given disease id.
      * 
-     * @param omimDiseaseId
-     * @return the Disease associated with the supplied OMIM disease id
+     * @param diseaseId
+     * @return the Disease associated with the supplied disease id
      */
-    protected Disease getDiseaseForOmimDiseaseId(String omimDiseaseId) {
-        return omimDiseaseIdToDiseaseMap.get(omimDiseaseId);
+    protected Disease getDiseaseForDiseaseId(String diseaseId) {
+        return diseaseIdToDiseaseMap.get(diseaseId);
     }
 
     /**
-     * Returns a Set of Diseases associated with the supplied OMIM gene id. Will
-     * return an empty Set in cases where the cache doesn't contain the omimGeneId.
+     * Returns a Set of Diseases associated with the supplied HGNC gene id. Will
+     * return an empty Set in cases where the cache doesn't contain the hgncGeneId.
      * 
-     * @param omimGeneId
-     * @return Set of Diseases associated with the supplied OMIM gene id
+     * @param hgncGeneId
+     * @return Set of Diseases associated with the supplied HGNC gene id
      */
-    protected Set<Disease> getDiseasesByOmimGeneId(String omimGeneId) {
-        Set<Disease> diseases = omimGeneIdToDiseasesMap.get(omimGeneId);
+    protected Set<Disease> getDiseasesByHgncGeneId(String hgncGeneId) {
+        Set<Disease> diseases = hgncGeneIdToDiseasesMap.get(hgncGeneId);
         if (diseases == null){ 
-            logger.info(omimGeneId + " not mapped to any diseases" );
+            logger.info(hgncGeneId + " not mapped to any diseases" );
             return new TreeSet<Disease>();
         }
         return diseases;
@@ -99,8 +99,8 @@ class DiseaseCache {
      * @return Set of all diseases in PhenoDigm.
      */
     protected Set<Disease> getAllDiseses() {
-        Set<Disease> allDiseases = new TreeSet();
-        allDiseases.addAll(omimDiseaseIdToDiseaseMap.values());
+        Set<Disease> allDiseases = new TreeSet<Disease>();
+        allDiseases.addAll(diseaseIdToDiseaseMap.values());
         return allDiseases;
     }
 }

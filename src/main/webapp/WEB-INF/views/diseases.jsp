@@ -10,13 +10,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Disease</title>
+        <title>Diseases</title>
         <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/bootstrap.css"/>
         <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/custom.css"/>
         <link rel="stylesheet" href="/resources/demos/style.css" />
 
     </head>
     <body>
+        <p class="ikmcbreadcrumb">
+            <a href="../">Home</a>&nbsp;&raquo; Diseases
+        </p>
+        
         <div class='topic'>Ohh nasty diseases...</div>
         <div class="row-fluid dataset">
             <div class="container span12">
@@ -35,8 +39,8 @@
                         <tbody>
                             <c:forEach var="disease" items="${allDiseases}">
                                 <tr>
-                                <td><a href="disease/${disease.omimId}">${disease.term}</a></td>
-                                <td>${disease.omimId}</td>
+                                <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
+                                <td>${disease.diseaseId}</td>
                                 <td>
                                     <c:forEach var="geneIdentifier" items="${disease.associatedHumanGenes}">
                                         ${geneIdentifier.geneSymbol}</br>

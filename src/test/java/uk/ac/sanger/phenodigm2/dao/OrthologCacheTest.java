@@ -39,8 +39,8 @@ public class OrthologCacheTest {
         orthologMap = new HashMap<GeneIdentifier, GeneIdentifier>();
 
         //Human gene identifiers
-        FGFR1 = new GeneIdentifier("FGFR1", "OMIM:136350");
-        FGFR2 = new GeneIdentifier("FGFR2", "OMIM:176943");
+        FGFR1 = new GeneIdentifier("FGFR1", "HGNC:3688");
+        FGFR2 = new GeneIdentifier("FGFR2", "HGNC:3689");
         PHOSPHO1 = new GeneIdentifier("PHOSPHO1", "");
         SCHIP1 = new GeneIdentifier("SCHIP1", "");
         

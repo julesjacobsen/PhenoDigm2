@@ -27,6 +27,14 @@ public class DiseaseAssociationTest {
     }
     
     @Test
+    public void testGetSetDiseaseIdentifier() {
+        DiseaseIdentifier expected = new DiseaseIdentifier("OMIM:1234");
+        DiseaseAssociation diseaseAssociation = new DiseaseAssociation();
+        diseaseAssociation.setDiseaseIdentifier(expected);
+        assertEquals(expected, diseaseAssociation.getDiseaseIdentifier());
+    }
+    
+    @Test
     public void testCompareToDifferentValues() {
         DiseaseAssociation first = new DiseaseAssociation();
         first.setDiseaseToModelScore(90.12);
@@ -47,15 +55,15 @@ public class DiseaseAssociationTest {
     @Test
     public void testCompareToSameDiseaseToModelScores() {
         DiseaseAssociation first = new DiseaseAssociation();
-        first.setDiseaseToModelScore(90.12);
-        first.setOmimDiseaseId("OMIM:1234");
+        first.setDiseaseToModelScore(90.12);       
+        first.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:1234"));
         MouseModel firstMouseModel = new MouseModel();
         firstMouseModel.setMgiModelId("MGI:1234");
         first.setMouseModel(firstMouseModel);
         
         DiseaseAssociation second = new DiseaseAssociation();
         second.setDiseaseToModelScore(90.12);
-        second.setOmimDiseaseId("OMIM:1234");
+        second.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:1234"));
         MouseModel secondMouseModel = new MouseModel();
         secondMouseModel.setMgiModelId("MGI:1235");
         second.setMouseModel(secondMouseModel);
@@ -71,20 +79,19 @@ public class DiseaseAssociationTest {
         
         
     }
-    
-    
+        
     @Test
     public void testCompareToSameModelToDiseaseScores() {
         DiseaseAssociation first = new DiseaseAssociation();
         first.setModelToDiseaseScore(90.12);
-        first.setOmimDiseaseId("OMIM:1234");
+        first.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:1234"));
         MouseModel firstMouseModel = new MouseModel();
         firstMouseModel.setMgiModelId("MGI:1234");
         first.setMouseModel(firstMouseModel);
         
         DiseaseAssociation second = new DiseaseAssociation();
         second.setModelToDiseaseScore(90.12);
-        second.setOmimDiseaseId("OMIM:1234");
+        second.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:1234"));
         MouseModel secondMouseModel = new MouseModel();
         secondMouseModel.setMgiModelId("MGI:1235");
         second.setMouseModel(secondMouseModel);

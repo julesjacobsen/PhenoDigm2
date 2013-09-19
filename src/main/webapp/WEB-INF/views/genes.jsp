@@ -13,12 +13,16 @@
         <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/bootstrap.css"/>
         <link rel="stylesheet" type="text/css" href="https://www.mousephenotype.org/data/css/custom.css"/>
 
-        <title>Browse Genes</title>
+        <title>Genes</title>
     </head>
     <body>
+        <p class="ikmcbreadcrumb">
+            <a href=".">Home</a>&nbsp;&raquo; Genes
+        </p>
+        <div class='topic'>Genes</div>
+        
         <div class="row-fluid dataset">
-            <div class="container span12">
-                <div class='topic'>Genes</div>
+            <div class="container span12">          
                 <p>
                     This is a list of all genes with links to the geneView page from each gene.
                 </p>

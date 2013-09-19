@@ -84,7 +84,7 @@ public class PhenoDigmDaoJdbcImplTest {
     @Test
     public void getHumanOrthologIdentifierForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
-        GeneIdentifier expResult = new GeneIdentifier("FGFR2", "OMIM:176943");
+        GeneIdentifier expResult = new GeneIdentifier("FGFR2", "HGNC:3689");
         GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
@@ -100,7 +100,7 @@ public class PhenoDigmDaoJdbcImplTest {
     @Test
     public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInOMIM() {
         String mgiGeneId = "MGI:2447348";
-        GeneIdentifier expResult = new GeneIdentifier("PHOSPHO1", "OMIM", "");
+        GeneIdentifier expResult = new GeneIdentifier("PHOSPHO1", "HGNC", "");
         GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
@@ -119,19 +119,19 @@ public class PhenoDigmDaoJdbcImplTest {
     }
 
     /**
-     * Test of getDiseasesByOmimGeneId method, of class JdbcDiseaseDAOImpl.
+     * Test of getDiseasesByHgncGeneId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
-    public void testGetDiseasesByOmimGeneId() {
-        System.out.println("getDiseasesByOmimGeneId");
-        String omimGeneId = "OMIM:176943";
+    public void testGetDiseasesByHgncGeneId() {
+        System.out.println("getDiseasesByHgncGeneId");
+        String hgncGeneId = "HGNC:3689";
 
-        Set<Disease> result = instance.getDiseasesByOmimGeneId(omimGeneId);
-        System.out.println("Human diseases for gene " + omimGeneId);
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
+        System.out.println("Human diseases for gene " + hgncGeneId);
         for (Disease disease : result) {
-            System.out.println(disease.getOmimId() + " - " + disease.getTerm());
+            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
         }
-        assertEquals(11, result.size());
+        assertTrue(result.size() >= 14);
     }
 
     /**
@@ -145,9 +145,9 @@ public class PhenoDigmDaoJdbcImplTest {
         Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);
         System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
         for (Disease disease : result) {
-            System.out.println(disease.getOmimId() + " - " + disease.getTerm());
+            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
         }
-        assertEquals(11, result.size());
+        assertTrue(result.size() >= 14);
 
     }
 
@@ -165,7 +165,7 @@ public class PhenoDigmDaoJdbcImplTest {
         for (Disease disease : result.keySet()) {
             System.out.println(disease);
             Set<DiseaseAssociation> diseaseAssociations = result.get(disease);
-            if (disease.getOmimId().equals("OMIM:101200")) {
+            if (disease.getDiseaseId().equals("OMIM:101200")) {
                 assertEquals(2, diseaseAssociations.size());
             }
             for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
@@ -276,6 +276,7 @@ public class PhenoDigmDaoJdbcImplTest {
         PhenotypeMatch expectedMatch = new PhenotypeMatch();
         expectedMatch.setSimJ(0.853968);
         expectedMatch.setIc(8.901661);
+        expectedMatch.setLcs("HP_0009702 Carpal synostosis ^ MP_0008915 fused carpal bones");
         
         PhenotypeTerm humanTerm = new PhenotypeTerm();
         humanTerm.setTermId("HP:0005048");
@@ -287,7 +288,16 @@ public class PhenoDigmDaoJdbcImplTest {
         mouseTerm.setName("fused carpal bones");
         expectedMatch.setMousePhenotype(mouseTerm);
         
-        assertTrue(result.contains(expectedMatch));
+        PhenotypeMatch matchResult = null;
+        for (PhenotypeMatch phenotypeMatch : result) {
+            if (phenotypeMatch.equals(expectedMatch)) {
+                matchResult = phenotypeMatch;
+            }
+        }
+        assertNotNull(matchResult);
+        assertEquals(expectedMatch.getLcs(), matchResult.getLcs());
+        //make sure there are other matches in there too!
+        assertTrue(result.size() > 1);
     }
     
     @Test
@@ -329,7 +339,7 @@ public class PhenoDigmDaoJdbcImplTest {
         for (int i = 0; i < 10; i++) {
             if (predictedDiseaseIterator.hasNext()) {
                 Disease disease = predictedDiseaseIterator.next();
-                System.out.println(String.format("  %s %s", disease.getTerm(), disease.getOmimId()));
+                System.out.println(String.format("  %s %s", disease.getTerm(), disease.getDiseaseId()));
                 System.out.print(formatDiseaseAssociations(predictedDiseases.get(disease)));    
             }    
         }

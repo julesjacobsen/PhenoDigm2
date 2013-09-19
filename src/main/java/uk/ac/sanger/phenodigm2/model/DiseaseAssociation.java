@@ -13,7 +13,8 @@ import java.util.List;
  */
 public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     
-    private String omimDiseaseId;
+    private DiseaseIdentifier diseaseIdentifier;
+    //need to add gene identifier here? 
     private MouseModel mouseModel;
     private double modelToDiseaseScore;
     private double diseaseToModelScore;
@@ -23,12 +24,12 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     public DiseaseAssociation() {
     }
 
-    public String getOmimDiseaseId() {
-        return omimDiseaseId;
+    public DiseaseIdentifier getDiseaseIdentifier() {
+        return diseaseIdentifier;
     }
 
-    public void setOmimDiseaseId(String omimDiseaseId) {
-        this.omimDiseaseId = omimDiseaseId;
+    public void setDiseaseIdentifier(DiseaseIdentifier diseaseIdentifier) {
+        this.diseaseIdentifier = diseaseIdentifier;
     }
 
     public MouseModel getMouseModel() {
@@ -74,7 +75,7 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.omimDiseaseId != null ? this.omimDiseaseId.hashCode() : 0);
+        hash = 97 * hash + (this.diseaseIdentifier != null ? this.diseaseIdentifier.hashCode() : 0);
         hash = 97 * hash + (this.mouseModel != null ? this.mouseModel.hashCode() : 0);
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.modelToDiseaseScore) ^ (Double.doubleToLongBits(this.modelToDiseaseScore) >>> 32));
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.diseaseToModelScore) ^ (Double.doubleToLongBits(this.diseaseToModelScore) >>> 32));
@@ -91,7 +92,7 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
             return false;
         }
         final DiseaseAssociation other = (DiseaseAssociation) obj;
-        if ((this.omimDiseaseId == null) ? (other.omimDiseaseId != null) : !this.omimDiseaseId.equals(other.omimDiseaseId)) {
+        if ((this.diseaseIdentifier == null) ? (other.diseaseIdentifier != null) : !this.diseaseIdentifier.equals(other.diseaseIdentifier)) {
             return false;
         }
         if (this.mouseModel != other.mouseModel && (this.mouseModel == null || !this.mouseModel.equals(other.mouseModel))) {
@@ -111,7 +112,7 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     
     @Override
     public String toString() {
-        return "DiseaseAssociation{" + omimDiseaseId + " " + mouseModel.getMgiGeneId() + "_" + mouseModel.getMgiModelId() + " PubMed: " + pubMedId + " Scores: [m2d=" + modelToDiseaseScore + ", d2M=" + diseaseToModelScore + "] " + phenotypeMatches + '}';
+        return "DiseaseAssociation{" + diseaseIdentifier + " " + mouseModel.getMgiGeneId() + "_" + mouseModel.getMgiModelId() + " PubMed: " + pubMedId + " Scores: [m2d=" + modelToDiseaseScore + ", d2M=" + diseaseToModelScore + "] " + phenotypeMatches + '}';
     }
 
     
@@ -126,8 +127,8 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
             return EQUAL;
         }
         if (this.diseaseToModelScore == that.diseaseToModelScore) {
-            if (! this.omimDiseaseId.equals(that.omimDiseaseId)) {
-                return this.omimDiseaseId.compareTo(that.omimDiseaseId);                
+            if (! this.diseaseIdentifier.equals(that.diseaseIdentifier)) {
+                return this.diseaseIdentifier.compareTo(that.diseaseIdentifier);                
             } else {
                 return this.mouseModel.getMgiModelId().compareTo(that.mouseModel.getMgiModelId());
             }

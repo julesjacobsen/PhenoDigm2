@@ -25,7 +25,7 @@ public interface PhenoDigmDao {
     
     public Disease getDiseaseByDiseaseId(String diseaseId);
     
-    public Set<Disease> getDiseasesByOmimGeneId(String omimGeneId);
+    public Set<Disease> getDiseasesByHgncGeneId(String hgncGeneId);
     
     public Set<Disease> getDiseasesByMgiGeneId(String mgiGeneId);
     
@@ -44,6 +44,8 @@ public interface PhenoDigmDao {
     public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc);
     
     public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId);
+    
+    public Set<MouseModel> getAllMouseModels();
     
     public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId);
     

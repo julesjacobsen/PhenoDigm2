@@ -4,8 +4,6 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
-import java.util.Objects;
-
 /**
  * Contains information about how well a pair of <code>PhenotypeTerm</code> 
  * match each other.
@@ -17,6 +15,9 @@ public class PhenotypeMatch {
     private double ic;
     //Jaccard similarity score
     private double simJ;
+    //lowest common subsumer
+    private String lcs;
+    
     private PhenotypeTerm mousePhenotype;
     private PhenotypeTerm humanPhenotype;
 
@@ -37,6 +38,14 @@ public class PhenotypeMatch {
 
     public void setSimJ(double simJ) {
         this.simJ = simJ;
+    }
+
+    public String getLcs() {
+        return lcs;
+    }
+
+    public void setLcs(String lcs) {
+        this.lcs = lcs;
     }
 
     public PhenotypeTerm getMousePhenotype() {
@@ -94,6 +103,4 @@ public class PhenotypeMatch {
         return "PhenotypeMatch{" + "ic=" + ic + ", simJ=" + simJ + ", mousePhenotype=" + mousePhenotype.getTermId() + ", humanPhenotype=" + humanPhenotype.getTermId() + '}';
     }
     
-    
-
 }

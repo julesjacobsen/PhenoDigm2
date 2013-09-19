@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
@@ -51,14 +52,14 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         return instance;
     }
     
-    private PhenoDigmDaoStubImpl() {   
+    public PhenoDigmDaoStubImpl() {   
         populateDiseases();
         populatePhenotypeMatches();
     }
     
     @Override
-    public Set<Disease> getDiseasesByOmimGeneId(String omimGeneId){
-        Set<Disease> diseases = diseaseCache.getDiseasesByOmimGeneId(omimGeneId);
+    public Set<Disease> getDiseasesByHgncGeneId(String omimGeneId){
+        Set<Disease> diseases = diseaseCache.getDiseasesByHgncGeneId(omimGeneId);
         if (diseases == null){ 
             logger.warning(omimGeneId + " not mapped to any diseases" );
             return new TreeSet<Disease>();
@@ -69,14 +70,14 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     @Override
     public Disease getDiseaseByDiseaseId(String omimDiseaseId) {
    
-        return diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
+        return diseaseCache.getDiseaseForDiseaseId(omimDiseaseId);
     }
 
     @Override
     public Set<Disease> getDiseasesByMgiGeneId(String geneSymbol) {
         GeneIdentifier humanOrtholog = orthologCache.getHumanOrthologOfMouseGene(geneSymbol);
         logger.info(String.format("%s maps to human ortholog %s", geneSymbol, humanOrtholog));
-        return diseaseCache.getDiseasesByOmimGeneId(humanOrtholog.getCompoundIdentifier());
+        return diseaseCache.getDiseasesByHgncGeneId(humanOrtholog.getCompoundIdentifier());
     }
 
     @Override
@@ -85,11 +86,11 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
                
         Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = new TreeMap<Disease, Set<DiseaseAssociation>>();
         for (Disease disease : getDiseasesByMgiGeneId(geneSymbol)){
-            Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationMap.get(disease.getOmimId());
+            Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationMap.get(disease.getDiseaseId());
             if (diseaseAssociations != null) {
                 knownDiseaseAssociations.put(disease, diseaseAssociations);                
             } else {
-                logger.warning(String.format("No known Disease Associations for disease %s - %s with gene %s", disease.getOmimId(), disease.getTerm(), geneSymbol));
+                logger.warning(String.format("No known Disease Associations for disease %s - %s with gene %s", disease.getDiseaseId(), disease.getTerm(), geneSymbol));
                 knownDiseaseAssociations.put(disease, new TreeSet<DiseaseAssociation>()); 
             }
         }
@@ -102,10 +103,9 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         
         //the disease data should come from a cache
         for (String omimDiseaseId : predictedDiseaseAssociationsMap.keySet()) {
-            Disease disease = diseaseCache.getDiseaseForOmimDiseaseId(omimDiseaseId);
+            Disease disease = diseaseCache.getDiseaseForDiseaseId(omimDiseaseId);
             if (disease == null) {
-                disease = new Disease();
-                disease.setOmimId(omimDiseaseId);
+                disease = new Disease(omimDiseaseId);
                 disease.setTerm("STUB PREDICTED DISEASE FOR " + mgiGeneId);
             }
             diseaseAssociations.put(disease, predictedDiseaseAssociationsMap.get(omimDiseaseId));
@@ -164,7 +164,7 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
                 altTerms = fields[9];
             } 
             disease = makeDisease(omimDiseaseId, type, fullOmimId, term, altTerms);
-            diseaseMap.put(disease.getOmimId(), disease);
+            diseaseMap.put(disease.getDiseaseId(), disease);
         }
         
         if (!fields[0].isEmpty()) {
@@ -178,11 +178,8 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     }
     
     private Disease makeDisease(String omimId, String type, String fullOmimId, String term, String altTerms){
-        Disease disease = new Disease();
         
-        disease.setOmimId(omimId);
-        disease.setType(type);
-        disease.setFullOmimId(fullOmimId);
+        Disease disease = new Disease(omimId);
         disease.setTerm(term);
         
         //add alternative disease terms - if there are any
@@ -229,9 +226,10 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         String[] fields = line.split("\\t");
         
         MouseModel mouseModel = makeMouseModel(fields[3], fields[4], fields[5], fields[6], fields[7], fields[8]);
+        DiseaseIdentifier diseaseIdentifier = new DiseaseIdentifier(fields[0]);
+
         diseaseAssociation.setMouseModel(mouseModel);
-        
-        diseaseAssociation.setOmimDiseaseId(fields[0]);
+        diseaseAssociation.setDiseaseIdentifier(diseaseIdentifier);
         diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(fields[1]));
         diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(fields[2]));
         diseaseAssociation.setPubMedId("TODO");
@@ -254,13 +252,13 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     }
 
     private void addDiseaseAssociationToMap(Map<String, Set<DiseaseAssociation>> diseaseAssociationsMap, DiseaseAssociation diseaseAssociation) {
-        String omimDiseaseId = diseaseAssociation.getOmimDiseaseId();
-        if (!diseaseAssociationsMap.containsKey(omimDiseaseId)) {
+        String diseaseId = diseaseAssociation.getDiseaseIdentifier().getCompoundIdentifier();
+        if (!diseaseAssociationsMap.containsKey(diseaseId)) {
             Set<DiseaseAssociation> diseaseAssociations = new TreeSet<DiseaseAssociation>();
             diseaseAssociations.add(diseaseAssociation);
-            diseaseAssociationsMap.put(omimDiseaseId, diseaseAssociations);
+            diseaseAssociationsMap.put(diseaseId, diseaseAssociations);
         } else {
-            diseaseAssociationsMap.get(omimDiseaseId).add(diseaseAssociation);
+            diseaseAssociationsMap.get(diseaseId).add(diseaseAssociation);
         }
     }
     
@@ -325,22 +323,29 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
 
     @Override
     public Set<Disease> getAllDiseses() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return diseaseCache.getAllDiseses();
     }
 
     @Override
     public Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return orthologCache.getAllMouseGenes();
     }
 
     @Override
     public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Map<GeneIdentifier, Set<DiseaseAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+//        results.put(diseaseId, diseaseAssociationMap.get(diseaseId));
+        return results;
     }
 
     @Override
     public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-      
+        Map<GeneIdentifier, Set<DiseaseAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+//        results.put(diseaseId, diseaseAssociationMap.get(diseaseId));
+        return results;    }
+
+    @Override
+    public Set<MouseModel> getAllMouseModels() {
+        return mouseModelCache.getAllMouseModels();
+    }    
 }

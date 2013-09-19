@@ -10,7 +10,7 @@ import java.util.List;
  * Defines a mouse model for a genetic disease.
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
-public class MouseModel {
+public class MouseModel implements Comparable<MouseModel> {
     
     private String mgiGeneId;
     
@@ -115,7 +115,10 @@ public class MouseModel {
         return true;
     }
 
-    
+    @Override
+    public int compareTo(MouseModel other) {
+        return this.mgiModelId.compareTo(other.mgiModelId);
+    }
     
     @Override
     public String toString() {

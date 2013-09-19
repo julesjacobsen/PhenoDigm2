@@ -34,10 +34,7 @@ public class DiseaseCacheTest {
     public void setUp() {
         diseaseMap = new HashMap<String, Disease>();
 
-        apertSyndrome = new Disease();
-        apertSyndrome.setOmimId("OMIM:101200");
-        apertSyndrome.setType("disease");
-        apertSyndrome.setFullOmimId("#101200");
+        apertSyndrome = new Disease("OMIM:101200");
         apertSyndrome.setTerm("APERT SYNDROME");
         List<String> apertAlternativeTerms = new ArrayList<String>();
         apertAlternativeTerms.add("ACROCEPHALOSYNDACTYLY, TYPE I; ACS");
@@ -63,10 +60,7 @@ public class DiseaseCacheTest {
         diseaseMap.put("OMIM:101200", apertSyndrome);
 
 
-        pfeifferSyndrome = new Disease();
-        pfeifferSyndrome.setOmimId("OMIM:101600");
-        pfeifferSyndrome.setType("disease");
-        pfeifferSyndrome.setFullOmimId("#101600");
+        pfeifferSyndrome = new Disease("OMIM:101600");
         pfeifferSyndrome.setTerm("PFEIFFER SYNDROME");
         List<String> pfeifferAlternativeTerms = new ArrayList<String>();
         pfeifferAlternativeTerms.add("ACROCEPHALOSYNDACTYLY, TYPE V; ACS");
@@ -93,15 +87,15 @@ public class DiseaseCacheTest {
     }
 
     /**
-     * Test of getDiseaseForOmimDiseaseId method, of class DiseaseCache.
+     * Test of getDiseaseForDiseaseId method, of class DiseaseCache.
      */
     @Test
     public void testGetDiseaseForOmimDiseaseId() {
         System.out.println("getDiseaseForOmimDiseaseId");
         String omimDiseaseId = "OMIM:101200";
         DiseaseCache instance = new DiseaseCache(diseaseMap);
-        Disease result = instance.getDiseaseForOmimDiseaseId(omimDiseaseId);
-        assertEquals("OMIM:101200", result.getOmimId());
+        Disease result = instance.getDiseaseForDiseaseId(omimDiseaseId);
+        assertEquals("OMIM:101200", result.getDiseaseId());
     }
 
     @Test
@@ -109,12 +103,12 @@ public class DiseaseCacheTest {
         System.out.println("testGetDiseaseForUnknownOmimDiseaseId");
         String omimDiseaseId = "OMIM:WIBBLE";
         DiseaseCache instance = new DiseaseCache(diseaseMap);
-        Disease result = instance.getDiseaseForOmimDiseaseId(omimDiseaseId);;
+        Disease result = instance.getDiseaseForDiseaseId(omimDiseaseId);;
         assertNull(result);
     }
         
     /**
-     * Test of getDiseasesByOmimGeneId method, of class DiseaseCache.
+     * Test of getDiseasesByHgncGeneId method, of class DiseaseCache.
      */
     @Test
     public void testGetDiseasesByOmimGeneId() {
@@ -123,12 +117,12 @@ public class DiseaseCacheTest {
         DiseaseCache instance = new DiseaseCache(diseaseMap);
         Set<Disease> expResult = new TreeSet<Disease>();
         expResult.add(pfeifferSyndrome);
-        Set<Disease> result = instance.getDiseasesByOmimGeneId(omimGeneId);
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(omimGeneId);
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of getDiseasesByOmimGeneId method, of class DiseaseCache.
+     * Test of getDiseasesByHgncGeneId method, of class DiseaseCache.
      */
     @Test
     public void testGetDiseasesByOmimGeneIdTwoDiseasesForGene() {
@@ -138,12 +132,12 @@ public class DiseaseCacheTest {
         Set<Disease> expResult = new TreeSet<Disease>();
         expResult.add(apertSyndrome);
         expResult.add(pfeifferSyndrome);
-        Set<Disease> result = instance.getDiseasesByOmimGeneId(omimGeneId);
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(omimGeneId);
         assertEquals(expResult, result);
     }
     
     /**
-     * Test of getDiseasesByOmimGeneId method, of class DiseaseCache.
+     * Test of getDiseasesByHgncGeneId method, of class DiseaseCache.
      */
     @Test
     public void testGetDiseasesByUnknownOmimGeneId() {
@@ -152,7 +146,7 @@ public class DiseaseCacheTest {
         DiseaseCache instance = new DiseaseCache(diseaseMap);
  
         Set<Disease> expResult = new TreeSet<Disease>();
-        Set<Disease> result = instance.getDiseasesByOmimGeneId(omimGeneId);
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(omimGeneId);
         assertEquals(expResult, result);
     }
     

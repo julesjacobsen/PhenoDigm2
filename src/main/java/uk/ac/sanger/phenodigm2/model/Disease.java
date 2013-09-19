@@ -8,47 +8,49 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Simple Disease bean representing an OMIM (http://omim.org) genetic disease.
+ * Disease bean representing a genetic disease.
  * 
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class Disease implements Comparable<Disease>{
     
-    private String omimId;
-    private String fullOmimId;
-    private String type;
+    private DiseaseIdentifier diseaseIdentifier;
     private String term;
     private List<String> alternativeTerms;
+    //Human GeneIdentifiers come from the HGNC
     private List<GeneIdentifier> associatedHumanGenes;
+    //Mouse GeneIdentifiers come from the MGI
     private List<GeneIdentifier> associatedMouseGenes;
     private List<String> locations;
     private List<PhenotypeTerm> phenotypeTerms;
-    
+
     public Disease() {
     }
     
-    public String getOmimId() {
-        return omimId;
+    /**
+     * Convenience constructor - will create a new Disease with a new DiseaseIdentifier
+     * being made from the provided diseaseId.
+     * 
+     * @param diseaseId 
+     */
+    public Disease(String diseaseId) {
+        this.diseaseIdentifier = new DiseaseIdentifier(diseaseId);
+    }
+    
+    public Disease(DiseaseIdentifier diseaseIdentifier) {
+        this.diseaseIdentifier = diseaseIdentifier;
+    }
+    
+    public String getDiseaseId() {
+        return diseaseIdentifier.getCompoundIdentifier();
     }
 
-    public void setOmimId(String omimId) {
-        this.omimId = omimId;
+    public DiseaseIdentifier getDiseaseIdentifier() {
+        return diseaseIdentifier;
     }
-
-    public String getFullOmimId() {
-        return fullOmimId;
-    }
-
-    public void setFullOmimId(String fullOmimId) {
-        this.fullOmimId = fullOmimId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    
+    public void setDiseaseIdentifier(DiseaseIdentifier diseaseIdentifier) {
+        this.diseaseIdentifier = diseaseIdentifier;
     }
 
     public String getTerm() {
@@ -102,9 +104,7 @@ public class Disease implements Comparable<Disease>{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 17 * hash + Objects.hashCode(this.omimId);
-        hash = 17 * hash + Objects.hashCode(this.fullOmimId);
-        hash = 17 * hash + Objects.hashCode(this.type);
+        hash = 17 * hash + Objects.hashCode(this.diseaseIdentifier);
         hash = 17 * hash + Objects.hashCode(this.term);
         return hash;
     }
@@ -118,13 +118,7 @@ public class Disease implements Comparable<Disease>{
             return false;
         }
         final Disease other = (Disease) obj;
-        if (!Objects.equals(this.omimId, other.omimId)) {
-            return false;
-        }
-        if (!Objects.equals(this.fullOmimId, other.fullOmimId)) {
-            return false;
-        }
-        if (!Objects.equals(this.type, other.type)) {
+        if (!Objects.equals(this.diseaseIdentifier, other.diseaseIdentifier)) {
             return false;
         }
         if (!Objects.equals(this.term, other.term)) {
@@ -135,12 +129,12 @@ public class Disease implements Comparable<Disease>{
     
     @Override
     public int compareTo(Disease t) {
-        return this.omimId.compareTo(t.omimId);
+        return this.diseaseIdentifier.compareTo(t.diseaseIdentifier);
     }
     
     @Override
     public String toString() {
-        return "Disease{" + omimId + " - " + term + ", fullOmimId=" + fullOmimId + ", type=" + type + ", alternativeTerms=" + alternativeTerms + ", associatedHumanGenes=" + associatedHumanGenes + ", associatedMouseGenes=" + associatedMouseGenes + ", locations=" + locations + '}';
+        return "Disease{" + diseaseIdentifier + " - " + term + ", alternativeTerms=" + alternativeTerms + ", associatedHumanGenes=" + associatedHumanGenes + ", associatedMouseGenes=" + associatedMouseGenes + ", locations=" + locations + '}';
     }    
    
 }

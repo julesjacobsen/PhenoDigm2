@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.validation.constraints.Size;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -76,10 +75,10 @@ public class PhenoDigmDaoStubImplTest {
         String omimGeneId = "OMIM:176943";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
 
-        Set<Disease> result = instance.getDiseasesByOmimGeneId(omimGeneId);
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(omimGeneId);
         System.out.println("Human diseases for gene " + omimGeneId);
         for (Disease disease : result) {
-            System.out.println(disease.getOmimId() + " - " + disease.getTerm());
+            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
         }
         assertEquals(11, result.size());
 
@@ -97,7 +96,7 @@ public class PhenoDigmDaoStubImplTest {
         Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);
         System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
         for (Disease disease : result) {
-            System.out.println(disease.getOmimId() + " - " + disease.getTerm());
+            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
         }
         assertEquals(11, result.size());
 
@@ -192,7 +191,7 @@ public class PhenoDigmDaoStubImplTest {
         System.out.println("Predicted Disease Associations:");
         
         for (Disease disease : predictedDiseases.keySet()) {
-            System.out.println(String.format("  %s %s", disease.getTerm(), disease.getOmimId()));
+            System.out.println(String.format("  %s %s", disease.getTerm(), disease.getDiseaseId()));
             System.out.print(formatDiseaseAssociations(predictedDiseases.get(disease)));
         }   
         

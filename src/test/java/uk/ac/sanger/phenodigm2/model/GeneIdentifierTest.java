@@ -23,18 +23,6 @@ public class GeneIdentifierTest {
      * Test of constructor for class GeneIdentifier.
      */
     @Test
-    public void testGeneIdentifierEmptyConstructor() {
-        System.out.println("testGeneIdentifierEmptyConstructor");
-        GeneIdentifier instance = new GeneIdentifier();
-        String expResult = null;
-        String result = instance.getGeneSymbol();
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of constructor for class GeneIdentifier.
-     */
-    @Test
     public void testGeneIdentifierAllFieldsOverloadedConstructor() {
         System.out.println("testGeneIdentifierAllFieldsOverloadedConstructor");
         String geneSymbol = "Fgfr2";
@@ -63,8 +51,8 @@ public class GeneIdentifierTest {
     @Test
     public void testCompareTo(){
 
-        GeneIdentifier gene1 = new GeneIdentifier("Fgfr1", "MGI:95523");
-        GeneIdentifier gene2 = new GeneIdentifier("Fgfr2", "MGI:95524");
+        GeneIdentifier gene1 = new GeneIdentifier("Fgfr1", "MGI:95524");
+        GeneIdentifier gene2 = new GeneIdentifier("Fgfr2", "MGI:95523");
         
         List<GeneIdentifier> genesList = new ArrayList<GeneIdentifier>();
         

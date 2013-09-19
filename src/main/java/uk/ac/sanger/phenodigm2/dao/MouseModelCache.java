@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 
@@ -57,6 +58,12 @@ class MouseModelCache {
         return mouseModelMap.get(mouseModelId);
     }
     
+    protected Set<MouseModel> getAllMouseModels() {
+        Set<MouseModel> allMouseModels = new TreeSet<MouseModel>();
+        allMouseModels.addAll(mouseModelMap.values());
+        return allMouseModels;
+    }
+    
     /**
      * Returns a Set of MouseModel for a given MGI gene id. If the gene id is 
      * not in the cache an empty Set will be returned. 
@@ -71,5 +78,5 @@ class MouseModelCache {
             results = new HashSet<MouseModel>();
         }
         return results;
-    } 
+    }
 }
