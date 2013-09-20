@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.sanger.phenodigm2.db.TestDatabase;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -34,8 +33,6 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/jdbc-test-services.xml"})
 public class PhenoDigmDaoJdbcImplTest {
-
-    private static TestDatabase database;
     
     @Autowired
     PhenoDigmDao instance;
