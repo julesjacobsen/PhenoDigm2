@@ -10,6 +10,8 @@
     <name>PhenoDigm2</name>
 
     <properties>
+        <!--ooh yeah keep it cutting-edge! -->
+        <java.version>1.6</java.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.5.10</slf4j.version>

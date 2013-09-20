@@ -5,7 +5,6 @@
 package uk.ac.sanger.phenodigm2.model;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Disease bean representing a genetic disease.
@@ -103,9 +102,9 @@ public class Disease implements Comparable<Disease>{
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 17 * hash + Objects.hashCode(this.diseaseIdentifier);
-        hash = 17 * hash + Objects.hashCode(this.term);
+        int hash = 7;
+        hash = 53 * hash + (this.diseaseIdentifier != null ? this.diseaseIdentifier.hashCode() : 0);
+        hash = 53 * hash + (this.term != null ? this.term.hashCode() : 0);
         return hash;
     }
 
@@ -118,14 +117,15 @@ public class Disease implements Comparable<Disease>{
             return false;
         }
         final Disease other = (Disease) obj;
-        if (!Objects.equals(this.diseaseIdentifier, other.diseaseIdentifier)) {
+        if (this.diseaseIdentifier != other.diseaseIdentifier && (this.diseaseIdentifier == null || !this.diseaseIdentifier.equals(other.diseaseIdentifier))) {
             return false;
         }
-        if (!Objects.equals(this.term, other.term)) {
+        if ((this.term == null) ? (other.term != null) : !this.term.equals(other.term)) {
             return false;
         }
         return true;
     }
+
     
     @Override
     public int compareTo(Disease t) {

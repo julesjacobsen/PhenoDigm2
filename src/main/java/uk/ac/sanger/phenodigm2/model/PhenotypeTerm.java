@@ -4,8 +4,6 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
-import java.util.Objects;
-
 /**
  * Represents a phenotype term from a phenotype ontology - either the HPO or the MPO 
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
@@ -54,12 +52,12 @@ public class PhenotypeTerm {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.termId);
-        hash = 73 * hash + Objects.hashCode(this.name);
+        hash = 37 * hash + (this.termId != null ? this.termId.hashCode() : 0);
+        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
 
@@ -72,14 +70,15 @@ public class PhenotypeTerm {
             return false;
         }
         final PhenotypeTerm other = (PhenotypeTerm) obj;
-        if (!Objects.equals(this.termId, other.termId)) {
+        if ((this.termId == null) ? (other.termId != null) : !this.termId.equals(other.termId)) {
             return false;
         }
-        if (!Objects.equals(this.name, other.name)) {
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
             return false;
         }
         return true;
     }
+    
 
     @Override
     public String toString() {
