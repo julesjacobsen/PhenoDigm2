@@ -232,12 +232,15 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
         diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new GeneAssociationResultSetExtractor());
         
-//        Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
-//        logger.info("Looking for associated gene orthologs of " + disease);
-//        for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
-//            Set<DiseaseAssociation> diseaseAssociations = getKnownDiseaseAssociationsForMgiGeneId(geneIdentifier.getCompoundIdentifier()).get(disease);
-//            knownDiseaseGeneAssociations.put(geneIdentifier, diseaseAssociations);
-//        }
+        //leave this in  - not sure why I commented this out - it's needed for cases where the known associations for a disease are 
+        //by orthology only i.e. with NO MGI curated evidence e.g. OMIM:101400 should be associated with both Twist1 and Fgfr2
+        //without this next section only Twist1 will be included in the known associations section
+        Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
+        logger.info("Looking for associated gene orthologs of " + disease);
+        for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
+            Set<DiseaseAssociation> diseaseAssociations = getKnownDiseaseAssociationsForMgiGeneId(geneIdentifier.getCompoundIdentifier()).get(disease);
+            diseaseAssociationsMap.put(geneIdentifier, diseaseAssociations);
+        }
         
         return diseaseAssociationsMap;
         
