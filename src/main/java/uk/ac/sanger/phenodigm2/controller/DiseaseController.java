@@ -4,6 +4,8 @@
  */
 package uk.ac.sanger.phenodigm2.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -53,20 +55,39 @@ public class DiseaseController {
         
         disease.setPhenotypeTerms(diseaseDao.getDiseasePhenotypeTerms(diseaseId));
         
-        //add existing curated disease associations
-        Map<GeneIdentifier, Set<DiseaseAssociation>> orthologAssociations =  diseaseDao.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
-        populateGenePhenotypeTerms(orthologAssociations);
-        logInfo("orthologous", disease, orthologAssociations);
+        //add known curated disease associations - 
+        Map<GeneIdentifier, Set<DiseaseAssociation>> knownAssociations =  diseaseDao.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+        populateGenePhenotypeTerms(knownAssociations);
+        logInfo("orthologous", disease, knownAssociations);
 
-        model.addAttribute("orthologAssociations", orthologAssociations);
-        
+       
         //also want to display the genes associated by phenotype similarity
         Map<GeneIdentifier, Set<DiseaseAssociation>> predictedAssociations = diseaseDao.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
         populateGenePhenotypeTerms(predictedAssociations);
         logInfo("predicted", disease, predictedAssociations);
 
-        model.addAttribute("predictedAssociations", predictedAssociations);
-
+        List<GeneAssociationSummary> curatedAssociationSummaries = new ArrayList<GeneAssociationSummary>();
+        List<GeneAssociationSummary> phenotypeAssociationSummaries = new ArrayList<GeneAssociationSummary>();
+        //a 'known' disease association could be by orthology or by manual curation from MGI or both (this is the known bit).
+        //They could also have predicted phenotype associations too, hence the need to do this join here.  
+        for (GeneIdentifier geneIdentifier : knownAssociations.keySet()) {
+            Set<DiseaseAssociation> curatedAssociations = knownAssociations.get(geneIdentifier);
+            Set<DiseaseAssociation> phenotypeAssociations = predictedAssociations.get(geneIdentifier);
+            GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(diseaseDao.getHumanOrthologIdentifierForMgiGeneId(geneIdentifier.getCompoundIdentifier()), geneIdentifier, disease, curatedAssociations, phenotypeAssociations);            
+            curatedAssociationSummaries.add(geneAssociationSummary);
+        }
+        model.addAttribute("curatedAssociations", curatedAssociationSummaries);
+        
+        for (GeneIdentifier geneIdentifier : predictedAssociations.keySet()) {
+            Set<DiseaseAssociation> curatedAssociations = knownAssociations.get(geneIdentifier);
+            Set<DiseaseAssociation> phenotypeAssociations = predictedAssociations.get(geneIdentifier);
+            GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(diseaseDao.getHumanOrthologIdentifierForMgiGeneId(geneIdentifier.getCompoundIdentifier()), geneIdentifier, disease, curatedAssociations, phenotypeAssociations);            
+            phenotypeAssociationSummaries.add(geneAssociationSummary);
+        }
+        
+        model.addAttribute("phenotypeAssociations", phenotypeAssociationSummaries);
+        
+        
         return "disease";
     }
 

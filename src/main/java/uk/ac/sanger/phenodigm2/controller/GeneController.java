@@ -4,6 +4,8 @@
  */
 package uk.ac.sanger.phenodigm2.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -63,14 +65,31 @@ public class GeneController {
         Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = phenoDigmDao.getKnownDiseaseAssociationsForMgiGeneId(mgiId);
         //INTERFACE TESTING ONLY!!! This should be an AJAX call.
         populateDiseasePhenotypeTerms(knownDiseaseAssociations);
-
-        model.addAttribute("knownDiseaseAssociations", knownDiseaseAssociations);
+        
         //predicted
         Map<Disease, Set<DiseaseAssociation>> predictedDiseaseAssociations = phenoDigmDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiId);
         //INTERFACE TESTING ONLY!!! This should be an AJAX call.
         populateDiseasePhenotypeTerms(predictedDiseaseAssociations);
+                
+        List<DiseaseAssociationSummary> curatedDiseaseAssociationViews = new ArrayList<DiseaseAssociationSummary>();
+        List<DiseaseAssociationSummary> predictedDiseaseAssociationViews = new ArrayList<DiseaseAssociationSummary>();
+
+        for (Disease disease : knownDiseaseAssociations.keySet()) {
+            Set<DiseaseAssociation> curatedAssociations = knownDiseaseAssociations.get(disease);
+            Set<DiseaseAssociation> phenotypeAssociations = predictedDiseaseAssociations.get(disease);
+            DiseaseAssociationSummary assocView = new DiseaseAssociationSummary(geneIdentifier, disease, curatedAssociations, phenotypeAssociations);
+            curatedDiseaseAssociationViews.add(assocView);
+        }
+        model.addAttribute("curatedAssociations", curatedDiseaseAssociationViews);
         
-        model.addAttribute("predictedDiseaseAssociations", predictedDiseaseAssociations);
+        for (Disease disease : predictedDiseaseAssociations.keySet()) {
+            Set<DiseaseAssociation> curatedAssociations = knownDiseaseAssociations.get(disease);
+            Set<DiseaseAssociation> phenotypeAssociations = predictedDiseaseAssociations.get(disease);
+            DiseaseAssociationSummary assocView = new DiseaseAssociationSummary(geneIdentifier, disease, curatedAssociations, phenotypeAssociations);
+            predictedDiseaseAssociationViews.add(assocView);
+        }
+        model.addAttribute("phenotypeAssociations", predictedDiseaseAssociationViews);
+
         
         return "geneTabulatedDiseaseView";
     }
