@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <iframe width="600" height="300" src="http://console-test.neo4j.org/r/x8v9o3"/>
+    <iframe width="800" height="600" src="http://console-test.neo4j.org/r/x8v9o3"/>
     
     <canvas id="viewport" width="800" height="600"></canvas>
 
