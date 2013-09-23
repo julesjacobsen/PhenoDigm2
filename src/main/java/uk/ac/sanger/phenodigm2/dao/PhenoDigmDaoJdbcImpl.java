@@ -65,8 +65,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
         if (orthologCache == null) {
             System.out.println("Setting up ortholog cache...");
 
-//            String sql = "select mgi_gene_id, mgi_gene_symbol, human_gene_symbol, ifnull(omim_gene_id, \"\") as omim_gene_id from human2mouse_orthologs;";
-            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
+//            String sql = "select mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol, hgnc_id as hgnc_id from human2mouse_orthologs;";
+            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
 
             Map<GeneIdentifier, GeneIdentifier> orthologMap = this.jdbcTemplate.query(sql, new OrthologResultSetExtractor());
             orthologCache = new OrthologCache(orthologMap);
@@ -127,7 +127,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
     public Map<Disease, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
 
         Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap;
-        String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgm.mgi_gene_id, od.mouse_model_id from disease_2_mgi_mouse_models od join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id left join disease_mouse_genotype_associations dmga on dmga.disease_id = od.disease_id and dmga.mouse_model_id = od.mouse_model_id where mgm.mgi_gene_id = ? order by od.disease_id;";
+        String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgm.mgi_gene_id, od.mouse_model_id "
+                + "from disease_2_mgi_mouse_models od "
+                + "join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id "
+                + "left join disease_mouse_genotype_associations dmga on dmga.disease_id = od.disease_id and dmga.mouse_model_id = od.mouse_model_id "
+                + "where mgm.mgi_gene_id = ? order by od.disease_id;";
         
         PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mgiGeneId, sql);
 
@@ -135,7 +139,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
         
         System.out.println(String.format("%s has %d known disease associations", mgiGeneId, diseaseAssociationsMap.size()));
 
-        //also add in the diseases with no known disease associations.
+        //also add in the diseases with no known disease associations other than by gene orthology.
         for (Disease disease : getDiseasesByMgiGeneId(mgiGeneId)) {
             if (!diseaseAssociationsMap.keySet().contains(disease)) {
                 diseaseAssociationsMap.put(disease, new TreeSet<DiseaseAssociation>());
@@ -150,7 +154,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
         Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap;
         
-        String sql = "select disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi_gene_id, mouse_model_id from disease_mouse_genotype_associations d where mgi_gene_id = ?;";
+        String sql = "select disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi_gene_id, mouse_model_id "
+                + "from disease_mouse_genotype_associations d where mgi_gene_id = ?;";
         
         PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mgiGeneId, sql);
 
@@ -215,7 +220,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
     public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
         
         Map<GeneIdentifier, Set<DiseaseAssociation>> diseaseAssociationsMap = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
-        
+                    //disease_2_mgi_mouse_models has literature curated data
         String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, mgm.mgi_gene_id, od.mouse_model_id "
                 + "from disease_2_mgi_mouse_models od "
                 + "join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id "
@@ -241,7 +246,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
     @Override
     public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
         Map<GeneIdentifier, Set<DiseaseAssociation>> diseaseAssociationsMap;
-        
+                     //disease2mouse_gene_associations
         String sql = "select dmga2.disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, d.mgi_gene_id, d.mouse_model_id \n" +
                     "from disease_mouse_gene_associations dmga2 \n" +
                     "join mgi_genes mgi on mgi.mgi_gene_id = dmga2.mgi_gene_id " +
@@ -276,12 +281,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
                 GeneIdentifier humanGeneIdentifier;
                 //there might not be any disease orthologs mapped to a mouse gene in OMIM so we'll need to make up the Human ortholog gene
-                //luckily the mouse and human gene symbols are simply case variants of the same string (apart from when they aren't).
+                //luckily the mouse and human gene symbols are simply case variants of the same string (apart from when they aren't, which is quite often).
                 String humanGeneSymbol = rs.getString("human_gene_symbol");
                 String hgncGeneId = rs.getString("hgnc_id");
 //                System.out.println(String.format("Making new Human GeneIdentifier: %s %s", humanGeneSymbol, hgncGeneId));
                 if (humanGeneSymbol == null) {
-                    //TODO: Shouldn't OMIM really be HGNC? This might require a bit of database/phenodigm refactoring.
                     humanGeneIdentifier = new GeneIdentifier(mouseGeneIdentifier.getGeneSymbol().toUpperCase(), "HGNC", "");
                 }
                 else if (hgncGeneId == null) {
@@ -498,11 +502,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                     String geneSymbol = rs.getString("mgi_gene_symbol");
                     String mgiGeneId = mouseModel.getMgiGeneId();
 //                    logger.info(geneSymbol + " " + mgiGeneId);
-                    GeneIdentifier geneId = orthologCache.getMouseGeneIdentifier(mgiGeneId);
-//                    logger.info("Found GeneIdentifier in orthologCache: " + geneId);
-                    if (geneId == null) {
-                        geneId = new GeneIdentifier(geneSymbol, mgiGeneId);
-//                        logger.info(geneId + " not found in ortholog cache so made a new one.");
+                    GeneIdentifier mouseGeneId = orthologCache.getMouseGeneIdentifier(mgiGeneId);
+//                    logger.info("Found GeneIdentifier in orthologCache: " + mouseGeneId);
+                    if (mouseGeneId == null) {
+                        mouseGeneId = new GeneIdentifier(geneSymbol, mgiGeneId);
+                        logger.info(mouseGeneId + " not found in ortholog cache so made a new one: " + mouseGeneId);
                     }
                     diseaseAssociation.setMouseModel(mouseModel);
                     diseaseAssociation.setPubMedId("TODO");
@@ -510,12 +514,12 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                     diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(rs.getString("mouse2disease_score")));
                     diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());
 
-                    if (results.containsKey(geneId)) {
-                        results.get(geneId).add(diseaseAssociation);
+                    if (results.containsKey(mouseGeneId)) {
+                        results.get(mouseGeneId).add(diseaseAssociation);
                     } else {
                         Set<DiseaseAssociation> diseaseAssociations = new TreeSet<DiseaseAssociation>();
                         diseaseAssociations.add(diseaseAssociation);
-                        results.put(geneId, diseaseAssociations);
+                        results.put(mouseGeneId, diseaseAssociations);
                     }
                 }
             }

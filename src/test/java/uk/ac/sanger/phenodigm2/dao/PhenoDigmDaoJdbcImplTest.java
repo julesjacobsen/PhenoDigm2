@@ -39,8 +39,6 @@ public class PhenoDigmDaoJdbcImplTest {
 
     @BeforeClass
     public static void setUpClass() {
-//        database = new TestDatabase();
-//        database.setUp("test");
     }
 
     @AfterClass
@@ -87,17 +85,17 @@ public class PhenoDigmDaoJdbcImplTest {
     }
     
     @Test
-    public void getGeneIdentifierForMgiGeneIdUnmappedInOMIM() {
-        String mgiGeneId = "MGI:2447348";
-        GeneIdentifier expResult = new GeneIdentifier("Phospho1", "MGI:2447348");
+    public void getGeneIdentifierForMgiGeneIdUnmappedInHGNC() {
+        String mgiGeneId = "MGI:FOOP!";
+        GeneIdentifier expResult = null;
         GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
    
     @Test
-    public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInOMIM() {
-        String mgiGeneId = "MGI:2447348";
-        GeneIdentifier expResult = new GeneIdentifier("PHOSPHO1", "HGNC", "");
+    public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInHGNC() {
+        String mgiGeneId = "MGI:FOOP!";
+        GeneIdentifier expResult = null;
         GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
         assertEquals(expResult, result);
     }
@@ -166,7 +164,7 @@ public class PhenoDigmDaoJdbcImplTest {
                 assertEquals(2, diseaseAssociations.size());
             }
             for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
-                System.out.println(String.format("    %s", diseaseAssociation));                
+                System.out.println(String.format("    %s", diseaseAssociation));
             }
         }
 
