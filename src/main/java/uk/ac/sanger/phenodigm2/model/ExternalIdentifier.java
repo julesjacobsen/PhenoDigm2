@@ -5,6 +5,8 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
+import org.apache.log4j.Logger;
+
 /**
  * Class describing the attributes of an external reference. In PhenoDigm
  * this is anouther resource, e.g. MGI, HGNC, OMIM, ORPHANET, DECIPHER.
@@ -12,6 +14,8 @@ package uk.ac.sanger.phenodigm2.model;
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class ExternalIdentifier {
+    
+    private static final Logger logger = Logger.getLogger(ExternalIdentifier.class);
     
     private String databaseCode;
     private String databaseAcc;
@@ -25,9 +29,10 @@ public class ExternalIdentifier {
      * Examples: OMIM:101600, ORPHANET:1040, MGI:88452
      * @param compoundIdentifier 
      */
-    public ExternalIdentifier(String compoundIdentifier) {
+    protected ExternalIdentifier(String compoundIdentifier) {
         
-        if (compoundIdentifier.equals("")) { 
+        if (!compoundIdentifier.contains(":")) {
+            logger.warn(compoundIdentifier + " is not of the format GENE:ACCESSION - creating an empty external identifier");
             this.databaseAcc = "";
             this.databaseCode = "";
         } else {
@@ -46,7 +51,7 @@ public class ExternalIdentifier {
      * @param databaseCode
      * @param databaseAcc 
      */
-    public ExternalIdentifier(String databaseCode, String databaseAcc) {
+    protected ExternalIdentifier(String databaseCode, String databaseAcc) {
         this.databaseCode = databaseCode;
         this.databaseAcc = databaseAcc;
     }
