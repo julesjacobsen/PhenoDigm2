@@ -11,7 +11,7 @@
 
     <modules>
         <module>phenodigm2-core</module>
-        <!--<module>phenodigm2-web</module>-->
+        <module>phenodigm2-web</module>
         <module>phenodigm2-graph</module>
         <module>phenodigm2-solr</module>
     </modules>

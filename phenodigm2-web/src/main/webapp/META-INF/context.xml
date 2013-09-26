@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/PhenoDigm2">
+  <ResourceLink global="jdbc/phenodigmDataSource" name="jdbc/phenodigmDataSource" type="javax.sql.DataSource"/>
+</Context>
