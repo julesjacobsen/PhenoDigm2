@@ -3,12 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.sanger</groupId>
-    <artifactId>PhenoDigm2</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <artifactId>phenodigm2</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
 
     <name>PhenoDigm2</name>
 
+    <modules>
+        <module>phenodigm2-core</module>
+        <!--<module>phenodigm2-web</module>-->
+        <module>phenodigm2-graph</module>
+        <module>phenodigm2-solr</module>
+    </modules>
+    
     <properties>
         <!--ooh yeah keep it cutting-edge! -->
         <java.version>1.6</java.version>
@@ -45,18 +52,7 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>${spring.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
+        
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -71,6 +67,18 @@
         
         
         <!--databases-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
