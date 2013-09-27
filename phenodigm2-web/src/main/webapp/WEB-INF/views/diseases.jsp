@@ -29,31 +29,32 @@
                             <tr>
                                 <th>Disease Name</th>
                                 <th>Source</th>
-                                <th>Assoc. Human Genes</th>
-                                <th>Assoc. Mouse Orthologs</th>
+                                <th>Curated Gene Association in Human</th>
                                 <th>MGI Literature Evidence</th>
-                                <th>Mouse Phenotype Evidence</th>
-                                <th></th>
+                                <th>Mouse Phenotype Evidence (MGI)</th>
+                                <th>Mouse Phenotype Evidence (IMPC)</th>
                             </tr>
                         </thead>                        
                         <tbody>
                             <c:forEach var="disease" items="${allDiseases}">
+                                <c:set var="status" value="${disease.curationStatus}"></c:set>
                                 <tr>
-                                <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
-                                <td>${disease.diseaseId}</td>
-                                <td>
-                                    <c:forEach var="geneIdentifier" items="${disease.associatedHumanGenes}">
-                                        ${geneIdentifier.geneSymbol}</br>
-                                    </c:forEach>
-                                </td>
-                                <td>
-                                    <c:forEach var="geneIdentifier" items="${disease.associatedMouseGenes}">
-                                        <a href="gene/${geneIdentifier.databaseCode}:${geneIdentifier.databaseAcc}">${geneIdentifier.geneSymbol}</a></br>
-                                    </c:forEach>
-                                </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                    
+                                    <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
+                                    <td>${disease.diseaseId}</td>
+                                    <td colspan="4">
+                                        ${status}
+                                        <%--<c:if test="${status.isAssociatedInHuman}">Yes</c:if>--%>
+                                    </td>
+<!--                                    <td>
+                                        <%--<c:if test="${status.hasMgiLiteratureEvidence}">Yes</c:if>--%>
+                                    </td>
+                                    <td>
+                                        <%--<c:if test="${status.hasMgiPhenotypeEvidence}">Yes</c:if>--%>
+                                    </td>
+                                    <td>
+                                        <%--<c:if test="${status.hasImpcPhenotypeEvidence}">Yes</c:if>--%>
+                                    </td>-->
                                 </tr>
                             </c:forEach>
                         </tbody>    

@@ -22,6 +22,8 @@ public class Disease implements Comparable<Disease>{
     private List<GeneIdentifier> associatedMouseGenes;
     private List<String> locations;
     private List<PhenotypeTerm> phenotypeTerms;
+    
+    private CurationStatus curationStatus;
 
     public Disease() {
     }
@@ -100,6 +102,14 @@ public class Disease implements Comparable<Disease>{
         this.phenotypeTerms = phenotypeTerms;
     }
 
+    public CurationStatus getCurationStatus() {
+        return curationStatus;
+    }
+
+    public void setCurationStatus(CurationStatus curationStatus) {
+        this.curationStatus = curationStatus;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 7;

@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
+import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -65,8 +66,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
             System.out.println("Setting up ortholog cache...");
 
 //            String sql = "select mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol, hgnc_id as hgnc_id from human2mouse_orthologs;";
-            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
-
+//            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
+            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id, human_curated, mouse_curated, mgi_predicted, impc_predicted, mgi_mouse, impc_mouse, impc_pheno \n" +
+                            "from mgi_genes mgi \n" +
+                            "left join gene_summary h2mo \n" +
+                            "on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
             Map<GeneIdentifier, GeneIdentifier> orthologMap = this.jdbcTemplate.query(sql, new OrthologResultSetExtractor());
             orthologCache = new OrthologCache(orthologMap);
         }
@@ -76,8 +80,12 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
         if (diseaseCache == null) {
             System.out.println("Setting up disease cache...");
 
-            String sql = "select distinct h2mo.*, d.*  from disease d left join disease_genes og on og.disease_id = d.disease_id left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id where d.type = 'disease';";
-
+//            String sql = "select distinct h2mo.*, d.*  from disease d left join disease_genes og on og.disease_id = d.disease_id left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id where d.type = 'disease';";
+            String sql = "select distinct h2mo.*, d.* \n" +
+                            "from disease_summary d \n" +
+                            "left join disease_genes og on og.disease_id = d.disease_id \n" +
+                            "left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id;";
+            
             Map<String, Disease> diseaseMap = this.jdbcTemplate.query(sql, new DiseaseResultSetExtractor());
             diseaseCache = new DiseaseCache(diseaseMap);
         }
@@ -320,11 +328,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                 String omimDiseaseId = rs.getString("disease_id");
                 Disease disease = diseaseMap.get(omimDiseaseId);
                 if (disease == null) {
-                    String type = rs.getString("type");
-                    String fullOmimId = rs.getString("disease_full_id");
                     String term = rs.getString("disease_term");
                     String altTerms = rs.getString("disease_alts");
-                    disease = makeDisease(omimDiseaseId, type, fullOmimId, term, altTerms);
+                    disease = makeDisease(omimDiseaseId, term, altTerms);
                     diseaseMap.put(disease.getDiseaseId(), disease);
                 }
                 String mgiGeneId = rs.getString("mgi_gene_id");
@@ -336,7 +342,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                     disease.getAssociatedHumanGenes().add(humanGene);
                     disease.getAssociatedMouseGenes().add(mouseGene);
                 }
-
+                rs.getInt("human_curated");
+                disease.setCurationStatus(makeCurationStatus(rs.getInt("human_curated"), rs.getInt("mouse_curated"), rs.getInt("mgi_predicted"), rs.getInt("impc_predicted")));
 //                addDiseaseToOmimGeneIdToDiseaseMap(disease);
             }
 
@@ -344,7 +351,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
         }
     }
 
-    private static Disease makeDisease(String omimId, String type, String fullOmimId, String term, String altTerms) {
+    private static Disease makeDisease(String omimId, String term, String altTerms) {
         Disease disease = new Disease(omimId);
 
         disease.setTerm(term);
@@ -361,6 +368,26 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
         return disease;
     }
 
+    private static CurationStatus makeCurationStatus(int human_curated, int mouse_curated, int mgi_phenotype, int impc_phenotype) {
+        
+        CurationStatus curationStatus = new CurationStatus();
+        
+        if (human_curated == 1) {
+            curationStatus.setIsAssociatedInHuman(true);
+        }
+        if (mouse_curated == 1) {
+            curationStatus.setHasMgiLiteratureEvidence(true);
+        }
+        if (mgi_phenotype == 1) {
+            curationStatus.setHasMgiPhenotypeEvidence(true);
+        }
+        if (impc_phenotype == 1) {
+            curationStatus.setHasImpcPhenotypeEvidence(true);
+        }
+        
+        return curationStatus;
+    }
+    
     private static List<String> makeAlternativeTerms(String otherTerms) {
         List<String> alternativeTerms = new ArrayList<String>();
         String[] altTerms = otherTerms.split("\\|");

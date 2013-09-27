@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -101,11 +102,26 @@ public class PhenoDigmDaoJdbcImplTest {
     }
     
     /**
+     * Test of setUpDiseaseCache method, of class JdbcDiseaseDAOImpl.
+     */
+    @Test
+    public void testsetUpDiseaseCache() {
+        String omimDiseaseId = "OMIM:101600";
+        CurationStatus expectedResult = new CurationStatus();
+        expectedResult.setIsAssociatedInHuman(true);
+        expectedResult.setHasMgiLiteratureEvidence(true);
+        expectedResult.setHasMgiPhenotypeEvidence(true);
+        expectedResult.setHasImpcPhenotypeEvidence(false);
+        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
+        assertEquals(expectedResult, result.getCurationStatus());
+
+    }
+
+    /**
      * Test of getDiseaseByDiseaseId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetDiseaseByOmimDiseaseId() {
-        System.out.println("getDiseaseByOmimDiseaseId");
         String omimDiseaseId = "OMIM:101600";
 
         Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);

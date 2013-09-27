@@ -173,6 +173,18 @@ public class DiseaseTest {
     }
 
     /**
+     * Test of getCurationStatus method, of class Disease.
+     */
+    @Test
+    public void testGetSetCurationStatus() {
+        Disease instance = new Disease();
+        CurationStatus expResult = new CurationStatus();
+        instance.setCurationStatus(expResult);
+        CurationStatus result = instance.getCurationStatus();
+        assertEquals(expResult, result);
+    }
+    
+    /**
      * Test of hashCode method, of class Disease.
      */
     @Test
