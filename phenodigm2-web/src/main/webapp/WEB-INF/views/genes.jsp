@@ -23,12 +23,59 @@
         
         <div class="row-fluid dataset">
             <div class="container span12">          
-                <p>
-                    This is a list of all genes with links to the geneView page from each gene.
-                </p>
-                <c:forEach var="geneIdentifier" items="${geneIdentifiers}">
-                    <a href="https://www.mousephenotype.org/data/genes/${geneIdentifier.databaseCode}:${geneIdentifier.databaseAcc}">${geneIdentifier.geneSymbol}</a> (${geneIdentifier.databaseCode}:${geneIdentifier.databaseAcc}) <a href="gene/${geneIdentifier.databaseCode}:${geneIdentifier.databaseAcc}">Explore phenotype-associated rare diseases</a></br>
-                </c:forEach>
+                <table id="genes" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mouse Gene Symbol</th>
+                                <th>Human Gene Symbol</th>
+                                <th>Curated Gene Association in Human</th>
+                                <th>MGI Literature Evidence</th>
+                                <th>Mouse Phenotype Evidence (MGI)</th>
+                                <th>Mouse Phenotype Evidence (IMPC)</th>
+                                <th>MGI Mouse</th>
+                                <th>IMPC Mouse</th>
+                                <th>IMPC Phenotype Data</th>
+                            </tr>
+                        </thead>                        
+                        <tbody>
+                            <c:forEach var="gene" items="${genes}">
+                                <c:set var="mouseGeneId" value="${gene.orthologGeneId}"></c:set>
+                                <c:set var="humanGeneId" value="${gene.humanGeneId}"></c:set>
+                                <c:set var="curationStatus" value="${gene.curationStatus}"></c:set>
+                                <c:set var="projectStatus" value="${gene.projectStatus}"></c:set>
+                                <tr> 
+                                    <td>
+                                        <a href="gene/${mouseGeneId.databaseCode}:${mouseGeneId.databaseAcc}">${mouseGeneId.geneSymbol}</a>
+                                    </td>
+                                    <td>                                
+                                        <a href="http://www.genenames.org/data/hgnc_data.php?hgnc_id=${humanGeneId.databaseAcc}">${humanGeneId.geneSymbol}</a>
+                                    </td>
+                                    <td>
+                                        <c:if test="${curationStatus.isAssociatedInHuman}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${curationStatus.hasMgiLiteratureEvidence}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${curationStatus.hasMgiPhenotypeEvidence}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${curationStatus.hasImpcPhenotypeEvidence}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${projectStatus.hasMgiMouse}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${projectStatus.hasImpcMouse}">Yes</c:if>                                        
+                                    </td>
+                                    <td>
+                                        <c:if test="${projectStatus.hasImpcPhenotypeData}">Yes</c:if>                                                                                
+                                    </td>
+                               
+                                </tr>
+                            </c:forEach>
+                        </tbody>    
+                
             </div></div>
     </body>
 </html>

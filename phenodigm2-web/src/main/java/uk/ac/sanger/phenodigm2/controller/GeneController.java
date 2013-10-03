@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 
@@ -35,13 +36,15 @@ public class GeneController {
     @RequestMapping("/gene")
     public String allGenes(Model model) {
         //Get all genes from the phenoDigmDao where we have a known disease association
-        Set<GeneIdentifier> genesWithKnownDiseaseAssociations = new TreeSet<GeneIdentifier>();
+        Set<Gene> genesWithKnownDiseaseAssociations = new TreeSet<Gene>();
         
         for (Disease disease : phenoDigmDao.getAllDiseses()) {
-            genesWithKnownDiseaseAssociations.addAll(disease.getAssociatedMouseGenes());
+            for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
+                genesWithKnownDiseaseAssociations.add(phenoDigmDao.getGene(geneIdentifier));            
+            }
         }
        
-        model.addAttribute("geneIdentifiers", genesWithKnownDiseaseAssociations);
+        model.addAttribute("genes", genesWithKnownDiseaseAssociations);
         return "genes";
     }
     

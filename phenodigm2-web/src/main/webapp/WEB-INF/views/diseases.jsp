@@ -21,7 +21,7 @@
             <a href="../">Home</a>&nbsp;&raquo; Diseases
         </p>
         
-        <div class='topic'>Ohh nasty diseases...</div>
+        <div class='topic'>Diseases</div>
         <div class="row-fluid dataset">
             <div class="container span12">
                 <table id="diseases" class="table table-striped">
@@ -42,19 +42,18 @@
                                     
                                     <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
                                     <td>${disease.diseaseId}</td>
-                                    <td colspan="4">
-                                        ${status}
-                                        <%--<c:if test="${status.isAssociatedInHuman}">Yes</c:if>--%>
-                                    </td>
-<!--                                    <td>
-                                        <%--<c:if test="${status.hasMgiLiteratureEvidence}">Yes</c:if>--%>
+                                    <td>
+                                        <c:if test="${status.isAssociatedInHuman}">Yes</c:if>
                                     </td>
                                     <td>
-                                        <%--<c:if test="${status.hasMgiPhenotypeEvidence}">Yes</c:if>--%>
+                                        <c:if test="${status.hasMgiLiteratureEvidence}">Yes</c:if>
                                     </td>
                                     <td>
-                                        <%--<c:if test="${status.hasImpcPhenotypeEvidence}">Yes</c:if>--%>
-                                    </td>-->
+                                        <c:if test="${status.hasMgiPhenotypeEvidence}">Yes</c:if>
+                                    </td>
+                                    <td>
+                                        <c:if test="${status.hasImpcPhenotypeEvidence}">Yes</c:if>
+                                    </td>
                                 </tr>
                             </c:forEach>
                         </tbody>    
