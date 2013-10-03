@@ -37,6 +37,7 @@ public class GeneIdentifier extends ExternalIdentifier implements Comparable<Gen
      * @return
      */
 
+    @Override
     public int compareTo(GeneIdentifier other) {
         return this.geneSymbol.compareTo(other.geneSymbol);
     }
