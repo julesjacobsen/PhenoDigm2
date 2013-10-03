@@ -29,7 +29,7 @@ public class CurationStatus {
         this.hasImpcPhenotypeEvidence = hasImpcPhenotypeEvidence;
     }
     
-    public boolean isAssociatedInHuman() {
+    public boolean getIsAssociatedInHuman() {
         return isAssociatedInHuman;
     }
 
@@ -37,7 +37,7 @@ public class CurationStatus {
         this.isAssociatedInHuman = isAssociatedInHuman;
     }
 
-    public boolean hasMgiLiteratureEvidence() {
+    public boolean getHasMgiLiteratureEvidence() {
         return hasMgiLiteratureEvidence;
     }
 
@@ -45,7 +45,7 @@ public class CurationStatus {
         this.hasMgiLiteratureEvidence = hasMgiLiteratureEvidence;
     }
 
-    public boolean hasMgiPhenotypeEvidence() {
+    public boolean getHasMgiPhenotypeEvidence() {
         return hasMgiPhenotypeEvidence;
     }
 
@@ -53,7 +53,7 @@ public class CurationStatus {
         this.hasMgiPhenotypeEvidence = hasMgiPhenotypeEvidence;
     }
 
-    public boolean hasImpcPhenotypeEvidence() {
+    public boolean getHasImpcPhenotypeEvidence() {
         return hasImpcPhenotypeEvidence;
     }
 

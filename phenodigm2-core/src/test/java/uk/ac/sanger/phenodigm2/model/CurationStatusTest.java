@@ -52,13 +52,13 @@ public class CurationStatusTest {
     }
 
     /**
-     * Test of isAssociatedInHuman method, of class CurationStatus.
+     * Test of getIsAssociatedInHuman method, of class CurationStatus.
      */
     @Test
     public void testIsAssociatedInHuman() {
         CurationStatus instance = new CurationStatus();
         boolean expResult = false;
-        boolean result = instance.isAssociatedInHuman();
+        boolean result = instance.getIsAssociatedInHuman();
         assertEquals(expResult, result);
     }
 
@@ -70,7 +70,7 @@ public class CurationStatusTest {
         boolean isAssociatedInHuman = true;
         CurationStatus instance = new CurationStatus();
         instance.setIsAssociatedInHuman(isAssociatedInHuman);
-        assertTrue(instance.isAssociatedInHuman());
+        assertTrue(instance.getIsAssociatedInHuman());
     }
 
     /**
@@ -80,7 +80,7 @@ public class CurationStatusTest {
     public void testHasMgiLiteratureEvidence() {
         CurationStatus instance = new CurationStatus();
         boolean expResult = false;
-        boolean result = instance.hasMgiLiteratureEvidence();
+        boolean result = instance.getHasMgiLiteratureEvidence();
         assertEquals(expResult, result);
     }
 
@@ -92,17 +92,17 @@ public class CurationStatusTest {
         boolean hasMgiLiteratureEvidence = true;
         CurationStatus instance = new CurationStatus();
         instance.setHasMgiLiteratureEvidence(hasMgiLiteratureEvidence);
-        assertTrue(instance.hasMgiLiteratureEvidence());
+        assertTrue(instance.getHasMgiLiteratureEvidence());
     }
 
     /**
-     * Test of hasMgiPhenotypeEvidence method, of class CurationStatus.
+     * Test of getHasMgiPhenotypeEvidence method, of class CurationStatus.
      */
     @Test
     public void testHasMgiPhenotypeEvidence() {
         CurationStatus instance = new CurationStatus();
         boolean expResult = false;
-        boolean result = instance.hasMgiPhenotypeEvidence();
+        boolean result = instance.getHasMgiPhenotypeEvidence();
         assertEquals(expResult, result);
     }
 
@@ -114,17 +114,17 @@ public class CurationStatusTest {
         boolean hasMgiPhenotypeEvidence = true;
         CurationStatus instance = new CurationStatus();
         instance.setHasMgiPhenotypeEvidence(hasMgiPhenotypeEvidence);
-        assertTrue(instance.hasMgiPhenotypeEvidence());
+        assertTrue(instance.getHasMgiPhenotypeEvidence());
     }
 
     /**
-     * Test of hasImpcPhenotypeEvidence method, of class CurationStatus.
+     * Test of getHasImpcPhenotypeEvidence method, of class CurationStatus.
      */
     @Test
     public void testHasImpcPhenotypeEvidence() {
         CurationStatus instance = new CurationStatus();
         boolean expResult = false;
-        boolean result = instance.hasImpcPhenotypeEvidence();
+        boolean result = instance.getHasImpcPhenotypeEvidence();
         assertEquals(expResult, result);
     }
 
@@ -136,7 +136,7 @@ public class CurationStatusTest {
         boolean hasImpcPhenotypeEvidence = true;
         CurationStatus instance = new CurationStatus();
         instance.setHasImpcPhenotypeEvidence(hasImpcPhenotypeEvidence);
-        assertTrue(instance.hasImpcPhenotypeEvidence());
+        assertTrue(instance.getHasImpcPhenotypeEvidence());
     }
 
     /**

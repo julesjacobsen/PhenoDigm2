@@ -15,7 +15,7 @@ public class ProjectStatus {
     public ProjectStatus() {
     }
 
-    public boolean hasMgiMouse() {
+    public boolean getHasMgiMouse() {
         return hasMgiMouse;
     }
 
@@ -23,7 +23,7 @@ public class ProjectStatus {
         this.hasMgiMouse = hasMgiMouse;
     }
 
-    public boolean hasImpcMouse() {
+    public boolean getHasImpcMouse() {
         return hasImpcMouse;
     }
 
@@ -31,7 +31,7 @@ public class ProjectStatus {
         this.hasImpcMouse = hasImpcMouse;
     }
 
-    public boolean hasImpcPhenotypeData() {
+    public boolean getHasImpcPhenotypeData() {
         return hasImpcPhenotypeData;
     }
 
