@@ -4,11 +4,12 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 
 /**
@@ -22,7 +23,7 @@ class OrthologCache {
 
     
     //access is usually to get human orthologs of a mouse gene identifier via MGI id
-    private static Map<GeneIdentifier, GeneIdentifier> mouseToHumanOrthologsMap;
+    private static Map<GeneIdentifier, Gene> mouseToHumanOrthologsMap;
     
     private static Map<String, GeneIdentifier> mgiIdToGeneIdentifierMap;
     
@@ -30,7 +31,7 @@ class OrthologCache {
      * Requires a Map of MGI geneId to OMIM geneId. i.e. Mouse to Human gene identifiers.
      * @param mouseToHumanOrthologs 
      */
-    protected OrthologCache(Map<GeneIdentifier, GeneIdentifier> mouseToHumanOrthologs){
+    protected OrthologCache(Map<GeneIdentifier, Gene> mouseToHumanOrthologs){
         mouseToHumanOrthologsMap = mouseToHumanOrthologs;
         init();
     }
@@ -66,12 +67,32 @@ class OrthologCache {
         return getHumanOrthologOfMouseGene(mouseGeneIdentifier);
     }
     
+    
+    /**
+     * 
+     * @param mouseGeneIdentifier
+     * @return human GeneIdentifier or null 
+     */
     protected GeneIdentifier getHumanOrthologOfMouseGene(GeneIdentifier mouseGeneIdentifier) {
-        return mouseToHumanOrthologsMap.get(mouseGeneIdentifier);
+        
+        Gene gene = mouseToHumanOrthologsMap.get(mouseGeneIdentifier); 
+
+        if (gene == null) {
+            return null;
+        }
+             
+        return gene.getHumanGeneId();
     }
 
-    protected Set<GeneIdentifier> getAllMouseGenes() {
+    protected Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
         return mouseToHumanOrthologsMap.keySet();
     }
     
+    protected Gene getGene(GeneIdentifier geneIdentifier) {
+        return mouseToHumanOrthologsMap.get(geneIdentifier);
+    }
+
+    protected Collection<Gene> getGenes() {
+        return mouseToHumanOrthologsMap.values();
+    }
 }

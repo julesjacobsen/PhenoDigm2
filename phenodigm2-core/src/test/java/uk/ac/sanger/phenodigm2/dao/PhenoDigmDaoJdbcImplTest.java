@@ -134,14 +134,13 @@ public class PhenoDigmDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseasesByHgncGeneId() {
-        System.out.println("getDiseasesByHgncGeneId");
         String hgncGeneId = "HGNC:3689";
 
         Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
-        System.out.println("Human diseases for gene " + hgncGeneId);
-        for (Disease disease : result) {
-            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
-        }
+//        System.out.println("Human diseases for gene " + hgncGeneId);
+//        for (Disease disease : result) {
+//            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
+//        }
         assertTrue(result.size() >= 14);
     }
 
@@ -150,37 +149,50 @@ public class PhenoDigmDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseasesByMgiGeneId() {
-        System.out.println("getDiseasesByMgiGeneId");
         String mgiGeneId = "MGI:95523";
 
         Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);
-        System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
-        for (Disease disease : result) {
-            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
-        }
+//        System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
+//        for (Disease disease : result) {
+//            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
+//        }
         assertTrue(result.size() >= 14);
 
     }
+    
+    /**
+     * Test of getDiseasesByMgiGeneId method, of class
+     * JdbcDiseaseDAOImpl.
+     */
+    @Test
+    public void testGetDiseasesByMgiGeneIdNoMappedOrtholog() {
+        String mgiGeneId = "MGI:87874";
 
+        Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);   
+
+        assertTrue(result.isEmpty());
+        
+        
+    }
+    
     /**
      * Test of getKnownDiseaseAssociationsForMgiGeneId method, of class
      * JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetKnownDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getKnownDiseaseAssociationsForMgiGeneId");
         String mgiGeneId = "MGI:95523";
 
         Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
 
         for (Disease disease : result.keySet()) {
-            System.out.println(disease);
+//            System.out.println(disease);
             Set<DiseaseAssociation> diseaseAssociations = result.get(disease);
             if (disease.getDiseaseId().equals("OMIM:101200")) {
                 assertEquals(2, diseaseAssociations.size());
             }
             for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
-                System.out.println(String.format("    %s", diseaseAssociation));
+//                System.out.println(String.format("    %s", diseaseAssociation));
             }
         }
 
@@ -195,7 +207,6 @@ public class PhenoDigmDaoJdbcImplTest {
      */
     @Test
     public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getPredictedDiseaseAssociationsForMgiGeneId");
         String mgiGeneId = "MGI:95523";
 
         Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
@@ -211,7 +222,6 @@ public class PhenoDigmDaoJdbcImplTest {
 
     @Test 
     public void testGetKnownDiseaseAssociationsForDiseaseId() {
-        System.out.println("testGetKnownDiseaseAssociationsForDiseaseId");
         String diseaseId = "OMIM:101600";
         
         Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
@@ -227,17 +237,16 @@ public class PhenoDigmDaoJdbcImplTest {
         GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
         assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
         
-        System.out.println(result);
+//        System.out.println(result);
     }
     
     @Test 
     public void testGetPredictedDiseaseAssociationsForDiseaseId() {
-        System.out.println("testGetPredictedDiseaseAssociationsForDiseaseId");
         String diseaseId = "OMIM:101600";
         
         Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
 
-        System.out.println(result);
+//        System.out.println(result);
 
         int resultSize = result.keySet().size();
         int expectSize = 46;

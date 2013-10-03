@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 
@@ -56,7 +57,6 @@ public class PhenoDigmDaoStubImplTest {
      */
     @Test
     public void testGetDiseaseByOmimDiseaseId() {
-        System.out.println("getDiseaseByOmimDiseaseId");
         testDiseaseDao = PhenoDigmDaoStubImpl.getInstance();
         
         String omimId = "OMIM:101200";
@@ -71,7 +71,6 @@ public class PhenoDigmDaoStubImplTest {
      */
     @Test
     public void testGetDiseaseByOmimGeneId() {
-        System.out.println("getDiseaseByOmimGeneId");
         String omimGeneId = "OMIM:176943";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
 
@@ -89,7 +88,6 @@ public class PhenoDigmDaoStubImplTest {
      */
     @Test
     public void testGetDiseaseByMgiGeneId() {
-        System.out.println("getDiseaseByMgiGeneId");
         String mgiGeneId = "MGI:95523";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
 
@@ -107,7 +105,6 @@ public class PhenoDigmDaoStubImplTest {
      */
     @Test
     public void testGetKnownDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getKnownDiseaseAssociationsForMgiGeneId");
         String mgiGeneId = "MGI:95523";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
         Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
@@ -129,7 +126,7 @@ public class PhenoDigmDaoStubImplTest {
         String mgiGeneId = "MGI:95523";
         GeneIdentifier expResult = new GeneIdentifier("Fgfr2", "MGI:95523");
         GeneIdentifier result = PhenoDigmDaoStubImpl.getInstance().getGeneIdentifierForMgiGeneId(mgiGeneId);
-//        assertEquals(expResult, result);
+        assertEquals(expResult, result);
     }
     
     @Test
@@ -137,15 +134,24 @@ public class PhenoDigmDaoStubImplTest {
         String mgiGeneId = "MGI:95523";
         GeneIdentifier expResult = new GeneIdentifier("FGFR2", "OMIM:176943");
         GeneIdentifier result = PhenoDigmDaoStubImpl.getInstance().getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
-//        assertEquals(expResult, result);
+        assertEquals(expResult, result);
     }
+    
+    @Test
+    public void testGetGene() {
+        GeneIdentifier mgiGeneId = new GeneIdentifier("Fgfr2", "MGI:95523");
+        GeneIdentifier humanOrtholog = new GeneIdentifier("FGFR2", "OMIM:176943");
+        Gene expResult = new Gene(mgiGeneId, humanOrtholog);
+        Gene result = PhenoDigmDaoStubImpl.getInstance().getGene(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+    
     
     /**
      * Test of getPredictedDiseaseAssociationsForMgiGeneId method, of class DiseaseDAOImpl.
      */
     @Test
     public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getPredictedDiseaseAssociationsForMgiGeneId");
         String mgiGeneId = "MGI:95523";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
         Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);

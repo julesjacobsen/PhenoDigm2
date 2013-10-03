@@ -4,11 +4,13 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
@@ -50,4 +52,7 @@ public interface PhenoDigmDao {
     public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId);
     
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
+
+    public Gene getGene(GeneIdentifier geneIdentifier);
+
 }

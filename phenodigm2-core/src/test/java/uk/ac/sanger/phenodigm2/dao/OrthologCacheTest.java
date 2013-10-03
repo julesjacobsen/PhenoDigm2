@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 
 /**
@@ -18,17 +19,17 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 public class OrthologCacheTest {
     
-    private Map<GeneIdentifier, GeneIdentifier> orthologMap;
+    private Map<GeneIdentifier, Gene> orthologMap;
     //Human gene identifiers
     private GeneIdentifier FGFR1;
     private GeneIdentifier FGFR2;
-    private GeneIdentifier PHOSPHO1;
+    private GeneIdentifier SELT;
     private GeneIdentifier SCHIP1;
     
     //Mouse gene identifiers
     private GeneIdentifier Fgfr1;
     private GeneIdentifier Fgfr2;
-    private GeneIdentifier Phospho1;
+    private GeneIdentifier Selt1;
     private GeneIdentifier Schip1;
     
     public OrthologCacheTest() {
@@ -36,24 +37,31 @@ public class OrthologCacheTest {
     
     @Before
     public void setUp() {
-        orthologMap = new HashMap<GeneIdentifier, GeneIdentifier>();
+        orthologMap = new HashMap<GeneIdentifier, Gene>();
 
         //Human gene identifiers
         FGFR1 = new GeneIdentifier("FGFR1", "HGNC:3688");
         FGFR2 = new GeneIdentifier("FGFR2", "HGNC:3689");
-        PHOSPHO1 = new GeneIdentifier("PHOSPHO1", "");
-        SCHIP1 = new GeneIdentifier("SCHIP1", "");
+        SELT = new GeneIdentifier("SELT", "");
+        SCHIP1 = null;
         
         //Mouse gene identifiers
         Fgfr1 = new GeneIdentifier("Fgfr1", "MGI:95522");
         Fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
-        Phospho1 = new GeneIdentifier("Phospho1", "MGI:2447348");
+        Selt1 = new GeneIdentifier("Phospho1", "MGI:2447348");
         Schip1 = new GeneIdentifier("Schip1","MGI:1353557");
         
-        orthologMap.put(Fgfr1, FGFR1);
-        orthologMap.put(Fgfr2, FGFR2);
-        orthologMap.put(Phospho1, PHOSPHO1);
-        orthologMap.put(Schip1, SCHIP1);
+        //Genes (well, ortholog pairs really)
+        Gene fgfr1Gene = new Gene(Fgfr1, FGFR1);
+        Gene fgfr2Gene = new Gene(Fgfr2, FGFR2);
+        Gene selt1Ortholog = new Gene(Selt1, SELT);
+        Gene schip1Ortholog = new Gene(Schip1, SCHIP1);
+        
+        
+        orthologMap.put(Fgfr1, fgfr1Gene);
+        orthologMap.put(Fgfr2, fgfr2Gene);
+        orthologMap.put(Selt1, selt1Ortholog);
+        orthologMap.put(Schip1, schip1Ortholog);
     }
         
 
@@ -68,7 +76,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetMouseGeneIdentifier() {
-        System.out.println("getMouseGeneIdentifier");
         String mgiGeneId = "MGI:95522";
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier expResult = Fgfr1;
@@ -81,7 +88,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetMouseGeneIdentifierIncorrectGeneId() {
-        System.out.println("testGetMouseGeneIdentifierIncorrectGeneId");
         String mgiGeneId = "MGI:FROOD";
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier result = instance.getMouseGeneIdentifier(mgiGeneId);
@@ -93,7 +99,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetHumanOrthologOfMouseGene_String() {
-        System.out.println("getHumanOrthologOfMouseGene");
         String mgiGeneId = Fgfr1.getCompoundIdentifier();
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier expResult = FGFR1;
@@ -107,7 +112,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetHumanOrthologOfMouseGene_IncorrectString() {
-        System.out.println("getHumanOrthologOfMouseGene");
         String mgiGeneId = "Fgfr1"; //this is a gene symbol, not an identifier
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier result = instance.getHumanOrthologOfMouseGene(mgiGeneId);
@@ -120,7 +124,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetHumanOrthologOfMouseGene_IncorrectGeneIdentifier() {
-        System.out.println("getHumanOrthologOfMouseGeneIncorrectTest");
         GeneIdentifier mouseGeneIdentifier = Fgfr2;
         OrthologCache instance = new OrthologCache(orthologMap);
         //this is NOT what we would expect to have returned.
@@ -134,7 +137,6 @@ public class OrthologCacheTest {
      */
     @Test
     public void testGetHumanOrthologOfMouseGene_GeneIdentifier() {
-        System.out.println("getHumanOrthologOfMouseGene");
         GeneIdentifier mouseGeneIdentifier = Fgfr2;
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier expResult = FGFR2;
@@ -146,18 +148,17 @@ public class OrthologCacheTest {
     public void testGetAllMouseGenes() {
         OrthologCache instance = new OrthologCache(orthologMap);
 
-        assertEquals(orthologMap.size(), instance.getAllMouseGenes().size());
+        assertEquals(orthologMap.size(), instance.getAllMouseGeneIdentifiers().size());
     }
     
     /**
      * Test of getHumanOrthologOfMouseGene method, of class OrthologCache.
      */
     @Test
-    public void testGetHumanOrthologOfMouseGene_NoOmimGeneIdentifier() {
-        System.out.println("getHumanOrthologOfMouseGene_NoOmimGeneIdentifier");
-        GeneIdentifier mouseGeneIdentifier = Phospho1;
+    public void testGetHumanOrthologOfMouseGene_NoHgncIdentifier() {
+        GeneIdentifier mouseGeneIdentifier = Selt1;
         OrthologCache instance = new OrthologCache(orthologMap);
-        GeneIdentifier expResult = PHOSPHO1;
+        GeneIdentifier expResult = SELT;
         GeneIdentifier result = instance.getHumanOrthologOfMouseGene(mouseGeneIdentifier);
         assertEquals(expResult, result);
     }
@@ -166,13 +167,35 @@ public class OrthologCacheTest {
      * Test of getHumanOrthologOfMouseGene method, of class OrthologCache.
      */
     @Test
-    public void testGetHumanOrthologOfMouseGene_NoOmimGeneIdentifierTwo() {
-        System.out.println("getHumanOrthologOfMouseGene_NoOmimGeneIdentifierTwo");
+    public void testGetHumanOrthologOfMouseGene_NoHgncIdentifierTwo() {
         GeneIdentifier mouseGeneIdentifier = Schip1;
         OrthologCache instance = new OrthologCache(orthologMap);
         GeneIdentifier expResult = SCHIP1;
         GeneIdentifier result = instance.getHumanOrthologOfMouseGene(mouseGeneIdentifier);
         assertEquals(expResult, result);
     }
+ 
+    /**
+     * Test of getGene method, of class OrthologCache.
+     */
+    @Test
+    public void testGetGeneHasHumanOrtholog() {
+        GeneIdentifier mouseGeneIdentifier = Fgfr1;
+        OrthologCache instance = new OrthologCache(orthologMap);
+        GeneIdentifier expResult = FGFR1;
+        GeneIdentifier result = instance.getHumanOrthologOfMouseGene(mouseGeneIdentifier);
+        assertEquals(expResult, result);
+    }
     
+    /**
+     * Test of getGene method, of class OrthologCache.
+     */
+    @Test
+    public void testGetGeneNoHumanOrtholog() {
+        GeneIdentifier mouseGeneIdentifier = Schip1;
+        OrthologCache instance = new OrthologCache(orthologMap);
+        GeneIdentifier expResult = null;
+        GeneIdentifier result = instance.getHumanOrthologOfMouseGene(mouseGeneIdentifier);
+        assertEquals(expResult, result);
+    }
 }

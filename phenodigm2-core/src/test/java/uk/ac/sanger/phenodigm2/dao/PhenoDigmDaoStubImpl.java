@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
+import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
@@ -116,7 +117,7 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
 
     private void populateDiseases() {
 
-        Map<GeneIdentifier, GeneIdentifier> mgiToOmimOrthologMap = new HashMap<GeneIdentifier, GeneIdentifier>();
+        Map<GeneIdentifier, Gene> mgiToOmimOrthologMap = new HashMap<GeneIdentifier, Gene>();
         Map<String, Disease> omimDiseaseIdToDiseaseMap = new HashMap<String, Disease>();
         
         //String diseaseStubData = "src/test/resources/data/fgfr2KnownDiseaseAssociationTestData.dsv";
@@ -150,10 +151,10 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
      * Handles logic for linking diseases with genes and orthologs
      * @param line 
      */
-    private void makeDiseaseAndGeneOrthologs(String line, Map<GeneIdentifier, GeneIdentifier> orthologMap, Map<String, Disease> diseaseMap){
+    private void makeDiseaseAndGeneOrthologs(String line, Map<GeneIdentifier, Gene> orthologMap, Map<String, Disease> diseaseMap){
         String[] fields = line.split("\\t");
-        String omimDiseaseId = fields[5];
-        Disease disease = diseaseMap.get(omimDiseaseId);
+        String diseaseId = fields[5];
+        Disease disease = diseaseMap.get(diseaseId);
         
         if (disease == null) {
             String type = fields[6];
@@ -163,21 +164,22 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
             if (fields.length == 10) {
                 altTerms = fields[9];
             } 
-            disease = makeDisease(omimDiseaseId, type, fullOmimId, term, altTerms);
+            disease = makeDisease(diseaseId, term, altTerms);
             diseaseMap.put(disease.getDiseaseId(), disease);
         }
         
         if (!fields[0].isEmpty()) {
             GeneIdentifier humanGene = new GeneIdentifier(fields[2], fields[3]);
             GeneIdentifier mouseGene = new GeneIdentifier(fields[1], fields[0]);
-            orthologMap.put(mouseGene, humanGene);
+            Gene gene = new Gene(mouseGene, humanGene);
+            orthologMap.put(mouseGene, gene);
             disease.getAssociatedHumanGenes().add(humanGene);
             disease.getAssociatedMouseGenes().add(mouseGene);
         }
         
     }
     
-    private Disease makeDisease(String omimId, String type, String fullOmimId, String term, String altTerms){
+    private Disease makeDisease(String omimId, String term, String altTerms){
         
         Disease disease = new Disease(omimId);
         disease.setTerm(term);
@@ -328,7 +330,7 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
 
     @Override
     public Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
-        return orthologCache.getAllMouseGenes();
+        return orthologCache.getAllMouseGeneIdentifiers();
     }
 
     @Override
@@ -348,4 +350,9 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     public Set<MouseModel> getAllMouseModels() {
         return mouseModelCache.getAllMouseModels();
     }    
+
+    @Override
+    public Gene getGene(GeneIdentifier geneIdentifier) {
+        return orthologCache.getGene(geneIdentifier);
+    }
 }
