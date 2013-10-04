@@ -36,15 +36,13 @@ public class GeneController {
     @RequestMapping("/gene")
     public String allGenes(Model model) {
         //Get all genes from the phenoDigmDao where we have a known disease association
-        Set<Gene> genesWithKnownDiseaseAssociations = new TreeSet<Gene>();
-        
-        for (Disease disease : phenoDigmDao.getAllDiseses()) {
-            for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
-                genesWithKnownDiseaseAssociations.add(phenoDigmDao.getGene(geneIdentifier));            
-            }
-        }
-       
-        model.addAttribute("genes", genesWithKnownDiseaseAssociations);
+        Set<Gene> allGenes = phenoDigmDao.getAllGenes();       
+//        for (Disease disease : phenoDigmDao.getAllDiseses()) {
+//            for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
+//                genesWithKnownDiseaseAssociations.add(phenoDigmDao.getGene(geneIdentifier));            
+//            }
+//        }
+        model.addAttribute("genes", allGenes);
         return "genes";
     }
     

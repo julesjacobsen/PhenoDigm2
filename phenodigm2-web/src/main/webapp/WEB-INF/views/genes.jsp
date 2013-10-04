@@ -28,10 +28,10 @@
                             <tr>
                                 <th>Mouse Gene Symbol</th>
                                 <th>Human Gene Symbol</th>
-                                <th>Curated Gene Association in Human</th>
-                                <th>MGI Literature Evidence</th>
-                                <th>Mouse Phenotype Evidence (MGI)</th>
-                                <th>Mouse Phenotype Evidence (IMPC)</th>
+                                <th>Curated Diseases in Human</th>
+                                <th>Curated Diseases in Mouse (MGI)</th>
+                                <th>Candidate Diseases by Phenotype (MGI)</th>
+                                <th>Candidate Diseases by Phenotype (IMPC)</th>
                                 <th>MGI Mouse</th>
                                 <th>IMPC Mouse</th>
                                 <th>IMPC Phenotype Data</th>

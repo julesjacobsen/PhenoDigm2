@@ -29,10 +29,10 @@
                             <tr>
                                 <th>Disease Name</th>
                                 <th>Source</th>
-                                <th>Curated Gene Association in Human</th>
-                                <th>MGI Literature Evidence</th>
-                                <th>Mouse Phenotype Evidence (MGI)</th>
-                                <th>Mouse Phenotype Evidence (IMPC)</th>
+                                <th>Curated Genes in Human</th>
+                                <th>Curated Genes in Mouse (MGI)</th>
+                                <th>Candidate Genes by Phenotype (MGI)</th>
+                                <th>Candidate Genes by Phenotype (IMPC)</th>
                             </tr>
                         </thead>                        
                         <tbody>
@@ -40,7 +40,7 @@
                                 <c:set var="status" value="${disease.curationStatus}"></c:set>
                                 <tr>
                                     
-                                    <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
+                                    <td><a href="../disease/${disease.diseaseId}">${disease.term}</a></td>
                                     <td>${disease.diseaseId}</td>
                                     <td>
                                         <c:if test="${status.isAssociatedInHuman}">Yes</c:if>
