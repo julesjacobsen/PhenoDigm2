@@ -534,6 +534,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                 MouseModel mouseModel = new MouseModel();
                 mouseModel.setMgiGeneId(rs.getString("mgi_gene_id"));
                 mouseModel.setMgiModelId(rs.getString("mouse_model_id"));
+                mouseModel.setSource(rs.getString("source"));
                 mouseModel.setAllelicComposition(rs.getString("allelic_composition"));
                 mouseModel.setGeneticBackground(rs.getString("genetic_background"));
                 mouseModel.setAllelicCompositionLink(rs.getString("allcomp_link"));

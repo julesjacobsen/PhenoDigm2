@@ -135,7 +135,7 @@
                                             <h5>${disease.diseaseId} Associated Mouse Models (MGI curated)</h5>
                                             <c:forEach var="diseaseAssociation" items="${association.curatedAssociations}" varStatus="loop">
                                                 <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
+                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})</br>
                                                 <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                     ${phenotypeTerm}<br/>
                                                 </c:forEach>
@@ -146,7 +146,7 @@
                                             <h5>${disease.diseaseId} Associated Mouse Models (PhenoDigm predicted)</h5>
                                             <c:forEach var="diseaseAssociation" items="${association.phenotypicAssociations}" varStatus="loop">
                                                 <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
+                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})</br>
                                                 <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                     ${phenotypeTerm}<br/>
                                                 </c:forEach>
@@ -210,7 +210,7 @@
                                             <h5>${disease.diseaseId} Associated Mouse Models (MGI curated)</h5>
                                             <c:forEach var="diseaseAssociation" items="${association.curatedAssociations}" varStatus="loop">
                                                 <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: MGI curation)</br>
+                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})</br>
                                                 <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                     ${phenotypeTerm}<br/>
                                                 </c:forEach>
@@ -221,7 +221,7 @@
                                             <h5>${disease.diseaseId} Associated Mouse Models (PhenoDigm predicted)</h5>
                                             <c:forEach var="diseaseAssociation" items="${association.phenotypicAssociations}" varStatus="loop">
                                                 <c:set var="mouseModel" value="${diseaseAssociation.mouseModel}"></c:set>
-                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: PhenoDigm)</br>
+                                                <b style="color:#FF9000">${diseaseAssociation.modelToDiseaseScore}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})</br>
                                                 <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                                                     ${phenotypeTerm}<br/>
                                                 </c:forEach>
