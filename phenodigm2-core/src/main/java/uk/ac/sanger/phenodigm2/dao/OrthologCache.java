@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -92,7 +93,9 @@ class OrthologCache {
         return mouseToHumanOrthologsMap.get(geneIdentifier);
     }
 
-    protected Collection<Gene> getGenes() {
-        return mouseToHumanOrthologsMap.values();
+    protected Set<Gene> getGenes() {
+        Set<Gene> genes = new TreeSet<Gene>();
+        genes.addAll(mouseToHumanOrthologsMap.values());
+        return genes;
     }
 }

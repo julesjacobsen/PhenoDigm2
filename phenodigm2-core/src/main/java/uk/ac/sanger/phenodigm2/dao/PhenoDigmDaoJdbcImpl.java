@@ -292,6 +292,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
     public Gene getGene(GeneIdentifier geneIdentifier) {
         return orthologCache.getGene(geneIdentifier);
     }
+
+    @Override
+    public Set<Gene> getAllGenes() {
+        return orthologCache.getGenes();
+    }
     
     private static class OrthologResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, GeneIdentifier>> {
 

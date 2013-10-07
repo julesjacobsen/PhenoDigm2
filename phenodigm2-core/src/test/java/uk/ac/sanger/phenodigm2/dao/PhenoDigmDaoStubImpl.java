@@ -355,4 +355,9 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     public Gene getGene(GeneIdentifier geneIdentifier) {
         return orthologCache.getGene(geneIdentifier);
     }
+
+    @Override
+    public Set<Gene> getAllGenes() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

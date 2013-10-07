@@ -145,10 +145,17 @@ public class OrthologCacheTest {
     }
     
     @Test
-    public void testGetAllMouseGenes() {
+    public void testGetAllMouseGeneIdentifiers() {
         OrthologCache instance = new OrthologCache(orthologMap);
 
         assertEquals(orthologMap.size(), instance.getAllMouseGeneIdentifiers().size());
+    }
+    
+    @Test
+    public void testGetAllGenes() {
+        OrthologCache instance = new OrthologCache(orthologMap);
+        
+        assertEquals(orthologMap.size(), instance.getGenes().size());
     }
     
     /**

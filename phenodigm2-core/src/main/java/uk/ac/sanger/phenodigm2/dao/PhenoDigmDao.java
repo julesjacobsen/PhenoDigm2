@@ -4,7 +4,6 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +23,8 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 public interface PhenoDigmDao {
     
     public Set<Disease> getAllDiseses();
+    
+    public Set<Gene> getAllGenes();
     
     public Disease getDiseaseByDiseaseId(String diseaseId);
     
