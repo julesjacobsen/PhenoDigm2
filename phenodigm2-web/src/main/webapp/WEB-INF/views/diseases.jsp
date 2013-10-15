@@ -18,7 +18,7 @@
     </head>
     <body>
         <p class="ikmcbreadcrumb">
-            <a href="../">Home</a>&nbsp;&raquo; Diseases
+            <a href=".">Home</a>&nbsp;&raquo; Diseases
         </p>
         
         <div class='topic'>Diseases</div>
@@ -40,7 +40,7 @@
                                 <c:set var="status" value="${disease.curationStatus}"></c:set>
                                 <tr>
                                     
-                                    <td><a href="../disease/${disease.diseaseId}">${disease.term}</a></td>
+                                    <td><a href="disease/${disease.diseaseId}">${disease.term}</a></td>
                                     <td>${disease.diseaseId}</td>
                                     <td>
                                         <c:if test="${status.isAssociatedInHuman}">Yes</c:if>
