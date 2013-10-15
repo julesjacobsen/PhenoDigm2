@@ -5,7 +5,9 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Class describing the attributes of an external reference. In PhenoDigm
@@ -15,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 public class ExternalIdentifier {
     
-    private static final Logger logger = Logger.getLogger(ExternalIdentifier.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExternalIdentifier.class);
     
     private String databaseCode;
     private String databaseAcc;

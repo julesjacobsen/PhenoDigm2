@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,11 +32,14 @@ import uk.ac.sanger.phenodigm2.model.MouseModel;
 @Controller
 public class GeneController {
 
+    private static final Logger logger = LoggerFactory.getLogger(GeneController.class);
+    
     @Autowired
     private PhenoDigmDao phenoDigmDao;
     
     @RequestMapping("/gene")
     public String allGenes(Model model) {
+        logger.info("Making all genes page");
         //Get all genes from the phenoDigmDao where we have a known disease association
         Set<Gene> allGenes = phenoDigmDao.getAllGenes();       
 //        for (Disease disease : phenoDigmDao.getAllDiseses()) {
@@ -50,7 +55,7 @@ public class GeneController {
     @RequestMapping(value="/gene/{acc}", method=RequestMethod.GET)
     public String gene(@PathVariable("acc") String acc, Model model) {
         String mgiId = acc;
-        System.out.println("GeneController: Making gene page for " + mgiId);
+        logger.info("Making gene page for " + mgiId);
         model.addAttribute("mgiId", mgiId);
         
         GeneIdentifier geneIdentifier = phenoDigmDao.getGeneIdentifierForMgiGeneId(mgiId);
@@ -58,7 +63,7 @@ public class GeneController {
             return "geneNotFound";
         }
         
-        System.out.println("GeneController: Found GeneIdentifier: " + geneIdentifier);
+        logger.info("Found GeneIdentifier: " + geneIdentifier);
         model.addAttribute("geneIdentifier", geneIdentifier);
         model.addAttribute("humanOrtholog", phenoDigmDao.getHumanOrthologIdentifierForMgiGeneId(mgiId));
         //Diseases 

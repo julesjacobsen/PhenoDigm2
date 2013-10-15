@@ -9,7 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 
 /**
@@ -25,7 +26,7 @@ import uk.ac.sanger.phenodigm2.model.MouseModel;
  */
 class MouseModelCache {
     
-    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static Map<String, MouseModel> mouseModelMap;
     private static Map<String, Set<MouseModel>> mgiGeneIdToModelsMap;
@@ -51,7 +52,7 @@ class MouseModelCache {
                 mgiGeneIdToModelsMap.put(mgiGeneId, mouseModelSet);
             }
         }
-        System.out.println(String.format("MouseModelCache initialized. Mapped %d models to %d genes.", mouseModelMap.size(), mgiGeneIdToModelsMap.keySet().size()));
+        logger.info(String.format("MouseModelCache initialized. Mapped %d models to %d genes.", mouseModelMap.size(), mgiGeneIdToModelsMap.keySet().size()));
     }
     
     protected MouseModel getModel(String mouseModelId) {

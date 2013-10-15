@@ -4,7 +4,7 @@
 
     <groupId>uk.ac.sanger</groupId>
     <artifactId>phenodigm2-core</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>phenodigm2-core</name>
@@ -12,7 +12,7 @@
     <parent>
         <groupId>uk.ac.sanger</groupId>
         <artifactId>phenodigm2</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
     </parent>
 </project>
     

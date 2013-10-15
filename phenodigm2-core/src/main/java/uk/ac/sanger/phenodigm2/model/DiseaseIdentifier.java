@@ -19,7 +19,7 @@ public class DiseaseIdentifier extends ExternalIdentifier implements Comparable<
         super(databaseCode, databaseAcc);
     }  
     
-        /**
+    /**
      * Sorts the ExternalIdentifier by databaseCode and then by databaseIdentifier
      * @param other
      * @return 

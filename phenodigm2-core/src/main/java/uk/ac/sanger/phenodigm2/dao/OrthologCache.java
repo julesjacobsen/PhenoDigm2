@@ -4,12 +4,12 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 
@@ -20,7 +20,7 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 class OrthologCache {
     
-    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     
     //access is usually to get human orthologs of a mouse gene identifier via MGI id
@@ -43,7 +43,7 @@ class OrthologCache {
         for (GeneIdentifier mouseGeneId : mouseToHumanOrthologsMap.keySet()) {
             mgiIdToGeneIdentifierMap.put(mouseGeneId.getCompoundIdentifier(), mouseGeneId);
         }
-        System.out.println(String.format("OrthologCache initialized. Mapped %d orthologs.", mouseToHumanOrthologsMap.keySet().size()));
+        logger.info(String.format("OrthologCache initialized. Mapped %d orthologs.", mouseToHumanOrthologsMap.keySet().size()));
     }      
     
     /**

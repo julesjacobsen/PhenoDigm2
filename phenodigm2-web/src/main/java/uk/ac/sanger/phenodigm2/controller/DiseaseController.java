@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,15 +28,14 @@ import uk.ac.sanger.phenodigm2.model.MouseModel;
  * @author jj8
  */
 @Controller
-@RequestMapping(value = "/disease")
 public class DiseaseController {
     
-    private static final Logger logger = Logger.getLogger(DiseaseController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiseaseController.class);
     
     @Autowired
     PhenoDigmDao diseaseDao;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/disease")
     public String allDiseases(Model model) {
         Set<Disease> allDiseases = diseaseDao.getAllDiseses();
         
@@ -44,7 +44,7 @@ public class DiseaseController {
         return "diseases";
     }
 
-    @RequestMapping(value = "/{diseaseId}")
+    @RequestMapping(value = "/disease/{diseaseId}")
     public String disease(@PathVariable("diseaseId") String diseaseId, Model model) {
         
         logger.info("Getting gene-disease associations for disease: " + diseaseId);

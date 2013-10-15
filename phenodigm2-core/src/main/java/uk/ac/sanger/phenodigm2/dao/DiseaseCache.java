@@ -4,12 +4,12 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import org.apache.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 
@@ -25,9 +25,8 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 class DiseaseCache {
     
-    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
-
-        
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
     private final Map<String, Disease> diseaseIdToDiseaseMap;    
     private Map<String, Set<Disease>> hgncGeneIdToDiseasesMap;
 
@@ -44,7 +43,7 @@ class DiseaseCache {
         for (Disease disease : diseaseIdToDiseaseMap.values()) {
             mapDiseaseToHgncGeneId(disease);
         }
-        System.out.println(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", diseaseIdToDiseaseMap.size(), hgncGeneIdToDiseasesMap.keySet().size()));
+        logger.info(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", diseaseIdToDiseaseMap.size(), hgncGeneIdToDiseasesMap.keySet().size()));
     }
     
     /**
@@ -88,7 +87,7 @@ class DiseaseCache {
     protected Set<Disease> getDiseasesByHgncGeneId(String hgncGeneId) {
         Set<Disease> diseases = hgncGeneIdToDiseasesMap.get(hgncGeneId);
         if (diseases == null){ 
-            logger.info(hgncGeneId + " not mapped to any diseases" );
+            logger.info(String.format("'%s' not mapped to any diseases", hgncGeneId));
             return new TreeSet<Disease>();
         }
         return diseases;

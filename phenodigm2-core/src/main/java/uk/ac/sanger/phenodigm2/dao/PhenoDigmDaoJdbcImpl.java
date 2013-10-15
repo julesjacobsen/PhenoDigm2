@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -42,7 +43,8 @@ import uk.ac.sanger.phenodigm2.model.ProjectStatus;
 @Repository
 public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
-    private static final Logger logger = Logger.getLogger(PhenoDigmDaoJdbcImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(PhenoDigmDaoJdbcImpl.class);
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
     //caches these are constantly cross-referenced when building objects
@@ -65,7 +67,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
     private void setUpOrthologCache() {
 
         if (orthologCache == null) {
-            System.out.println("Setting up ortholog cache...");
+            logger.info("Setting up ortholog cache...");
 
 //            String sql = "select mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol, hgnc_id as hgnc_id from human2mouse_orthologs;";
 //            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
@@ -86,7 +88,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
     private void setUpDiseaseCache() {
         if (diseaseCache == null) {
-            System.out.println("Setting up disease cache...");
+            logger.info("Setting up disease cache...");
 
 //            String sql = "select distinct h2mo.*, d.*  from disease d left join disease_genes og on og.disease_id = d.disease_id left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id where d.type = 'disease';";
             String sql = "select distinct h2mo.*, ds.* \n" +
@@ -101,7 +103,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
     private void setUpMouseModelsCache() {
         if (mouseModelCache == null) {
-            System.out.println("Setting up mouse model cache...");
+            logger.info("Setting up mouse model cache...");
 
             String sql = "select mgm.mgi_gene_id, mm.mouse_model_id, mm.allelic_composition, mm.genetic_background, mm.allcomp_link, mm.source from mouse_models mm join mgi_gene_models mgm on mgm.mouse_model_id = mm.mouse_model_id order by mgm.mgi_gene_id;";
             Map<String, MouseModel> mouseModels = this.jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
@@ -157,7 +159,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
 
         diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new DiseaseAssociationResultSetExtractor());
         
-        System.out.println(String.format("%s has %d known disease associations", mgiGeneId, diseaseAssociationsMap.size()));
+        logger.info(String.format("%s has %d known disease associations", mgiGeneId, diseaseAssociationsMap.size()));
 
         //also add in the diseases with no known disease associations other than by gene orthology.
         for (Disease disease : getDiseasesByMgiGeneId(mgiGeneId)) {
@@ -565,7 +567,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                 String diseaseId = rs.getString("disease_id");
                 Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
                 if (disease == null) {
-                    System.out.println("unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
+                    logger.info("Unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
                 } else {
                     diseaseAssociation.setDiseaseIdentifier(disease.getDiseaseIdentifier());
                     diseaseAssociation.setMouseModel(mouseModelCache.getModel(rs.getString("mouse_model_id")));
@@ -612,7 +614,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                 String diseaseId = rs.getString("disease_id");
                 Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
                 if (disease == null) {
-                    logger.info("unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
+                    logger.info("Unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
                 } else {
                     diseaseAssociation.setDiseaseIdentifier(disease.getDiseaseIdentifier());
                     MouseModel mouseModel = mouseModelCache.getModel(rs.getString("mouse_model_id"));
