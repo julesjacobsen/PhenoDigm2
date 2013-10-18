@@ -1191,6 +1191,13 @@
     -->
   </requestHandler>
 
+
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+    <lst name="defaults">
+      <str name="config">${solr.core.data.config}</str>
+    </lst>
+  </requestHandler>
+  
   <!-- Search Components
 
        Search components are registered to SolrCore and used by 
@@ -1815,9 +1822,9 @@
     -->
     
 
-  <!-- Legacy config for the admin interface -->
-  <admin>
-    <defaultQuery>*:*</defaultQuery>
-  </admin>
+    <!-- Legacy config for the admin interface -->
+    <admin>
+        <defaultQuery>*:*</defaultQuery>
+    </admin>
 
 </config>

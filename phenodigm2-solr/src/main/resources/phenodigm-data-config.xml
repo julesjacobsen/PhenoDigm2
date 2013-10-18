@@ -1,11 +1,12 @@
 <dataConfig>
- <dataSource name="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://web-mei-phcp:3369/phenodigm_b4" user="pheno_ro" password="1fgrtty345"/>
+ <dataSource name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource"/>
 <document>
  <!--
-  Gene
+  Diseases
  -->
- <entity name="diseases" query="select * from disease_gene_summary">
-   <field column="disease_id" name="id"/>
+ <entity name="phenodb" query="select concat(disease_id, '_', mgi_gene_id) as id, disease_id, mgi_gene_id, mgi_gene_symbol, disease_term, disease_alts from disease_gene_summary;">
+   <field column="id" name="id"/>
+   <field column="disease_id" name="disease_id"/>
    <field column="disease_term" name="disease_term"/>
    <field column="disease_alts" name="disease_alts"/>
    <field column="mgi_gene_id" name="marker_accession"/>
