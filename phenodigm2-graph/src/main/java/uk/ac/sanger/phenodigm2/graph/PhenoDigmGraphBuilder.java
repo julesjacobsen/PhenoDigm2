@@ -8,12 +8,13 @@ package uk.ac.sanger.phenodigm2.graph;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.UniqueFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
@@ -29,7 +30,7 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
  */
 public class PhenoDigmGraphBuilder {
     
-    private static final Logger logger = Logger.getLogger(PhenoDigmGraphBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(PhenoDigmGraphBuilder.class);
 
 //    @Autowired
     PhenoDigmDao phenoDao;
