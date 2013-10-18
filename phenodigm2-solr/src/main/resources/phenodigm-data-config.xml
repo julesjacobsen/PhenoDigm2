@@ -1,0 +1,15 @@
+<dataConfig>
+ <dataSource name="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://web-mei-phcp:3369/phenodigm_b4" user="pheno_ro" password="1fgrtty345"/>
+<document>
+ <!--
+  Gene
+ -->
+ <entity name="diseases" query="select * from disease_gene_summary">
+   <field column="disease_id" name="id"/>
+   <field column="disease_term" name="disease_term"/>
+   <field column="disease_alts" name="disease_alts"/>
+   <field column="mgi_gene_id" name="marker_accession"/>
+   <field column="mgi_gene_symbol" name="marker_symbol"/>
+ </entity>
+ </document>
+</dataConfig>
