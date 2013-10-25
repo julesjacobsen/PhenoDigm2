@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/data/neo4j
+                http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+                http://www.springframework.org/schema/tx
+                http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    
+    <context:component-scan base-package="uk.ac.sanger.phenodigm2.graph" />
+    <context:property-placeholder location="classpath:neo4jServer.properties"/>
+
+    <bean class="org.springframework.context.annotation.ConfigurationClassPostProcessor"/>
+
+    <neo4j:config graphDatabaseService="graphDatabaseService"/>
+
+    <bean id="graphDatabaseService"
+      class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
+        <constructor-arg index="0" value="${NEO4J_REST_URL}" />
+        <constructor-arg index="1" value="${NEO4J_LOGIN}" />
+        <constructor-arg index="2" value="${NEO4J_PASSWORD}" />
+    </bean>
+
+<!--    <bean id="graphDatabaseService"
+      class="org.neo4j.kernel.EmbeddedGraphDatabase">
+        <constructor-arg index="0" value="target/phenoDigm.graphdb" />
+    </bean>-->
+</beans>

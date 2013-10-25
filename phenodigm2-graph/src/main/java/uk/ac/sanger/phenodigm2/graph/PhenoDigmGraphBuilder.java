@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.neo4j.graphdb.GraphDatabaseService;
+//import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -32,7 +33,7 @@ public class PhenoDigmGraphBuilder {
     
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmGraphBuilder.class);
 
-//    @Autowired
+    @Autowired
     PhenoDigmDao phenoDao;
 
     GraphDatabaseService graphDb;
@@ -58,7 +59,7 @@ public class PhenoDigmGraphBuilder {
         //these next ones might make things really slow...
         loadDiseasePhenotypeTerms();
         loadMouseModelPhenotypeTerms();
-        //this could taka long time too...
+//        //this could take a long time too...
         loadHpMpMappings();
         
         shutDown();
@@ -69,34 +70,8 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading gene orthologs...");
         Transaction tx = graphDb.beginTx();
         try {
-//            
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
+            
+            initUniqueNodeFactories();
 
             //make the ortholog associations
             for (GeneIdentifier mouseGeneIdentifier : phenoDao.getAllMouseGeneIdentifiers()) {
@@ -105,12 +80,13 @@ public class PhenoDigmGraphBuilder {
                 //add the new nodes to the graph database
                 Node mouseGene = geneFactory.getOrCreate("geneId", mouseGeneIdentifier.getCompoundIdentifier());
                 mouseGene.setProperty("geneSymbol", mouseGeneIdentifier.getGeneSymbol());
-//                Label geneLabel = new DynamicNodeLabels(Fgfr2NodeId, null);
+                if (humanGeneIdentifier != null) {
+                    Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
+                    humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
 
-                Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
-                humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
-
-                mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
+                    mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
+                }
+                
 //                humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
 
             }
@@ -126,33 +102,7 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading mouse models...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
+            initUniqueNodeFactories();
 
             Set<MouseModel> mouseModels = phenoDao.getAllMouseModels();
             for (MouseModel mouseModel : mouseModels) {
@@ -178,33 +128,8 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading Diseases...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
+            initUniqueNodeFactories();
+            
             for (Disease disease : phenoDao.getAllDiseses()) {
                 //add the new nodes to the graph database
                 Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
@@ -229,33 +154,8 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading orthologous gene disease associations...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
+            initUniqueNodeFactories();
 
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
             //make the ortholog associations
             for (Disease disease : phenoDao.getAllDiseses()) {
                 //add the new nodes to the graph database
@@ -271,19 +171,20 @@ public class PhenoDigmGraphBuilder {
 
                     GeneIdentifier humanGeneIdentifier = phenoDao.getHumanOrthologIdentifierForMgiGeneId(mouseGeneIdentifier.getCompoundIdentifier());
 
-                    Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
-                    if (!humanGene.hasProperty("geneSymbol")) {
-                        humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
-                        System.out.println("Made humanGene node " + humanGene.getProperty("geneSymbol"));
-                    }
+                    if (humanGeneIdentifier != null) {
+                        Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
+                        if (!humanGene.hasProperty("geneSymbol")) {
+                            humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
+                            System.out.println("Made humanGene node " + humanGene.getProperty("geneSymbol"));
+                        }
 
-                    if (!mouseGene.hasRelationship(PhenoDigmRelationshipType.IS_ORTHOLOG_OF)) {
-                        mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
-//                        humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
+                        if (!mouseGene.hasRelationship(PhenoDigmRelationshipType.IS_ORTHOLOG_OF)) {
+                            mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
+    //                        humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
+                        }
+                        humanGene.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH);
                     }
-
                     mouseGene.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH_BY_ORTHOLOGY);
-                    humanGene.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH);
 
 //                    diseaseNode.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.HAS_ORTHOLOGOUS_GENE_ASSOCIATION);
 //                    diseaseNode.createRelationshipTo(humanGene, PhenoDigmRelationshipType.HAS_GENE_ASSOCIATION);
@@ -301,33 +202,9 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading Disease phenotype terms...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
+            
+            initUniqueNodeFactories();
 
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
             for (Disease disease : phenoDao.getAllDiseses()) {
                 //add the new nodes to the graph database
                 Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
@@ -359,33 +236,7 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading mouse model phenotypes...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
+            initUniqueNodeFactories();
 
             Set<MouseModel> mouseModels = phenoDao.getAllMouseModels();
             for (MouseModel mouseModel : mouseModels) {
@@ -420,33 +271,8 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading predicted gene disease associations...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
-            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("modelId", properties.get("modelId"));
-                }
-            };
-
-            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("geneId", properties.get("geneId"));
-                }
-            };
-
-            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("diseaseId", properties.get("diseaseId"));
-                }
-            };
+            initUniqueNodeFactories();
+            
             for (Disease disease : phenoDao.getAllDiseses()) {
                 //add the new nodes to the graph database
                 Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
@@ -518,13 +344,8 @@ public class PhenoDigmGraphBuilder {
         logger.info("Loading HP - MP mappings...");
         Transaction tx = graphDb.beginTx();
         try {
-            ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
-                @Override
-                protected void initialize(Node created, Map<String, Object> properties) {
-                    created.setProperty("termId", properties.get("termId"));
-                }
-            };
-
+            
+            initUniqueNodeFactories();
             //make the HP-MP associations TODO: This is NOT the way to do it efficiently - this should be a single query off the HP-MP mappings table which I can't see yet.
             for (Disease disease : phenoDao.getAllDiseses()) {
                 //add the new nodes to the graph database
@@ -591,6 +412,40 @@ public class PhenoDigmGraphBuilder {
             tx.finish();
         }
         logger.info("Done loading HP - MP mappings.");
+    }
+    
+    private void initUniqueNodeFactories() {
+        ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
+                @Override
+                protected void initialize(Node created, Map<String, Object> properties) {
+                    created.setProperty("termId", properties.get("termId"));
+//                    created.addLabel(PhenoDigmLabel.Phenotype);
+                }
+            };
+
+            mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
+                @Override
+                protected void initialize(Node created, Map<String, Object> properties) {
+                    created.setProperty("modelId", properties.get("modelId"));
+//                    created.addLabel(PhenoDigmLabel.MouseModel);
+                }
+            };
+
+            geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
+                @Override
+                protected void initialize(Node created, Map<String, Object> properties) {
+                    created.setProperty("geneId", properties.get("geneId"));
+//                    created.addLabel(PhenoDigmLabel.Gene);
+                }
+            };
+
+            diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
+                @Override
+                protected void initialize(Node created, Map<String, Object> properties) {
+                    created.setProperty("diseaseId", properties.get("diseaseId"));
+//                    created.addLabel(PhenoDigmLabel.Disease);
+                }
+            };
     }
     
     private void startDb(String dbPath) {

@@ -32,7 +32,7 @@ public class PhenoDigmGraphBuilderTest {
     PhenoDigmDao phenoDao;// = new PhenoDigmDaoStubImpl();
     
 //    private static final String TEST_DB_PATH = "target/phenodigm_graph_test.db";
-    private static final String TEST_DB_PATH = "target/phenodigm_graph.db";
+    private static final String TEST_DB_PATH = "target/phenodigm.graphdb";
     
     public PhenoDigmGraphBuilderTest() {
     }
@@ -63,7 +63,7 @@ public class PhenoDigmGraphBuilderTest {
         System.out.println("buildGraphDatabase");
         String dbPath = TEST_DB_PATH;
         PhenoDigmGraphBuilder instance = new PhenoDigmGraphBuilder();
-//        instance.buildGraphDatabase(phenoDao, dbPath);
+        instance.buildGraphDatabase(phenoDao, dbPath);
     }
   
     private void clearDb() {
