@@ -106,13 +106,23 @@
       trailing underscores (e.g. _version_) are reserved.
    -->
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />      
+   <field name="type" type="string" indexed="true" stored="true"/>
+   <!--disease fields-->
    <field name="disease_id" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="disease_term" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
-   <field name="disease_alts" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
-   <field name="marker_accession" type="string" indexed="true" stored="true" required="true"  multiValued="false"/>
+   <field name="disease_term" type="text_en_splitting" indexed="true" stored="true" omitNorms="true"/>
+   <field name="disease_alts" type="text_en_splitting" indexed="true" stored="true" omitNorms="true"/>
+   <field name="disease_classes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   <!--gene fields-->
+   <field name="marker_accession" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="human_marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="hgnc_id" type="string" indexed="true" stored="true" multiValued="false"/>
+   <!--mouse model fields-->
    <field name="mouse_model_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="source" type="string" indexed="true" stored="true" multiValued="false" /> 
+    <!--project/curation status flags-->
+   <field name="human_curated" type="int" indexed="true" stored="true" omitNorms="true"/>
+   <field name="mouse_curated" type="int" indexed="true" stored="true" omitNorms="true"/>
    
 
    <!-- Common metadata fields, named specifically to match up with
