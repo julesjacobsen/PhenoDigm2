@@ -107,23 +107,40 @@
    -->
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />      
    <field name="type" type="string" indexed="true" stored="true"/>
+   
    <!--disease fields-->
    <field name="disease_id" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="disease_term" type="text_en_splitting" indexed="true" stored="true" omitNorms="true"/>
-   <field name="disease_alts" type="text_en_splitting" indexed="true" stored="true" omitNorms="true"/>
+   <field name="disease_source" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="disease_term" type="text_en_splitting" indexed="true" stored="true"/>
+   <field name="disease_alts" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
    <field name="disease_classes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   <field name="disease_phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   
    <!--gene fields-->
    <field name="marker_accession" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="human_marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hgnc_id" type="string" indexed="true" stored="true" multiValued="false"/>
+   
    <!--mouse model fields-->
    <field name="mouse_model_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="source" type="string" indexed="true" stored="true" multiValued="false" /> 
-    <!--project/curation status flags-->
-   <field name="human_curated" type="int" indexed="true" stored="true" omitNorms="true"/>
-   <field name="mouse_curated" type="int" indexed="true" stored="true" omitNorms="true"/>
+   <field name="mouse_phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
    
+   <!--project/curation status flags-->
+   <field name="human_curated" type="int" indexed="true" stored="true"/>
+   <field name="mouse_curated" type="int" indexed="true" stored="true"/>
+   <field name="mgi_predicted" type="int" indexed="true" stored="true"/>
+   <field name="impc_predicted" type="int" indexed="true" stored="true"/>
+   <field name="mgi_predicted_in_locus" type="int" indexed="true" stored="true"/>
+   <field name="impc_predicted_in_locus" type="int" indexed="true" stored="true"/>
+   
+   <!--phenotypes-->
+   <field name="mp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="mp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="hp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="hp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="definition" type="text_en_splitting" indexed="true" stored="true" multiValued="false" /> 
 
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.
@@ -260,9 +277,15 @@
 
    <copyField source="disease_term" dest="text"/>
    <copyField source="disease_alts" dest="text"/>
+   <copyField source="disease_classes" dest="text"/>
    <copyField source="disease_id" dest="text"/>
+   <copyField source="disease_source" dest="text"/>
    <copyField source="marker_symbol" dest="text"/>
    <copyField source="marker_accession" dest="text"/>
+   <copyField source="mp_id" dest="text"/>
+   <copyField source="mp_term" dest="text"/>
+   <copyField source="hp_id" dest="text"/>
+   <copyField source="hp_term" dest="text"/>
 
    <!-- Copy the price into a currency enabled field (default USD) -->
    <!--<copyField source="price" dest="price_c"/>-->
