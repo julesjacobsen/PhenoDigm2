@@ -19,7 +19,7 @@
         <profile>
             <id>dev</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <build.profile.id>dev</build.profile.id>
@@ -32,7 +32,7 @@
                 <solr.core.data.config>phenodigm-data-config.xml</solr.core.data.config>
                 <!--SYSTEM PROPERTIES-->
                 <!--Configures the home directory of Solr. Set the preferred directory path here.-->
-                <solr.home>C:/Users/jj8/solr/build</solr.home>
+                <solr.home>${project.build.directory}</solr.home>
             </properties>
         </profile>
     </profiles>
@@ -95,7 +95,7 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>compile</phase>
+                        <phase>test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
