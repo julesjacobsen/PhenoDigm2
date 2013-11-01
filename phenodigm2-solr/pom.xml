@@ -87,8 +87,6 @@
     
     <build>
         <finalName>phenodigm-solr</finalName>
-        <!-- Add filter configuration here -->
-        <!-- Add resources configuration here -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -128,7 +126,7 @@
                 <executions>
                     <execution>
                         <id>copy-solr-config</id>
-                        <phase>compile</phase>
+                        <phase>test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
