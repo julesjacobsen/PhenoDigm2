@@ -8,7 +8,7 @@
 	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
 
-    <context:component-scan base-package="uk.ac.sanger.phenodigm2.dao"/>
+    <!--<context:component-scan base-package="uk.ac.sanger.phenodigm2.dao"/>-->
     
     <context:property-placeholder location="classpath:jdbc.properties"/>
 
@@ -24,5 +24,7 @@
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource" ref="phenodigmDataSource" />
     </bean>
+
+    <bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches"/>
         
 </beans>

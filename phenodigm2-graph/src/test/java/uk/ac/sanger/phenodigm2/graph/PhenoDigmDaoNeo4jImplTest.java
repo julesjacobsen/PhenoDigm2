@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
@@ -61,255 +62,267 @@ public class PhenoDigmDaoNeo4jImplTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of getAllDiseses method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetAllDiseses() {
+    @Test 
+    public void getAllGeneIdentifiers() {
+        assertTrue(instance.getAllMouseGeneIdentifiers().size() > 9000);
+    }
+    
+    @Test 
+    public void getAllDiseases() {
         Set<Disease> result = instance.getAllDiseses();
-//        for (Disease disease : result) {
-//            logger.info("{}", disease);
-//        }
         assertTrue(result.size() > 6700);
         assertFalse("Expected a full set of Disease objects, but got an empty one :(", result.isEmpty());
     }
-
+    
+    @Test
+    public void getGeneIdentifierForMgiGeneId() {
+        String mgiGeneId = "MGI:95523";
+        GeneIdentifier expResult = new GeneIdentifier("Fgfr2", "MGI:95523");
+        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+   
+    @Test
+    public void getHumanOrthologIdentifierForMgiGeneId() {
+        String mgiGeneId = "MGI:95523";
+        GeneIdentifier expResult = new GeneIdentifier("FGFR2", "HGNC:3689");
+        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void getGeneIdentifierForMgiGeneIdUnmappedInHGNC() {
+        String mgiGeneId = "MGI:FOOP!";
+        GeneIdentifier expResult = null;
+        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+   
+    @Test
+    public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInHGNC() {
+        String mgiGeneId = "MGI:FOOP!";
+        GeneIdentifier expResult = null;
+        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
+        assertEquals(expResult, result);
+    }
+    
     /**
-     * Test of getAllGenes method, of class PhenoGraphDAO.
+     * Test of setUpDiseaseCache method, of class JdbcDiseaseDAOImpl.
      */
     @Test
-    public void testGetAllGenes() {
-        System.out.println("getAllGenes");
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Set<Gene> expResult = null;
-        Set<Gene> result = instance.getAllGenes();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testsetUpDiseaseCache() {
+        String omimDiseaseId = "OMIM:101600";
+        CurationStatus expectedResult = new CurationStatus();
+        expectedResult.setIsAssociatedInHuman(true);
+        expectedResult.setHasMgiLiteratureEvidence(true);
+        expectedResult.setHasMgiPhenotypeEvidence(true);
+        expectedResult.setHasImpcPhenotypeEvidence(false);
+        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
+        assertEquals(expectedResult, result.getCurationStatus());
+
     }
 
     /**
-     * Test of getDiseaseByDiseaseId method, of class PhenoGraphDAO.
+     * Test of getDiseaseByDiseaseId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
-    public void testGetDiseaseByDiseaseId() {
-        System.out.println("getDiseaseByDiseaseId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Disease expResult = null;
-        Disease result = instance.getDiseaseByDiseaseId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetDiseaseByOmimDiseaseId() {
+        String omimDiseaseId = "OMIM:101600";
+
+        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
+        assertEquals("PFEIFFER SYNDROME", result.getTerm());
+
     }
 
     /**
-     * Test of getDiseasesByHgncGeneId method, of class PhenoGraphDAO.
+     * Test of getDiseasesByHgncGeneId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetDiseasesByHgncGeneId() {
-        System.out.println("getDiseasesByHgncGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Set<Disease> expResult = null;
-        Set<Disease> result = instance.getDiseasesByHgncGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String hgncGeneId = "HGNC:3689";
+
+        Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
+//        System.out.println("Human diseases for gene " + hgncGeneId);
+//        for (Disease disease : result) {
+//            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
+//        }
+        assertTrue(result.size() >= 14);
     }
 
     /**
-     * Test of getDiseasesByMgiGeneId method, of class PhenoGraphDAO.
+     * Test of getDiseasesByMgiGeneId method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetDiseasesByMgiGeneId() {
-        System.out.println("getDiseasesByMgiGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Set<Disease> expResult = null;
-        Set<Disease> result = instance.getDiseasesByMgiGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        String mgiGeneId = "MGI:95523";
 
+        Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);
+//        System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
+//        for (Disease disease : result) {
+//            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
+//        }
+        assertTrue(result.size() >= 14);
+
+    }
+    
     /**
-     * Test of getKnownDiseaseAssociationsForMgiGeneId method, of class PhenoGraphDAO.
+     * Test of getDiseasesByMgiGeneId method, of class
+     * JdbcDiseaseDAOImpl.
+     */
+    @Test
+    public void testGetDiseasesByMgiGeneIdNoMappedOrtholog() {
+        String mgiGeneId = "MGI:87874";
+
+        Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);   
+
+        assertTrue(result.isEmpty());
+        
+        
+    }
+    
+    /**
+     * Test of getKnownDiseaseAssociationsForMgiGeneId method, of class
+     * JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetKnownDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getKnownDiseaseAssociationsForMgiGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Map<Disease, Set<DiseaseAssociation>> expResult = null;
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String mgiGeneId = "MGI:95523";
+
+        Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+
+        for (Disease disease : result.keySet()) {
+//            System.out.println(disease);
+            Set<DiseaseAssociation> diseaseAssociations = result.get(disease);
+            if (disease.getDiseaseId().equals("OMIM:101200")) {
+                assertEquals(2, diseaseAssociations.size());
+            }
+            for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+//                System.out.println(String.format("    %s", diseaseAssociation));
+            }
+        }
+
+        assertTrue(result.keySet().size() >= 11);
+        
+        
     }
 
     /**
-     * Test of getPredictedDiseaseAssociationsForMgiGeneId method, of class PhenoGraphDAO.
+     * Test of getPredictedDiseaseAssociationsForMgiGeneId method, of class
+     * JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
-        System.out.println("getPredictedDiseaseAssociationsForMgiGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Map<Disease, Set<DiseaseAssociation>> expResult = null;
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String mgiGeneId = "MGI:95523";
+
+        Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+      
+//        for (Disease disease : result.keySet()) {
+//            System.out.println(disease);
+//            for (DiseaseAssociation diseaseAssociation : result.get(disease)) {
+//                System.out.println(String.format("    %s", diseaseAssociation));
+//            }
+//        }
+        assertTrue(result.keySet().size() > 290);
     }
 
-    /**
-     * Test of getKnownDiseaseAssociationsForDiseaseId method, of class PhenoGraphDAO.
-     */
-    @Test
+    @Test 
     public void testGetKnownDiseaseAssociationsForDiseaseId() {
-        System.out.println("getKnownDiseaseAssociationsForDiseaseId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Map<GeneIdentifier, Set<DiseaseAssociation>> expResult = null;
-        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String diseaseId = "OMIM:101600";
+        
+        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+        
+        int resultSize = result.keySet().size();
+        int expectSize = 2;
+        String sizeErrorMessage = String.format("Expected %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+        assertEquals(sizeErrorMessage, resultSize, expectSize);
+        
+        GeneIdentifier fgfr1 = new GeneIdentifier("Fgfr1", "MGI:95522");
+        assertTrue("Expected gene " + fgfr1 + "to be in result set", result.keySet().contains(fgfr1));
+        
+        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+        
+//        System.out.println(result);
     }
-
-    /**
-     * Test of getPredictedDiseaseAssociationsForDiseaseId method, of class PhenoGraphDAO.
-     */
-    @Test
+    
+    @Test 
     public void testGetPredictedDiseaseAssociationsForDiseaseId() {
-        System.out.println("getPredictedDiseaseAssociationsForDiseaseId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Map<GeneIdentifier, Set<DiseaseAssociation>> expResult = null;
-        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        String diseaseId = "OMIM:101600";
+        
+        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
 
-    /**
-     * Test of getAllMouseGeneIdentifiers method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetAllMouseGeneIdentifiers() {
-        System.out.println("getAllMouseGeneIdentifiers");
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Set<GeneIdentifier> expResult = null;
-        Set<GeneIdentifier> result = instance.getAllMouseGeneIdentifiers();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//        System.out.println(result);
 
-    /**
-     * Test of getGeneIdentifierForMgiGeneId method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetGeneIdentifierForMgiGeneId() {
-        System.out.println("getGeneIdentifierForMgiGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        GeneIdentifier expResult = null;
-        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int resultSize = result.keySet().size();
+        int expectSize = 46;
+        String sizeErrorMessage = String.format("Expected more than %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+        assertTrue(sizeErrorMessage, resultSize > expectSize);
+        
+        GeneIdentifier gja1 = new GeneIdentifier("Gja1", "MGI:95713");
+        assertTrue("Expected gene " + gja1 + "to be in result set", result.keySet().contains(gja1));
+        
+        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+        
+        GeneIdentifier fgfr3 = new GeneIdentifier("Fgfr3", "MGI:95524");
+        assertTrue("Expected gene " + fgfr3 + "to be in result set", result.keySet().contains(fgfr3));
+        
+             
     }
-
-    /**
-     * Test of getHumanOrthologIdentifierForMgiGeneId method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetHumanOrthologIdentifierForMgiGeneId() {
-        System.out.println("getHumanOrthologIdentifierForMgiGeneId");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        GeneIdentifier expResult = null;
-        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getDiseasePhenotypeTerms method, of class PhenoGraphDAO.
-     */
+    
     @Test
     public void testGetDiseasePhenotypeTerms() {
-        System.out.println("getDiseasePhenotypeTerms");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        List<PhenotypeTerm> expResult = null;
-        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String diseaseId = "OMIM:101200";
+        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setTermId("HP:0000175");
+        expectedTerm.setName("Cleft palate");
+        expectedTerm.setDefinition("Cleft palate is a developmental defect of the `palate` (FMA:54549) resulting from a failure of fusion of the palatine processes and manifesting as a spearation of the roof of the mouth (soft and hard palate).");
+        expectedTerm.setComment("Cleft palate is a developmental defect that occurs between the 7th and 12th week of pregnancy. Normally, the palatine processes fuse during this time to form the soft and hard palate. A failure of fusion results in a cleft palate. The clinical spectrum ranges from bifid uvula, to (incomplete or complete) cleft of the soft palate, up to (complete or incomplete) cleft of both the soft and hard palate.");
+        assertTrue(result.contains(expectedTerm));
     }
-
-    /**
-     * Test of getAllMouseModels method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetAllMouseModels() {
-        System.out.println("getAllMouseModels");
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Set<MouseModel> expResult = null;
-        Set<MouseModel> result = instance.getAllMouseModels();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getMouseModelPhenotypeTerms method, of class PhenoGraphDAO.
-     */
+    
     @Test
     public void testGetMouseModelPhenotypeTerms() {
-        System.out.println("getMouseModelPhenotypeTerms");
-        String string = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        List<PhenotypeTerm> expResult = null;
-        List<PhenotypeTerm> result = instance.getMouseModelPhenotypeTerms(string);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String mouseModelId = "1";
+        List<PhenotypeTerm> result = instance.getMouseModelPhenotypeTerms(mouseModelId);
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setTermId("MP:0000609");
+        expectedTerm.setName("abnormal liver physiology");
+        expectedTerm.setDefinition("any functional anomaly of the bile-secreting organ that is important for detoxification, for fat, carbohydrate, and protein metabolism, and for glycogen storage");
+        assertTrue(result.contains(expectedTerm));
     }
-
-    /**
-     * Test of getPhenotypeMatches method, of class PhenoGraphDAO.
-     */
+    
     @Test
-    public void testGetPhenotypeMatches() {
-        System.out.println("getPhenotypeMatches");
-        String string = "";
-        String string1 = "";
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        List<PhenotypeMatch> expResult = null;
-        List<PhenotypeMatch> result = instance.getPhenotypeMatches(string, string1);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getGene method, of class PhenoGraphDAO.
-     */
-    @Test
-    public void testGetGene() {
-        System.out.println("getGene");
-        GeneIdentifier gi = null;
-        PhenoDigmDaoNeo4jImpl instance = new PhenoDigmDaoNeo4jImpl();
-        Gene expResult = null;
-        Gene result = instance.getGene(gi);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetDiseaseAssociationPhenotypeMatches() {
+        String diseaseId = "OMIM:101600";
+        String mouseModelId = "27680";
+        List<PhenotypeMatch> result = instance.getPhenotypeMatches(diseaseId, mouseModelId);
+        PhenotypeMatch expectedMatch = new PhenotypeMatch();
+        expectedMatch.setSimJ(0.853968);
+        expectedMatch.setIc(8.901661);
+        expectedMatch.setLcs("HP_0009702 Carpal synostosis ^ MP_0008915 fused carpal bones");
+        
+        PhenotypeTerm humanTerm = new PhenotypeTerm();
+        humanTerm.setTermId("HP:0005048");
+        humanTerm.setName("Synostosis of carpal bones");
+        expectedMatch.setHumanPhenotype(humanTerm);
+        
+        PhenotypeTerm mouseTerm = new PhenotypeTerm();
+        mouseTerm.setTermId("MP:0008915");
+        mouseTerm.setName("fused carpal bones");
+        expectedMatch.setMousePhenotype(mouseTerm);
+        
+        PhenotypeMatch matchResult = null;
+        for (PhenotypeMatch phenotypeMatch : result) {
+            if (phenotypeMatch.equals(expectedMatch)) {
+                matchResult = phenotypeMatch;
+            }
+        }
+        assertNotNull(matchResult);
+        assertEquals(expectedMatch.getLcs(), matchResult.getLcs());
+        //make sure there are other matches in there too!
+        assertTrue(result.size() > 1);
     }
     
 }

@@ -29,7 +29,7 @@
         <constructor-arg index="2" value="${NEO4J_PASSWORD}" />
     </bean>
 
-<!--    <bean id="graphDatabaseService"
+    <!--    <bean id="graphDatabaseService"
       class="org.neo4j.kernel.EmbeddedGraphDatabase">
         <constructor-arg index="0" value="target/phenoDigm.graphdb" />
     </bean>-->

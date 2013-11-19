@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
+import uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl;
 
 /**
  *
@@ -29,7 +30,7 @@ import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
 public class PhenoDigmGraphBuilderTest {
     
     @Autowired
-    PhenoDigmDao phenoDao;// = new PhenoDigmDaoStubImpl();
+    PhenoDigmDao phenoDigmDao;// = new PhenoDigmDaoStubImpl();
     
 //    private static final String TEST_DB_PATH = "target/phenodigm_graph_test.db";
     private static final String TEST_DB_PATH = "target/phenodigm.graphdb";
@@ -63,7 +64,7 @@ public class PhenoDigmGraphBuilderTest {
         System.out.println("buildGraphDatabase");
         String dbPath = TEST_DB_PATH;
         PhenoDigmGraphBuilder instance = new PhenoDigmGraphBuilder();
-        instance.buildGraphDatabase(phenoDao, dbPath);
+        instance.buildGraphDatabase(phenoDigmDao, dbPath);
     }
   
     private void clearDb() {
