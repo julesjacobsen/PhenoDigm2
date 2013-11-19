@@ -5,18 +5,17 @@
 
 	<!-- Processes application requests -->
 	<servlet>
-		<servlet-name>phenoServlet</servlet-name>
+		<servlet-name>phenodigm2</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
                         <param-value>/WEB-INF/servlet-context.xml</param-value>
-			<!--<param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>-->
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>phenoServlet</servlet-name>
+		<servlet-name>phenodigm2</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 </web-app>

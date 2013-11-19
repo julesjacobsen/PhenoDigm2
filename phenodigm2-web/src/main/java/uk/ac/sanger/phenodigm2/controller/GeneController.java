@@ -4,6 +4,7 @@
  */
 package uk.ac.sanger.phenodigm2.controller;
 
+import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +18,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
-import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDao;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
-import uk.ac.sanger.phenodigm2.model.MouseModel;
+import uk.ac.sanger.phenodigm2.web.AssociationSummary;
 
 /**
  *
@@ -30,18 +29,19 @@ import uk.ac.sanger.phenodigm2.model.MouseModel;
  */
 
 @Controller
+@RequestMapping("/gene")
 public class GeneController {
 
     private static final Logger logger = LoggerFactory.getLogger(GeneController.class);
     
     @Autowired
-    private PhenoDigmDao phenoDigmDao;
+    private PhenoDigmWebDao phenoDigmDao;
     
-    @RequestMapping("/gene")
+    @RequestMapping("/")
     public String allGenes(Model model) {
         logger.info("Making all genes page");
         //Get all genes from the phenoDigmDao where we have a known disease association
-        Set<Gene> allGenes = phenoDigmDao.getAllGenes();       
+        Set<Gene> allGenes = new TreeSet<>();//phenoDigmDao.getAllGenes();       
 //        for (Disease disease : phenoDigmDao.getAllDiseses()) {
 //            for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
 //                genesWithKnownDiseaseAssociations.add(phenoDigmDao.getGene(geneIdentifier));            
@@ -51,73 +51,41 @@ public class GeneController {
         return "genes";
     }
     
-    
-    @RequestMapping(value="/gene/{acc}", method=RequestMethod.GET)
+    @RequestMapping(value="/{acc}", method=RequestMethod.GET)
     public String gene(@PathVariable("acc") String acc, Model model) {
         String mgiId = acc;
         logger.info("Making gene page for " + mgiId);
         model.addAttribute("mgiId", mgiId);
-        
-        GeneIdentifier geneIdentifier = phenoDigmDao.getGeneIdentifierForMgiGeneId(mgiId);
-        if (geneIdentifier == null) {
-            return "geneNotFound";
-        }
-        
+        GeneIdentifier geneIdentifier = new GeneIdentifier(mgiId, mgiId);
         logger.info("Found GeneIdentifier: " + geneIdentifier);
         model.addAttribute("geneIdentifier", geneIdentifier);
-        model.addAttribute("humanOrtholog", phenoDigmDao.getHumanOrthologIdentifierForMgiGeneId(mgiId));
-        //Diseases 
-        //known
-        Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = phenoDigmDao.getKnownDiseaseAssociationsForMgiGeneId(mgiId);
-        //INTERFACE TESTING ONLY!!! This should be an AJAX call.
-        populateDiseasePhenotypeTerms(knownDiseaseAssociations);
         
-        //predicted
-        Map<Disease, Set<DiseaseAssociation>> predictedDiseaseAssociations = phenoDigmDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiId);
-        //INTERFACE TESTING ONLY!!! This should be an AJAX call.
-        populateDiseasePhenotypeTerms(predictedDiseaseAssociations);
-                
-        List<DiseaseAssociationSummary> curatedDiseaseAssociationViews = new ArrayList<DiseaseAssociationSummary>();
-        List<DiseaseAssociationSummary> predictedDiseaseAssociationViews = new ArrayList<DiseaseAssociationSummary>();
-
-        for (Disease disease : knownDiseaseAssociations.keySet()) {
-            Set<DiseaseAssociation> curatedAssociations = knownDiseaseAssociations.get(disease);
-            Set<DiseaseAssociation> phenotypeAssociations = predictedDiseaseAssociations.get(disease);
-            DiseaseAssociationSummary assocView = new DiseaseAssociationSummary(geneIdentifier, disease, curatedAssociations, phenotypeAssociations);
-            curatedDiseaseAssociationViews.add(assocView);
-        }
-        model.addAttribute("curatedAssociations", curatedDiseaseAssociationViews);
+        logger.info("Getting disease-gene associations for gene: " + mgiId);
+        Map<Gene, List<DiseaseAssociationSummary>> geneToDiseaseAssociationsMap = phenoDigmDao.getGeneToDiseaseAssociationSummaries(geneIdentifier);
         
-        for (Disease disease : predictedDiseaseAssociations.keySet()) {
-            Set<DiseaseAssociation> curatedAssociations = knownDiseaseAssociations.get(disease);
-            Set<DiseaseAssociation> phenotypeAssociations = predictedDiseaseAssociations.get(disease);
-            DiseaseAssociationSummary assocView = new DiseaseAssociationSummary(geneIdentifier, disease, curatedAssociations, phenotypeAssociations);
-            predictedDiseaseAssociationViews.add(assocView);
-        }
-        model.addAttribute("phenotypeAssociations", predictedDiseaseAssociationViews);
-
+        List<DiseaseAssociationSummary> curatedAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
+        List<DiseaseAssociationSummary> phenotypeAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
         
-        return "geneTabulatedDiseaseView";
-    }
-     
-    /**
-     * Populates the PhenotypeTerms for all DiseaseAssociation in the given map  
-     * @param diseaseAssociationsMap 
-     */
-    private void populateDiseasePhenotypeTerms(Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap){
-        
-        for (Disease disease : diseaseAssociationsMap.keySet()) {
-            if (disease.getPhenotypeTerms() == null) {
-                disease.setPhenotypeTerms(phenoDigmDao.getDiseasePhenotypeTerms(disease.getDiseaseId()));                
-            }
-            Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationsMap.get(disease);
-            for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
-                MouseModel mouseModel = diseaseAssociation.getMouseModel();
-                if (mouseModel.getPhenotypeTerms().isEmpty()) {
-                    mouseModel.setPhenotypeTerms(phenoDigmDao.getMouseModelPhenotypeTerms(mouseModel.getMgiModelId()));
+        for (Gene gene : geneToDiseaseAssociationsMap.keySet()) {
+            logger.info(String.format("Found gene: %s %s", gene.getOrthologGeneId().getCompoundIdentifier(), gene.getOrthologGeneId().getGeneSymbol()));
+            List<DiseaseAssociationSummary> diseaseAssociationSummarys = geneToDiseaseAssociationsMap.get(gene);
+            
+            for (DiseaseAssociationSummary geneAssociationSummary : diseaseAssociationSummarys) {
+                AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
+                //always want the associations in the phenotypes list
+                if (associationSummary.getBestImpcScore() > 0.0 || associationSummary.getBestMgiScore() > 0.0) {
+                    phenotypeAssociationSummaries.add(geneAssociationSummary);
+                }
+                //but only the curated ones in the curated list...
+                if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
+                   curatedAssociationSummaries.add(geneAssociationSummary);
                 }
             }
         }
-    }
-
+            
+        model.addAttribute("curatedAssociations", curatedAssociationSummaries);         
+        model.addAttribute("phenotypeAssociations", phenotypeAssociationSummaries);
+       
+        return "gene";
+    }    
 }

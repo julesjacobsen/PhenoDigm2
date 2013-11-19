@@ -15,9 +15,11 @@
     <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
  
     <!-- Scans within the base package of the application for @Components to configure as beans -->
-    <!-- @Controller, @Service, @Configuration, etc. -->
-    <context:component-scan base-package="uk.ac.sanger.phenodigm2" />
-    
+    <!-- @Controller, @Service, @Configuration, etc. 
+    Not a good ideas if you have multiple implementations and only want to run one of them
+    as they are all instansiated with this-->
+    <context:component-scan base-package="uk.ac.sanger.phenodigm2.controller" />
+      
     <!--  Get the datasources from the JNDI container -->
     <jee:jndi-lookup id="phenodigmDataSource" jndi-name="jdbc/phenodigmDataSource" expected-type="javax.sql.DataSource" />
 
@@ -26,6 +28,9 @@
         <property name="dataSource" ref="phenodigmDataSource" />
     </bean>
     
+    <!--this is the DAO implementation we are looking for...-->
+    <bean id="phenoDigmWebDao" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl"/>     
+
     <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/views/" />
         <property name="suffix" value=".jsp" />
@@ -36,12 +41,6 @@
     
     <!-- Enables the Spring MVC @Controller programming model -->
     <mvc:annotation-driven />
-    
-<!--    <mvc:interceptors>
-        <mvc:interceptor>
-            <bean>
-        </mvc:interceptor>
-    </mvc:interceptors>-->
     
     <bean id="globalConfiguration" class="org.springframework.beans.factory.config.MapFactoryBean">
 		<property name="targetMapClass">
