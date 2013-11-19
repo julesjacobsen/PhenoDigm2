@@ -16,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,9 +34,11 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/jdbc-test-services.xml"})
+@ContextConfiguration(locations = {"classpath:jdbc-test-services.xml"})
 public class PhenoDigmDaoJdbcImplTest {
     
+    Logger logger = LoggerFactory.getLogger(PhenoDigmDaoJdbcImplTest.class);
+
     @Autowired
     PhenoDigmDao instance;
 
@@ -66,7 +70,9 @@ public class PhenoDigmDaoJdbcImplTest {
     }
     
     @Test public void getAllDiseases() {
-        assertTrue(instance.getAllDiseses().size() > 6700);
+        Set<Disease> result = instance.getAllDiseses();
+        assertTrue(result.size() > 6700);
+        assertFalse("Expected a full set of Disease objects, but got an empty one :(", result.isEmpty());
     }
     
     @Test
@@ -166,11 +172,11 @@ public class PhenoDigmDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseasesByMgiGeneIdNoMappedOrtholog() {
-        String mgiGeneId = "MGI:87874";
+        String mgiGeneId = "MGI:flipWooP!";
 
         Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);   
 
-        assertTrue(result.isEmpty());
+        assertTrue("Expected empty result, but got: " + result, result.isEmpty());
         
         
     }

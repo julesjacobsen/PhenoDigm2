@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © 2011-2013 EMBL - European Bioinformatics Institute
+ * and Genome Research Limited
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License.  
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.ac.sanger.phenodigm2.model;
 
@@ -23,6 +34,40 @@ public class ExternalIdentifier {
     private String databaseAcc;
     private String externalUri;
 
+    private static enum ExternalLink {
+        MGI("MGI", "http://www.informatics.jax.org/accession/MGI:"),
+        HGNC("HGNC", "http://www.genenames.org/data/hgnc_data.php?hgnc_id="),
+        OMIM("OMIM", "http://omim.org/entry/"),
+        ORPHANET("ORPHANET", "http://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=GB&Expert="),
+        DECIPHER("DECIPHER", "https://decipher.sanger.ac.uk/syndrome/"),
+        UNKNOWN("UNKNOWN", "");
+        
+        private final String identifier;
+        private final String link;
+        
+        
+        private ExternalLink(String identifier, String link){
+            this.identifier = identifier;
+            this.link = link;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public String getLink() {
+            return link;
+        }
+        
+        public static ExternalLink getExternalLink(String identifier) {
+            for (ExternalLink externalLink : ExternalLink.values()) {
+                if (externalLink.identifier.equals(identifier)) {
+                    return externalLink;
+                }
+            }
+            return UNKNOWN;
+        }
+    }
     /**
      * Creates a new ExternalIdentifier from a compound identifier.
      * Compound identifiers must follow the format:
@@ -75,7 +120,12 @@ public class ExternalIdentifier {
     }
 
     public String getExternalUri() {
-        return externalUri;
+        ExternalLink externalLink = ExternalLink.getExternalLink(this.databaseCode);
+        if (externalLink == ExternalLink.UNKNOWN) {
+            logger.info("{} not a known external resource - must be one of {}", this.databaseCode, ExternalLink.values());
+            return "";
+        }
+        return String.format("%s%s", externalLink.getLink(), this.databaseAcc);
     }
 
     public void setExternalUri(String externalUri) {

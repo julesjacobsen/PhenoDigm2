@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright Â© 2011-2013 EMBL - European Bioinformatics Institute
+ * and Genome Research Limited
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License.  
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.ac.sanger.phenodigm2.dao;
 
@@ -41,22 +53,21 @@ import uk.ac.sanger.phenodigm2.model.ProjectStatus;
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 @Repository
-public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
+public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmDaoJdbcImpl.class);
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     //caches these are constantly cross-referenced when building objects
     private static OrthologCache orthologCache;
     private static DiseaseCache diseaseCache;
     private static MouseModelCache mouseModelCache;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        setUpCaches();
+    
+    public PhenoDigmDaoJdbcImpl() {
     }
-
+  
     private void setUpCaches() {
         //don't change the order - the orthologs are needed first off
         setUpOrthologCache();
@@ -571,7 +582,6 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                 } else {
                     diseaseAssociation.setDiseaseIdentifier(disease.getDiseaseIdentifier());
                     diseaseAssociation.setMouseModel(mouseModelCache.getModel(rs.getString("mouse_model_id")));
-                    diseaseAssociation.setPubMedId("TODO");
                     diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(rs.getString("disease2mouse_score")));
                     diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(rs.getString("mouse2disease_score")));
                     diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());
@@ -629,7 +639,6 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao, InitializingBean {
                         logger.info(mouseGeneId + " not found in ortholog cache so made a new one: " + mouseGeneId);
                     }
                     diseaseAssociation.setMouseModel(mouseModel);
-                    diseaseAssociation.setPubMedId("TODO");
                     diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(rs.getString("disease2mouse_score")));
                     diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(rs.getString("mouse2disease_score")));
                     diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());

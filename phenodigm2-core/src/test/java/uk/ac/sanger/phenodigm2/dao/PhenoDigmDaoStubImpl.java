@@ -234,7 +234,6 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         diseaseAssociation.setDiseaseIdentifier(diseaseIdentifier);
         diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(fields[1]));
         diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(fields[2]));
-        diseaseAssociation.setPubMedId("TODO");
         diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());
         
         return diseaseAssociation;

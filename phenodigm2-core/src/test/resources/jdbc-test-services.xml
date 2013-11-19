@@ -9,7 +9,7 @@
        >
 
 
-    <context:component-scan base-package="uk.ac.sanger.phenodigm2.dao"/>
+    <!--<context:component-scan base-package="uk.ac.sanger.phenodigm2.dao"/>-->
     
     <context:property-placeholder location="classpath:jdbc.properties"/>
 
@@ -26,4 +26,6 @@
         <property name="dataSource" ref="phenodigmDataSource" />
     </bean>
     
+    <bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches"/>
+    <bean id="phenoDigmWebDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl"/>    
 </beans>

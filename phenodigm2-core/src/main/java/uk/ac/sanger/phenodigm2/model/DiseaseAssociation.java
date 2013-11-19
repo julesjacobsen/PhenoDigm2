@@ -1,14 +1,29 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © 2011-2013 EMBL - European Bioinformatics Institute
+ * and Genome Research Limited
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License.  
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.ac.sanger.phenodigm2.model;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
- * 
+ * Contains the information relating a mouse model to a disease.
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
@@ -19,9 +34,17 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
     private double modelToDiseaseScore;
     private double diseaseToModelScore;
     private List<PhenotypeMatch> phenotypeMatches;
-    private String pubMedId;
+    //Store the Mouse Model phenotypes here as they should be garbage-collected.
+    //Storing the PhenotypeTerms directly in the MouseModel will be more efficient
+    //for database calls, but will lead to ever-increasing (although eventuallly constant)
+    //memory usage as the MouseModels may be cached
+    //
+    private List<PhenotypeTerm> mouseModelPhenotypeTerms;
+    private boolean hasLiteratureEvidence;
     
     public DiseaseAssociation() {
+        mouseModelPhenotypeTerms = new ArrayList<>();
+        hasLiteratureEvidence = false;
     }
 
     public DiseaseIdentifier getDiseaseIdentifier() {
@@ -64,22 +87,30 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
         this.phenotypeMatches = phenotypeMatches;
     }
 
-    public String getPubMedId() {
-        return pubMedId;
+    public List<PhenotypeTerm> getMouseModelPhenotypeTerms() {
+        return mouseModelPhenotypeTerms;
     }
 
-    public void setPubMedId(String pubMedId) {
-        this.pubMedId = pubMedId;
+    public void setMouseModelPhenotypeTerms(List<PhenotypeTerm> mouseModelPhenotypeTerms) {
+        this.mouseModelPhenotypeTerms = mouseModelPhenotypeTerms;
+    }
+
+    public boolean hasLiteratureEvidence() {
+        return hasLiteratureEvidence;
+    }
+
+    public void setHasLiteratureEvidence(boolean hasLiteratureEvidence) {
+        this.hasLiteratureEvidence = hasLiteratureEvidence;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.diseaseIdentifier != null ? this.diseaseIdentifier.hashCode() : 0);
-        hash = 97 * hash + (this.mouseModel != null ? this.mouseModel.hashCode() : 0);
+        hash = 97 * hash + Objects.hashCode(this.diseaseIdentifier);
+        hash = 97 * hash + Objects.hashCode(this.mouseModel);
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.modelToDiseaseScore) ^ (Double.doubleToLongBits(this.modelToDiseaseScore) >>> 32));
         hash = 97 * hash + (int) (Double.doubleToLongBits(this.diseaseToModelScore) ^ (Double.doubleToLongBits(this.diseaseToModelScore) >>> 32));
-        hash = 97 * hash + (this.pubMedId != null ? this.pubMedId.hashCode() : 0);
+        hash = 97 * hash + (this.hasLiteratureEvidence ? 1 : 0);
         return hash;
     }
 
@@ -92,10 +123,10 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
             return false;
         }
         final DiseaseAssociation other = (DiseaseAssociation) obj;
-        if ((this.diseaseIdentifier == null) ? (other.diseaseIdentifier != null) : !this.diseaseIdentifier.equals(other.diseaseIdentifier)) {
+        if (!Objects.equals(this.diseaseIdentifier, other.diseaseIdentifier)) {
             return false;
         }
-        if (this.mouseModel != other.mouseModel && (this.mouseModel == null || !this.mouseModel.equals(other.mouseModel))) {
+        if (!Objects.equals(this.mouseModel, other.mouseModel)) {
             return false;
         }
         if (Double.doubleToLongBits(this.modelToDiseaseScore) != Double.doubleToLongBits(other.modelToDiseaseScore)) {
@@ -104,17 +135,56 @@ public class DiseaseAssociation implements Comparable<DiseaseAssociation> {
         if (Double.doubleToLongBits(this.diseaseToModelScore) != Double.doubleToLongBits(other.diseaseToModelScore)) {
             return false;
         }
-        if ((this.pubMedId == null) ? (other.pubMedId != null) : !this.pubMedId.equals(other.pubMedId)) {
+        if (this.hasLiteratureEvidence != other.hasLiteratureEvidence) {
             return false;
         }
         return true;
     }
-    
+        
     @Override
     public String toString() {
-        return "DiseaseAssociation{" + diseaseIdentifier + " " + mouseModel.getMgiGeneId() + "_" + mouseModel.getMgiModelId() + " PubMed: " + pubMedId + " Scores: [m2d=" + modelToDiseaseScore + ", d2M=" + diseaseToModelScore + "] " + phenotypeMatches + '}';
+        return String.format("DiseaseAssociation{%s %s_%s hasLiteratureEvidence: %s Scores: [m2d=%s, d2m=%s] PhenotypeMatches: %s MouseModelPhenotypes: %s}", diseaseIdentifier, mouseModel.getMgiGeneId(), mouseModel.getMgiModelId(), hasLiteratureEvidence, modelToDiseaseScore, diseaseToModelScore, phenotypeMatches, mouseModelPhenotypeTerms);
     }
 
+    public static Comparator<DiseaseAssociation> DiseaseToGeneScoreComparator = new Comparator<DiseaseAssociation>() {
+
+        private static final int BEFORE = -1;
+        private static final int EQUAL = 0;
+        private static final int AFTER = 1;
+        
+        @Override
+        public int compare(DiseaseAssociation o1, DiseaseAssociation o2) {
+            if (o1.diseaseToModelScore > o2.diseaseToModelScore) {
+                return BEFORE;
+            }
+            if (o1.diseaseToModelScore < o2.diseaseToModelScore) {
+                return AFTER;
+            }
+
+            return EQUAL;
+        }
+        
+    };
+    
+    public static Comparator<DiseaseAssociation> GeneToDiseaseScoreComparator  = new Comparator<DiseaseAssociation>() {
+
+        private static final int BEFORE = -1;
+        private static final int EQUAL = 0;
+        private static final int AFTER = 1;
+        
+        @Override
+        public int compare(DiseaseAssociation o1, DiseaseAssociation o2) {
+            if (o1.modelToDiseaseScore > o2.modelToDiseaseScore) {
+                return BEFORE;
+            }
+            if (o1.modelToDiseaseScore < o2.modelToDiseaseScore) {
+                return AFTER;
+            }
+
+            return EQUAL;
+        }
+        
+    };
     
     //need to specify comparator for different sorting criteria 
     @Override
