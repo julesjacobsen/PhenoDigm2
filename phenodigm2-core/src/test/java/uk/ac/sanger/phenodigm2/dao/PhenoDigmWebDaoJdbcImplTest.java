@@ -16,6 +16,8 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.After;
@@ -83,6 +85,24 @@ public class PhenoDigmWebDaoJdbcImplTest {
         Map<Disease, List<GeneAssociationSummary>> expResult = null;
         Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
 //        assertEquals(expResult, result);
+
+    }
+    
+    /**
+     * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetDiseaseToGeneAssociationSummariesNoAssociations() {
+        System.out.println("getDiseaseToGeneAssociationSummaries");
+        
+//        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:243050");
+        Map<Disease, List<GeneAssociationSummary>> expResult = new HashMap<>();
+        Disease disease = new Disease(diseaseId);
+        disease.setTerm("INDOLYLACROYL GLYCINURIA WITH MENTAL RETARDATION");
+        expResult.put(disease, new ArrayList<GeneAssociationSummary>());
+        Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
+        assertEquals(expResult, result);
 
     }
 

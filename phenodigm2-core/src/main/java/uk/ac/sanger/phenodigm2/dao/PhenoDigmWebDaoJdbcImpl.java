@@ -68,6 +68,12 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
         Map<Disease, List<GeneAssociationSummary>> diseaseToGeneAssociationSummariesMap = jdbcTemplate.query(preparedStatement, new DiseaseToGeneAssociationSummariesResultSetExtractor());
 
+        if (diseaseToGeneAssociationSummariesMap.isEmpty()) {
+            logger.info("No GeneAssociations found for {}", diseaseId);
+            Disease disease = getDisease(diseaseId);
+            diseaseToGeneAssociationSummariesMap.put(disease, new ArrayList<GeneAssociationSummary>());
+            
+        }
         return diseaseToGeneAssociationSummariesMap;
     }
 
@@ -112,6 +118,20 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         return result;
     }
 
+    private Disease getDisease(DiseaseIdentifier diseaseId) {
+        String sql = "select d.disease_id, d.disease_term "
+                + "from disease_summary d "
+                + "where d.disease_id = ?;";
+        
+        PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
+        Disease disease = jdbcTemplate.query(preparedStatement,  new DiseaseResultSetExtractor());
+        
+        if (disease.getDiseaseId() == null) {
+            disease = new Disease(diseaseId);
+        }
+        
+        return disease;
+    }
     
     private List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         
@@ -176,11 +196,13 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         Map<Disease, List<GeneAssociationSummary>> results;
 
         public DiseaseToGeneAssociationSummariesResultSetExtractor() {
-            results = new HashMap<Disease, List<GeneAssociationSummary>>();
+            
         }
 
         @Override
         public Map<Disease, List<GeneAssociationSummary>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            results = new HashMap<Disease, List<GeneAssociationSummary>>();
+            
             boolean madeDisease = false;
             Disease disease = null;
             List<GeneAssociationSummary> geneAssociationSummaries = new ArrayList<GeneAssociationSummary>();
@@ -214,7 +236,9 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 geneAssociationSummaries.add(geneAssociationSummary);
                 logger.debug("Made {}", geneAssociationSummary);
             }
-            results.put(disease, geneAssociationSummaries);
+            if (disease != null) {
+                results.put(disease, geneAssociationSummaries);            
+            }
             return results;
         }
 
@@ -363,6 +387,26 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             
             return phenotypes;
         }
+    }
+
+    
+    private static class DiseaseResultSetExtractor implements ResultSetExtractor<Disease> {
+
+        public DiseaseResultSetExtractor() {
+        }
+
+        @Override
+        public Disease extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Disease disease = new Disease();
+            
+            while (rs.next()) {
+                disease.setDiseaseIdentifier(new DiseaseIdentifier(rs.getString("disease_id")));
+                disease.setTerm(rs.getString("disease_term"));
+            }
+            
+            return disease;
+        }
+    
     }
 
 }
