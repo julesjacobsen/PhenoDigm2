@@ -120,7 +120,7 @@
                                     <c:set var="mouseGeneIdentifier" value="${association.mouseGeneIdentifier}"></c:set>
                                     <c:set var="humanGeneIdentifier" value="${association.humanGeneIdentifier}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
-                                        <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}">
+                                        <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                             <td>
                                                 <!--Human Gene Symbol-->
                                                 <a href="${humanGeneIdentifier.externalUri}">${humanGeneIdentifier.geneSymbol}</a> 
@@ -140,7 +140,7 @@
                                             </td>                                    
                                             <td>
                                                 <c:if test="${associationSummary.inLocus}">
-                                                    <b style="color:#FF9000">Yes</b>
+                                                    Yes
                                                 </c:if>
                                             </td>
                                             <!--Mouse Phenotype Evidence (Phenodigm)-->
@@ -165,8 +165,8 @@
                 </c:choose>
             </div>
         </div>
-        <div class="container span12">
-            <div class="row-fluid dataset">
+        <div class="row-fluid dataset">
+            <div class="container span12">
                 <h4 class="topic">Phenotypic Gene Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>
                     <c:choose>
                         <c:when test="${empty phenotypeAssociations}">
@@ -192,7 +192,7 @@
                                     <c:set var="mouseGeneIdentifier" value="${association.mouseGeneIdentifier}"></c:set>
                                     <c:set var="humanGeneIdentifier" value="${association.humanGeneIdentifier}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
-                                        <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="P${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}">
+                                        <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="P${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                             <td>
                                                 <!--Human Gene Symbol-->
                                                 <a href="${humanGeneIdentifier.externalUri}">${humanGeneIdentifier.geneSymbol}</a> 
@@ -212,7 +212,7 @@
                                             </td>                                    
                                             <td>
                                                 <c:if test="${associationSummary.inLocus}">
-                                                    <b style="color:#FF9000">Yes</b>
+                                                    Yes
                                                 </c:if>
                                             </td>
                                             <!--Mouse Phenotype Evidence (Phenodigm)-->

@@ -41,7 +41,7 @@ import uk.ac.sanger.phenodigm2.graph.converter.DiseaseNodeConverter;
 import uk.ac.sanger.phenodigm2.graph.converter.NodeConverter;
 import uk.ac.sanger.phenodigm2.graph.converter.PhenotypeNodeConverter;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -128,22 +128,22 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String string) {
+    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String string) {
+    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String string) {
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String string) {
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

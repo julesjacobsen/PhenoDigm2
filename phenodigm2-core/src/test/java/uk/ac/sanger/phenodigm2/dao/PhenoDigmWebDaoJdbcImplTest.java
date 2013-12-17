@@ -16,6 +16,7 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import com.googlecode.flyway.core.Flyway;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -131,7 +132,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
         DiseaseGeneAssociationDetail result = instance.getDiseaseGeneAssociationDetail(diseaseId, geneId);
 //        assertEquals(expResult, result);
         System.out.println(result.getDiseaseId());
-        for (DiseaseAssociation diseaseAssociation : result.getDiseaseAssociations()) {
+        for (DiseaseModelAssociation diseaseAssociation : result.getDiseaseAssociations()) {
             System.out.println(diseaseAssociation);
         }
 

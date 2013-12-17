@@ -38,7 +38,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -157,9 +157,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
+    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
 
-        Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap;
+        Map<Disease, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
         String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgm.mgi_gene_id, od.mouse_model_id "
                 + "from disease_2_mgi_mouse_models od "
                 + "join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id "
@@ -175,7 +175,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         //also add in the diseases with no known disease associations other than by gene orthology.
         for (Disease disease : getDiseasesByMgiGeneId(mgiGeneId)) {
             if (!diseaseAssociationsMap.keySet().contains(disease)) {
-                diseaseAssociationsMap.put(disease, new TreeSet<DiseaseAssociation>());
+                diseaseAssociationsMap.put(disease, new TreeSet<DiseaseModelAssociation>());
             }
         }
         
@@ -183,9 +183,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
+    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
 
-        Map<Disease, Set<DiseaseAssociation>> diseaseAssociationsMap;
+        Map<Disease, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
         
         String sql = "select disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi_gene_id, mouse_model_id "
                 + "from disease_mouse_genotype_associations d where mgi_gene_id = ?;";
@@ -250,9 +250,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
         
-        Map<GeneIdentifier, Set<DiseaseAssociation>> diseaseAssociationsMap = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> diseaseAssociationsMap = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
                     //disease_2_mgi_mouse_models has literature curated data
         String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, mgm.mgi_gene_id, od.mouse_model_id "
                 + "from disease_2_mgi_mouse_models od "
@@ -271,7 +271,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
         logger.info("Looking for associated gene orthologs of " + disease);
         for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
-            Set<DiseaseAssociation> diseaseAssociations = getKnownDiseaseAssociationsForMgiGeneId(geneIdentifier.getCompoundIdentifier()).get(disease);
+            Set<DiseaseModelAssociation> diseaseAssociations = getKnownDiseaseAssociationsForMgiGeneId(geneIdentifier.getCompoundIdentifier()).get(disease);
             diseaseAssociationsMap.put(geneIdentifier, diseaseAssociations);
         }
         
@@ -280,8 +280,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
-        Map<GeneIdentifier, Set<DiseaseAssociation>> diseaseAssociationsMap;
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
                      //disease2mouse_gene_associations
         String sql = "select dmga2.disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, d.mgi_gene_id, d.mouse_model_id \n" +
                     "from disease_mouse_gene_associations dmga2 \n" +
@@ -564,17 +564,17 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    private static class DiseaseAssociationResultSetExtractor implements ResultSetExtractor<Map<Disease, Set<DiseaseAssociation>>> {
+    private static class DiseaseAssociationResultSetExtractor implements ResultSetExtractor<Map<Disease, Set<DiseaseModelAssociation>>> {
 
         public DiseaseAssociationResultSetExtractor() {
         }
 
         @Override
-        public Map<Disease, Set<DiseaseAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<Disease, Set<DiseaseAssociation>> results = new TreeMap<Disease, Set<DiseaseAssociation>>();
+        public Map<Disease, Set<DiseaseModelAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Map<Disease, Set<DiseaseModelAssociation>> results = new TreeMap<Disease, Set<DiseaseModelAssociation>>();
 
             while (rs.next()) {
-                DiseaseAssociation diseaseAssociation = new DiseaseAssociation();
+                DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
                 String diseaseId = rs.getString("disease_id");
                 Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
                 if (disease == null) {
@@ -589,7 +589,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     if (results.containsKey(disease)) {
                         results.get(disease).add(diseaseAssociation);
                     } else {
-                        Set<DiseaseAssociation> diseaseAssociations = new TreeSet<DiseaseAssociation>();
+                        Set<DiseaseModelAssociation> diseaseAssociations = new TreeSet<DiseaseModelAssociation>();
                         diseaseAssociations.add(diseaseAssociation);
                         results.put(disease, diseaseAssociations);
                     }
@@ -610,17 +610,17 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
     
     
-    private static class GeneAssociationResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Set<DiseaseAssociation>>> {
+    private static class GeneAssociationResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Set<DiseaseModelAssociation>>> {
 
         public GeneAssociationResultSetExtractor() {
         }
 
         @Override
-        public Map<GeneIdentifier, Set<DiseaseAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<GeneIdentifier, Set<DiseaseAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+        public Map<GeneIdentifier, Set<DiseaseModelAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Map<GeneIdentifier, Set<DiseaseModelAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
 
             while (rs.next()) {
-                DiseaseAssociation diseaseAssociation = new DiseaseAssociation();
+                DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
                 String diseaseId = rs.getString("disease_id");
                 Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
                 if (disease == null) {
@@ -646,7 +646,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     if (results.containsKey(mouseGeneId)) {
                         results.get(mouseGeneId).add(diseaseAssociation);
                     } else {
-                        Set<DiseaseAssociation> diseaseAssociations = new TreeSet<DiseaseAssociation>();
+                        Set<DiseaseModelAssociation> diseaseAssociations = new TreeSet<DiseaseModelAssociation>();
                         diseaseAssociations.add(diseaseAssociation);
                         results.put(mouseGeneId, diseaseAssociations);
                     }

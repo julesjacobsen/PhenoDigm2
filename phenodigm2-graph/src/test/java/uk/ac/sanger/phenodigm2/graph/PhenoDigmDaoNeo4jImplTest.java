@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -188,15 +188,15 @@ public class PhenoDigmDaoNeo4jImplTest {
     public void testGetKnownDiseaseAssociationsForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
 
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
 
         for (Disease disease : result.keySet()) {
 //            System.out.println(disease);
-            Set<DiseaseAssociation> diseaseAssociations = result.get(disease);
+            Set<DiseaseModelAssociation> diseaseAssociations = result.get(disease);
             if (disease.getDiseaseId().equals("OMIM:101200")) {
                 assertEquals(2, diseaseAssociations.size());
             }
-            for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+            for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
 //                System.out.println(String.format("    %s", diseaseAssociation));
             }
         }
@@ -214,7 +214,7 @@ public class PhenoDigmDaoNeo4jImplTest {
     public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
 
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+      Map<Disease, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
       
 //        for (Disease disease : result.keySet()) {
 //            System.out.println(disease);
@@ -229,7 +229,7 @@ public class PhenoDigmDaoNeo4jImplTest {
     public void testGetKnownDiseaseAssociationsForDiseaseId() {
         String diseaseId = "OMIM:101600";
         
-        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
         
         int resultSize = result.keySet().size();
         int expectSize = 2;
@@ -249,7 +249,7 @@ public class PhenoDigmDaoNeo4jImplTest {
     public void testGetPredictedDiseaseAssociationsForDiseaseId() {
         String diseaseId = "OMIM:101600";
         
-        Map<GeneIdentifier, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
 
 //        System.out.println(result);
 

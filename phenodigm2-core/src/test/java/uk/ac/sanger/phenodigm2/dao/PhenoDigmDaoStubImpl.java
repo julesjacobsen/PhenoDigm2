@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -42,8 +42,8 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     private static DiseaseCache diseaseCache;
     private static MouseModelCache mouseModelCache;
        
-    private Map<String, Set<DiseaseAssociation>> diseaseAssociationMap;
-    private Map<String, Set<DiseaseAssociation>> predictedDiseaseAssociationsMap;
+    private Map<String, Set<DiseaseModelAssociation>> diseaseAssociationMap;
+    private Map<String, Set<DiseaseModelAssociation>> predictedDiseaseAssociationsMap;
     
     public static PhenoDigmDaoStubImpl getInstance() {
         if (instance == null) {
@@ -82,25 +82,25 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String geneSymbol) {
+    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String geneSymbol) {
         logger.info("getting known Disease Associations for " + geneSymbol);
                
-        Map<Disease, Set<DiseaseAssociation>> knownDiseaseAssociations = new TreeMap<Disease, Set<DiseaseAssociation>>();
+        Map<Disease, Set<DiseaseModelAssociation>> knownDiseaseAssociations = new TreeMap<Disease, Set<DiseaseModelAssociation>>();
         for (Disease disease : getDiseasesByMgiGeneId(geneSymbol)){
-            Set<DiseaseAssociation> diseaseAssociations = diseaseAssociationMap.get(disease.getDiseaseId());
+            Set<DiseaseModelAssociation> diseaseAssociations = diseaseAssociationMap.get(disease.getDiseaseId());
             if (diseaseAssociations != null) {
                 knownDiseaseAssociations.put(disease, diseaseAssociations);                
             } else {
                 logger.warning(String.format("No known Disease Associations for disease %s - %s with gene %s", disease.getDiseaseId(), disease.getTerm(), geneSymbol));
-                knownDiseaseAssociations.put(disease, new TreeSet<DiseaseAssociation>()); 
+                knownDiseaseAssociations.put(disease, new TreeSet<DiseaseModelAssociation>()); 
             }
         }
         return knownDiseaseAssociations;
     }
 
     @Override
-    public Map<Disease, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
-        Map<Disease, Set<DiseaseAssociation>> diseaseAssociations = new TreeMap<Disease, Set<DiseaseAssociation>>();
+    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
+        Map<Disease, Set<DiseaseModelAssociation>> diseaseAssociations = new TreeMap<Disease, Set<DiseaseModelAssociation>>();
         
         //the disease data should come from a cache
         for (String omimDiseaseId : predictedDiseaseAssociationsMap.keySet()) {
@@ -208,13 +208,13 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     private void populatePhenotypeMatches() {
         
         //this will contain all the known disease associations
-        diseaseAssociationMap = new HashMap<String, Set<DiseaseAssociation>>();
+        diseaseAssociationMap = new HashMap<String, Set<DiseaseModelAssociation>>();
 
         String knownDiseaseAssociationStubData = "src/test/resources/data/fgfr2MgiLiteratureMouseModels.dsv";
         makeDiseaseAssociations(diseaseAssociationMap, knownDiseaseAssociationStubData);
          
         //and this one the predicted associations
-        predictedDiseaseAssociationsMap = new HashMap<String, Set<DiseaseAssociation>>();
+        predictedDiseaseAssociationsMap = new HashMap<String, Set<DiseaseModelAssociation>>();
         String predictedDiseaseAssociationStubData = "src/test/resources/data/fgfr2PredictedMouseModelToDiseaseAsociations.dsv"; 
         makeDiseaseAssociations(predictedDiseaseAssociationsMap, predictedDiseaseAssociationStubData);
         
@@ -222,8 +222,8 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     
     }
     
-    private DiseaseAssociation makeDiseaseAssociation(String line) {
-        DiseaseAssociation diseaseAssociation = new DiseaseAssociation();
+    private DiseaseModelAssociation makeDiseaseAssociation(String line) {
+        DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
         
         String[] fields = line.split("\\t");
         
@@ -252,10 +252,10 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         return mouseModel;
     }
 
-    private void addDiseaseAssociationToMap(Map<String, Set<DiseaseAssociation>> diseaseAssociationsMap, DiseaseAssociation diseaseAssociation) {
+    private void addDiseaseAssociationToMap(Map<String, Set<DiseaseModelAssociation>> diseaseAssociationsMap, DiseaseModelAssociation diseaseAssociation) {
         String diseaseId = diseaseAssociation.getDiseaseIdentifier().getCompoundIdentifier();
         if (!diseaseAssociationsMap.containsKey(diseaseId)) {
-            Set<DiseaseAssociation> diseaseAssociations = new TreeSet<DiseaseAssociation>();
+            Set<DiseaseModelAssociation> diseaseAssociations = new TreeSet<DiseaseModelAssociation>();
             diseaseAssociations.add(diseaseAssociation);
             diseaseAssociationsMap.put(diseaseId, diseaseAssociations);
         } else {
@@ -275,7 +275,7 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
         return reader;
     }    
 
-    private void makeDiseaseAssociations(Map<String, Set<DiseaseAssociation>> diseaseAssociationsMap, String diseaseAssociationStubData) {
+    private void makeDiseaseAssociations(Map<String, Set<DiseaseModelAssociation>> diseaseAssociationsMap, String diseaseAssociationStubData) {
         
         BufferedReader diseaseAssociations = getReaderFromFile(diseaseAssociationStubData);
         
@@ -287,7 +287,7 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
                 //first line is a header 
                 if (currentLine != headerLine) {
 //                    System.out.println(line);
-                    DiseaseAssociation diseaseAssociation = makeDiseaseAssociation(line);
+                    DiseaseModelAssociation diseaseAssociation = makeDiseaseAssociation(line);
                     addDiseaseAssociationToMap(diseaseAssociationsMap, diseaseAssociation);
                 }
                 currentLine++; 
@@ -333,15 +333,15 @@ public class PhenoDigmDaoStubImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
-        Map<GeneIdentifier, Set<DiseaseAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
 //        results.put(diseaseId, diseaseAssociationMap.get(diseaseId));
         return results;
     }
 
     @Override
-    public Map<GeneIdentifier, Set<DiseaseAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
-        Map<GeneIdentifier, Set<DiseaseAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseAssociation>>();
+    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
+        Map<GeneIdentifier, Set<DiseaseModelAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
 //        results.put(diseaseId, diseaseAssociationMap.get(diseaseId));
         return results;    }
 

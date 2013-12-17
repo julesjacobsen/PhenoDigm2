@@ -18,7 +18,7 @@
 package uk.ac.sanger.phenodigm2.web;
 
 import java.util.List;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
@@ -33,7 +33,7 @@ public class DiseaseGeneAssociationDetail {
     private final DiseaseIdentifier diseaseId;
     private Gene gene;
     private List<PhenotypeTerm> diseasePhenotypes;
-    private List<DiseaseAssociation> diseaseAssociations;
+    private List<DiseaseModelAssociation> diseaseAssociations;
 
     public DiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId) {
         this.diseaseId = diseaseId;
@@ -59,11 +59,11 @@ public class DiseaseGeneAssociationDetail {
         this.diseasePhenotypes = diseasePhenotypes;
     }
 
-    public List<DiseaseAssociation> getDiseaseAssociations() {
+    public List<DiseaseModelAssociation> getDiseaseAssociations() {
         return diseaseAssociations;
     }
 
-    public void setDiseaseAssociations(List<DiseaseAssociation> diseaseAssociations) {
+    public void setDiseaseAssociations(List<DiseaseModelAssociation> diseaseAssociations) {
         this.diseaseAssociations = diseaseAssociations;
     }
     

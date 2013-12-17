@@ -28,51 +28,53 @@ import uk.ac.sanger.phenodigm2.web.AssociationSummary;
  */
 @Controller
 public class DiseaseController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(DiseaseController.class);
-    
+
     @Autowired
     private PhenoDigmWebDao phenoDigmDao;
 
     @RequestMapping(value = "/disease")
     public String allDiseases(Model model) {
         Set<Disease> allDiseases = new TreeSet<Disease>();//phenoDigmDao.getAllDiseses();
-        
+
         model.addAttribute("allDiseases", allDiseases);
-        
+
         return "diseases";
     }
 
     @RequestMapping(value = "/disease/{diseaseId}")
     public String disease(@PathVariable("diseaseId") String diseaseId, Model model) {
-        
+
         logger.info("Getting gene-disease associations for disease: " + diseaseId);
         Map<Disease, List<GeneAssociationSummary>> diseaseToGeneAssociationsMap = phenoDigmDao.getDiseaseToGeneAssociationSummaries(new DiseaseIdentifier(diseaseId));
-        
+
         List<GeneAssociationSummary> curatedAssociationSummaries = new ArrayList<GeneAssociationSummary>();
         List<GeneAssociationSummary> phenotypeAssociationSummaries = new ArrayList<GeneAssociationSummary>();
-            
+
         for (Disease disease : diseaseToGeneAssociationsMap.keySet()) {
             model.addAttribute("disease", disease);
             logger.info(String.format("Found disease: %s %s", disease.getDiseaseId(), disease.getTerm()));
             List<GeneAssociationSummary> geneAssociationSummarys = diseaseToGeneAssociationsMap.get(disease);
-            
-            for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummarys) {
-                AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
-                //always want the associations in the phenotypes list
-                if (associationSummary.getBestImpcScore() > 0.0 || associationSummary.getBestMgiScore() > 0.0) {
-                    phenotypeAssociationSummaries.add(geneAssociationSummary);
+//            if (!geneAssociationSummarys.isEmpty()) {
+                for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummarys) {
+                    AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
+                    //always want the associations in the phenotypes list
+                    if (associationSummary.getBestImpcScore() > 0.0 || associationSummary.getBestMgiScore() > 0.0) {
+                        phenotypeAssociationSummaries.add(geneAssociationSummary);
+                    }
+                    //but only the curated ones in the curated list...
+                    if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
+                        curatedAssociationSummaries.add(geneAssociationSummary);
+                    }
                 }
-                //but only the curated ones in the curated list...
-                if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
-                   curatedAssociationSummaries.add(geneAssociationSummary);
-                }
-            }
+//            }
+
         }
-        
+
         model.addAttribute("curatedAssociations", curatedAssociationSummaries);
         model.addAttribute("phenotypeAssociations", phenotypeAssociationSummaries);
-        
+
         return "disease";
     }
 }

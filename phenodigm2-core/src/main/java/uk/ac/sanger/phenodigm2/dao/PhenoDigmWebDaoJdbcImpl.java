@@ -34,7 +34,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
@@ -83,6 +83,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         logger.info("Getting associated diseases for gene {}", geneId);
 
         String sql = "select * from disease_gene_summary where mgi_gene_id = ? order by in_locus desc, max_mgi_mouse_to_disease_perc_score desc;";
+//        String sql = "select * from mouse_disease_gene_summary where model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneId.getCompoundIdentifier(), sql);
 
@@ -109,7 +110,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         if (result == null) {
             logger.info("No mouse models found for disease association {} {} - this should only be associated by orthology to the human ortholog.", diseaseId, geneId);
             result = new DiseaseGeneAssociationDetail(diseaseId);
-            result.setDiseaseAssociations(new ArrayList<DiseaseAssociation>());
+            result.setDiseaseAssociations(new ArrayList<DiseaseModelAssociation>());
         }
         //Remember to add the disease phenotype terms too.
         List<PhenotypeTerm> diseasePhenotypes = getDiseasePhenotypes(diseaseId);
@@ -306,9 +307,9 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         @Override
         public DiseaseGeneAssociationDetail extractData(ResultSet rs) throws SQLException, DataAccessException {
             DiseaseGeneAssociationDetail result = null;
-            List<DiseaseAssociation> diseaseAssociations = new ArrayList<>();
+            List<DiseaseModelAssociation> diseaseAssociations = new ArrayList<>();
             String currentModelId = "";
-            DiseaseAssociation currentAssociation = null;
+            DiseaseModelAssociation currentAssociation = null;
             while (rs.next()) {
                 if (result == null) {
                     //make the diseaseIdentifier (only one row needed)
@@ -323,7 +324,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     if (currentAssociation != null) {
                         logger.debug("Made DiseaseAssociation {} {} {} {}", currentAssociation.getDiseaseIdentifier(), currentAssociation.getMouseModel().getMgiGeneId(), currentAssociation.getMouseModel().getMgiModelId(), currentAssociation.getMouseModelPhenotypeTerms());
                     }
-                    DiseaseAssociation diseaseAssociation = new DiseaseAssociation();
+                    DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
                     currentAssociation = diseaseAssociation;
                     diseaseAssociation.setDiseaseIdentifier(result.getDiseaseId());
                     //disease association scores
@@ -358,7 +359,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             if (result != null) {
                 logger.debug("Made DiseaseGeneAssociationDetail for disease {}", result.getDiseaseId());
                 logger.debug("Disease phenotypes {}", result.getDiseasePhenotypes());
-                for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+                for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
                     logger.debug("{}", diseaseAssociation);
                 }
             }

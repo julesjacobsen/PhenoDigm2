@@ -17,7 +17,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -107,11 +107,11 @@ public class PhenoDigmDaoStubImplTest {
     public void testGetKnownDiseaseAssociationsForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
 
         for (Disease disease : result.keySet()) {
             System.out.println(disease);
-            for (DiseaseAssociation diseaseAssociation : result.get(disease)) {
+            for (DiseaseModelAssociation diseaseAssociation : result.get(disease)) {
                 System.out.println(String.format("    %s",diseaseAssociation));
             }
         }
@@ -154,11 +154,11 @@ public class PhenoDigmDaoStubImplTest {
     public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
         String mgiGeneId = "MGI:95523";
         PhenoDigmDaoStubImpl instance = PhenoDigmDaoStubImpl.getInstance();
-        Map<Disease, Set<DiseaseAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
         
         for (Disease disease : result.keySet()) {
             System.out.println(disease);
-            for (DiseaseAssociation diseaseAssociation : result.get(disease)) {
+            for (DiseaseModelAssociation diseaseAssociation : result.get(disease)) {
                 System.out.println(String.format("    %s",diseaseAssociation));
             }
         }
@@ -175,20 +175,20 @@ public class PhenoDigmDaoStubImplTest {
         String mgiGeneId = "MGI:95523";
         
         System.out.println("\n\nKnown Disease Associations:");
-        Map<Disease, Set<DiseaseAssociation>> knownDiseases = diseaseDao.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
-        Map<Disease, Set<DiseaseAssociation>> predictedDiseases = diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> knownDiseases = diseaseDao.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> predictedDiseases = diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
 
         for (Disease disease : knownDiseases.keySet()) {
             System.out.println(disease.getTerm());
             System.out.println(disease);
             System.out.println(String.format("%n  Mouse Disease Models with Phenotypic Similarity to %s - via Literature:", disease.getTerm()));
-            Set<DiseaseAssociation> literatureDiseaseAssociations = knownDiseases.get(disease);
+            Set<DiseaseModelAssociation> literatureDiseaseAssociations = knownDiseases.get(disease);
             System.out.print(formatDiseaseAssociations(literatureDiseaseAssociations));
             
             System.out.println(String.format("%n  Phenotypic Matches to Mouse Models of %s:", disease.getTerm()));
-            Set<DiseaseAssociation> phenotypicDiseaseAssociations = predictedDiseases.get(disease);
+            Set<DiseaseModelAssociation> phenotypicDiseaseAssociations = predictedDiseases.get(disease);
             if (phenotypicDiseaseAssociations == null) {
-                phenotypicDiseaseAssociations = new TreeSet<DiseaseAssociation>();
+                phenotypicDiseaseAssociations = new TreeSet<DiseaseModelAssociation>();
             }
             System.out.print(formatDiseaseAssociations(phenotypicDiseaseAssociations));
             System.out.println("--------------------------------------------------------------------------------------------------\n");
@@ -203,12 +203,12 @@ public class PhenoDigmDaoStubImplTest {
         
     }
     
-    private String formatDiseaseAssociations(Set<DiseaseAssociation> diseaseAssociations) {
+    private String formatDiseaseAssociations(Set<DiseaseModelAssociation> diseaseAssociations) {
         StringBuffer stringBuffer = new StringBuffer("");
         if (diseaseAssociations.isEmpty()) {
             return String.format("    No significant disease phenotype associations found.%n");
         }
-        for (DiseaseAssociation diseaseAssociation : diseaseAssociations) {
+        for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
             MouseModel associatedModel = diseaseAssociation.getMouseModel();
             stringBuffer.append(String.format("    d2mScore:%s %s%n", diseaseAssociation.getModelToDiseaseScore(), associatedModel));
             stringBuffer.append(String.format("      PhenotypeMatches: %s%n", diseaseAssociation.getPhenotypeMatches()));
