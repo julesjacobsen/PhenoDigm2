@@ -65,16 +65,16 @@ public class GeneAssociationSummaryTest {
     @Test
     public void testGetHumanGeneIdentifier() {
         GeneIdentifier expResult = humanGeneIdentifier;
-        GeneIdentifier result = instance.getHumanGeneIdentifier();
+        GeneIdentifier result = instance.getHgncGeneIdentifier();
         assertEquals(expResult, result);
     }
     /**
-     * Test of getMouseGeneIdentifier method, of class GeneAssociationSummary.
+     * Test of getModelGeneIdentifier method, of class GeneAssociationSummary.
      */
     @Test
     public void testGetMouseGeneIdentifier() {
         GeneIdentifier expResult = mouseGeneIdentifier;
-        GeneIdentifier result = instance.getMouseGeneIdentifier();
+        GeneIdentifier result = instance.getModelGeneIdentifier();
         assertEquals(expResult, result);
     }
 

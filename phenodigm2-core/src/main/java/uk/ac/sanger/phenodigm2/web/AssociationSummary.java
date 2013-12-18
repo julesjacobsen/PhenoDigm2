@@ -28,8 +28,8 @@ public class AssociationSummary {
     private boolean hasLiteratureEvidence;
     private boolean inLocus;
     private String locus;
-    private double bestMgiScore;
-    private double bestImpcScore;
+    private double bestModScore;
+    private double bestHtpcScore;
 
     public AssociationSummary() {
     }
@@ -39,8 +39,8 @@ public class AssociationSummary {
         this.hasLiteratureEvidence = hasLiteratureEvidence;
         this.inLocus = inLocus;
         this.locus = locus;
-        this.bestMgiScore = bestMgiScore;
-        this.bestImpcScore = bestImpcScore;
+        this.bestModScore = bestMgiScore;
+        this.bestHtpcScore = bestImpcScore;
     }  
     
     public boolean isAssociatedInHuman() {
@@ -75,24 +75,24 @@ public class AssociationSummary {
         this.locus = locus;
     }
 
-    public double getBestMgiScore() {
-        return bestMgiScore;
+    public double getBestModScore() {
+        return bestModScore;
     }
 
-    public void setBestMgiScore(double bestMgiScore) {
-        this.bestMgiScore = bestMgiScore;
+    public void setBestModScore(double bestModScore) {
+        this.bestModScore = bestModScore;
     }
 
-    public double getBestImpcScore() {
-        return bestImpcScore;
+    public double getBestHtpcScore() {
+        return bestHtpcScore;
     }
 
-    public void setBestImpcScore(double bestImpcScore) {
-        this.bestImpcScore = bestImpcScore;
+    public void setBestHtpcScore(double bestHtpcScore) {
+        this.bestHtpcScore = bestHtpcScore;
     }
 
     @Override
     public String toString() {
-        return "AssociationSummary{" + "associatedInHuman=" + associatedInHuman + ", hasLiteratureEvidence=" + hasLiteratureEvidence + ", inLocus=" + inLocus + ", locus=" + locus + ", bestMgiScore=" + bestMgiScore + ", bestImpcScore=" + bestImpcScore + '}';
+        return "AssociationSummary{" + "associatedInHuman=" + associatedInHuman + ", hasLiteratureEvidence=" + hasLiteratureEvidence + ", inLocus=" + inLocus + ", locus=" + locus + ", bestMgiScore=" + bestModScore + ", bestImpcScore=" + bestHtpcScore + '}';
     }   
 }

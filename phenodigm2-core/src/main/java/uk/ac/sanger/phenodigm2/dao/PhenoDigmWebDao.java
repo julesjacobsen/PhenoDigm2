@@ -54,4 +54,11 @@ public interface PhenoDigmWebDao {
      */
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId);
 
+    /**
+     * Returns a Disease object for a given DiseaseIdentifier.
+     * @param diseaseId
+     * @return
+     */
+    public Disease getDisease(DiseaseIdentifier diseaseId);
+    
 }

@@ -25,30 +25,30 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 public class GeneAssociationSummary {
     
-    private GeneIdentifier humanGeneIdentifier;
-    private GeneIdentifier mouseGeneIdentifier;
+    private GeneIdentifier hgncGeneIdentifier;
+    private GeneIdentifier modelGeneIdentifier;
     private AssociationSummary associationSummary;
 
     public GeneAssociationSummary(GeneIdentifier humanGeneIdentifier, GeneIdentifier mouseGeneIdentifier, AssociationSummary associationSummary) {
-        this.humanGeneIdentifier = humanGeneIdentifier;
-        this.mouseGeneIdentifier = mouseGeneIdentifier;
+        this.hgncGeneIdentifier = humanGeneIdentifier;
+        this.modelGeneIdentifier = mouseGeneIdentifier;
         this.associationSummary = associationSummary;
     }
 
-    public GeneIdentifier getHumanGeneIdentifier() {
-        return humanGeneIdentifier;
+    public GeneIdentifier getHgncGeneIdentifier() {
+        return hgncGeneIdentifier;
     }
 
-    public void setHumanGeneIdentifier(GeneIdentifier humanGeneIdentifier) {
-        this.humanGeneIdentifier = humanGeneIdentifier;
+    public void setHgncGeneIdentifier(GeneIdentifier hgncGeneIdentifier) {
+        this.hgncGeneIdentifier = hgncGeneIdentifier;
     }
 
-    public GeneIdentifier getMouseGeneIdentifier() {
-        return mouseGeneIdentifier;
+    public GeneIdentifier getModelGeneIdentifier() {
+        return modelGeneIdentifier;
     }
 
-    public void setMouseGeneIdentifier(GeneIdentifier mouseGeneIdentifier) {
-        this.mouseGeneIdentifier = mouseGeneIdentifier;
+    public void setModelGeneIdentifier(GeneIdentifier modelGeneIdentifier) {
+        this.modelGeneIdentifier = modelGeneIdentifier;
     }
 
     public AssociationSummary getAssociationSummary() {
@@ -62,7 +62,7 @@ public class GeneAssociationSummary {
     
     @Override
     public String toString() {
-        return String.format("GeneAssociationSummary{ %s %s %s}", humanGeneIdentifier, mouseGeneIdentifier, associationSummary);
+        return String.format("GeneAssociationSummary{ %s %s %s}", hgncGeneIdentifier, modelGeneIdentifier, associationSummary);
     }
     
 }

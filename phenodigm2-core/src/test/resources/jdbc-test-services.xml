@@ -28,9 +28,11 @@
     
     <bean id="flyway" class="com.googlecode.flyway.core.Flyway" init-method="migrate">
         <property name="dataSource" ref="phenodigmDataSource"/>
-        <property name="schemas" value="PHENODIGM2"/>
+<!--        There are problems using specified schemas and building/accessing the data using H2
+        so, given this is a test DB let's forget the custom schema name-->
+        <!--<property name="schemas" value="PHENODIGM2"/>-->
     </bean>
      
-    <bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches" depends-on="flyway"/>
-    <bean id="phenoDigmWebDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl" depends-on="flyway"/>    
+    <!--<bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches" depends-on="flyway"/>-->
+    <bean id="phenoDigmWebDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl" depends-on="flyway"/>
 </beans>

@@ -62,7 +62,12 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
         logger.info("Getting associated genes for disease {}", diseaseId);
 
-        String sql = "select * from disease_gene_summary where disease_id = ? order by in_locus desc, max_mgi_disease_to_mouse_perc_score desc;";
+//        String sql = "select * from disease_gene_summary where disease_id = ? order by in_locus desc, max_mgi_disease_to_mouse_perc_score desc;";
+        String sql = "select d.*, mgo.*, mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
+                + "from mouse_disease_gene_summary mdgs "
+                + "join disease d on d.disease_id = mdgs.disease_id "
+                + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
+                + "where d.disease_id = ? order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
 
@@ -82,8 +87,12 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
         logger.info("Getting associated diseases for gene {}", geneId);
 
-        String sql = "select * from disease_gene_summary where mgi_gene_id = ? order by in_locus desc, max_mgi_mouse_to_disease_perc_score desc;";
-//        String sql = "select * from mouse_disease_gene_summary where model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
+//        String sql = "select * from disease_gene_summary where mgi_gene_id = ? order by in_locus desc, max_mgi_mouse_to_disease_perc_score desc;";
+        String sql = "select d.*, mgo.*, mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
+                + "from mouse_disease_gene_summary mdgs "
+                + "join disease d on d.disease_id = mdgs.disease_id "
+                + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
+                + "where mgo.model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneId.getCompoundIdentifier(), sql);
 
@@ -97,14 +106,20 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
         logger.info("Getting disease-gene association details for {} {}", diseaseId, geneId);
 
-        String sql = "select disease_id, mgi_gene_id, mgi_gene_symbol, dmga.mouse_model_id, source, mgi_lit_model, allelic_composition, allcomp_link, genetic_background, disease_to_mouse_perc_score, mouse_to_disease_perc_score, mp.term_id, mp.name \n"
-                + "from disease_mouse_genotype_associations dmga \n"
-                //Could add in the human gene details too if we wanted to add the gene info for cases where there are no associated models 
-//                + "join gene_summary gs on gs.mgi_gene_id = dmga.mgi_gene_id"
-                + "join mp_mouse_models mmm on mmm.mouse_model_id = dmga.mouse_model_id \n"
-                + "join mp_term_infos mp on mp.term_id = mmm.mp_id \n"
-                + "where disease_id = ? and mgi_gene_id = ?;";
+//        String sql = "select disease_id, mgi_gene_id, mgi_gene_symbol, dmga.mouse_model_id, source, mgi_lit_model, allelic_composition, allcomp_link, genetic_background, disease_to_mouse_perc_score, mouse_to_disease_perc_score, mp.term_id, mp.name \n"
+//                + "from disease_mouse_genotype_associations dmga \n"
+//                + "join mp_mouse_models mmm on mmm.mouse_model_id = dmga.mouse_model_id \n"
+//                + "join mp_term_infos mp on mp.term_id = mmm.mp_id \n"
+//                + "where disease_id = ? and mgi_gene_id = ?;";
 
+        String sql = "select disease_id, model_gene_id, dmma.model_id, source, lit_model, allelic_composition, allelic_composition_link, genetic_background, disease_to_model_perc_score, model_to_disease_perc_score, mp.mp_id, mp.term "
+                + "from mouse_disease_model_association dmma "
+                + "join mouse_model mm on mm.model_id = dmma.model_id "
+                + "join mouse_model_gene_ortholog mmgo on mm.model_id = mmgo.model_id "
+                + "join mouse_model_mp mmp on mmp.model_id = mm.model_id "
+                + "join mp mp on mp.mp_id = mmp.mp_id "
+                + "where disease_id = ? and model_gene_id = ?;";
+       
         PreparedStatementCreator preparedStatement = new TwoValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), geneId.getCompoundIdentifier(), sql);
         DiseaseGeneAssociationDetail result = jdbcTemplate.query(preparedStatement, new DiseaseGeneAssociationDetailResultSetExtractor());
         if (result == null) {
@@ -119,9 +134,10 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         return result;
     }
 
-    private Disease getDisease(DiseaseIdentifier diseaseId) {
-        String sql = "select d.disease_id, d.disease_term "
-                + "from disease_summary d "
+    @Override
+    public Disease getDisease(DiseaseIdentifier diseaseId) {
+        String sql = "select d.* "
+                + "from disease d "
                 + "where d.disease_id = ?;";
         
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
@@ -136,9 +152,9 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
     
     private List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         
-        String sql = "select d.evidence, hp.term_id as term_id, hp.name as name, hp.definition as definition, hp.comment as comment "
-                + "from hp_term_infos hp "
-                + "join disease_hp d on d.hp_id = hp.term_id "
+        String sql = "select hp.hp_id as term_id, hp.term as term "
+                + "from hp hp "
+                + "join disease_hp d on d.hp_id = hp.hp_id "
                 + "where d.disease_id = ?;";
         
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
@@ -224,15 +240,21 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     madeDisease = true;
                     logger.debug("Made {}", disease);
                 }
-                GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("mgi_gene_symbol"), rs.getString("mgi_gene_id"));
-                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("human_gene_symbol"), rs.getString("hgnc_id"));
-                double bestMgiScore = rs.getDouble("max_mgi_disease_to_mouse_perc_score");
-                double bestImpcScore = rs.getDouble("max_impc_disease_to_mouse_perc_score");
+
+                //make the genes
+                GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
+                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
+                
+                //make the association summary
+                double bestModScore = rs.getDouble("max_mod_score");
+                double bestHtpcScore = rs.getDouble("max_htpc_score");
                 boolean associatedInHuman = rs.getBoolean("human_curated");
-                boolean hasLiteratureEvidence = rs.getBoolean("mouse_curated");
+                boolean hasLiteratureEvidence = rs.getBoolean("mod_curated");
                 boolean inLocus = rs.getBoolean("in_locus");
-                String locus = rs.getString("gene_locus");
-                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestMgiScore, bestImpcScore);
+                String locus = rs.getString("hgnc_gene_locus");
+                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestModScore, bestHtpcScore);
+                
+                //put genes and associations together
                 GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(humanIdentifier, mouseIdentifier, associationSummary);
                 geneAssociationSummaries.add(geneAssociationSummary);
                 logger.debug("Made {}", geneAssociationSummary);
@@ -262,20 +284,20 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             while (rs.next()) {
                 //make the disease from the first row
                 if (!madeGene) {
-                    GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("mgi_gene_symbol"), rs.getString("mgi_gene_id"));
-                    GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("human_gene_symbol"), rs.getString("hgnc_id"));
+                    GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
+                    GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
                     gene = new Gene(mouseIdentifier, humanIdentifier);
                     madeGene = true;
                     logger.debug("Made {}", gene);
                 }
                 //make the Association summary 
-                double bestMgiScore = rs.getDouble("max_mgi_mouse_to_disease_perc_score");
-                double bestImpcScore = rs.getDouble("max_impc_mouse_to_disease_perc_score");
+                double bestModScore = rs.getDouble("max_mod_score");
+                double bestHtpcScore = rs.getDouble("max_htpc_score");
                 boolean associatedInHuman = rs.getBoolean("human_curated");
-                boolean hasLiteratureEvidence = rs.getBoolean("mouse_curated");
+                boolean hasLiteratureEvidence = rs.getBoolean("mod_curated");
                 boolean inLocus = rs.getBoolean("in_locus");
                 String locus = rs.getString("disease_locus");
-                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestMgiScore, bestImpcScore);
+                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestModScore, bestHtpcScore);
 
                 //make the Disease                 
                 Disease disease = new Disease(rs.getString("disease_id"));
@@ -318,7 +340,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     result.setDiseaseAssociations(diseaseAssociations);
                     logger.debug("Making DiseaseGeneAssociationDetail for disease {}", result.getDiseaseId());
                 }
-                String mouseModelId = rs.getString("mouse_model_id");
+                String mouseModelId = rs.getString("model_id");
                 if (!mouseModelId.equals(currentModelId)) {
                     currentModelId = mouseModelId;
                     if (currentAssociation != null) {
@@ -328,17 +350,17 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     currentAssociation = diseaseAssociation;
                     diseaseAssociation.setDiseaseIdentifier(result.getDiseaseId());
                     //disease association scores
-                    diseaseAssociation.setDiseaseToModelScore(rs.getDouble("disease_to_mouse_perc_score"));
-                    diseaseAssociation.setModelToDiseaseScore(rs.getDouble("mouse_to_disease_perc_score"));
+                    diseaseAssociation.setDiseaseToModelScore(rs.getDouble("disease_to_model_perc_score"));
+                    diseaseAssociation.setModelToDiseaseScore(rs.getDouble("model_to_disease_perc_score"));
                     //TODO: wire this in when the column is available in the DB
-                    diseaseAssociation.setHasLiteratureEvidence(rs.getBoolean("mgi_lit_model"));
+                    diseaseAssociation.setHasLiteratureEvidence(rs.getBoolean("lit_model"));
                     //make the mouseModel (several rows)
                     MouseModel model = new MouseModel();
                     model.setMgiModelId(mouseModelId);
                     model.setAllelicComposition(rs.getString("allelic_composition"));
-                    model.setAllelicCompositionLink(rs.getString("allcomp_link"));
+                    model.setAllelicCompositionLink(rs.getString("allelic_composition_link"));
                     model.setGeneticBackground(rs.getString("genetic_background"));
-                    model.setMgiGeneId(rs.getString("mgi_gene_id"));
+                    model.setMgiGeneId(rs.getString("model_gene_id"));
                     model.setSource(rs.getString("source"));
                     
                     diseaseAssociation.setMouseModel(model);
@@ -349,8 +371,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 }
                 //make the MP terms and attach to the diseaseAssociation (each row)
                 PhenotypeTerm term = new PhenotypeTerm();
-                term.setTermId(rs.getString("term_id"));
-                term.setName(rs.getString("name"));
+                term.setTermId(rs.getString("mp_id"));
+                term.setName(rs.getString("term"));
                 if (currentAssociation != null) {
                     currentAssociation.getMouseModelPhenotypeTerms().add(term);
                 }
@@ -380,9 +402,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             while(rs.next()) {
                 PhenotypeTerm term = new PhenotypeTerm();
                 term.setTermId(rs.getString("term_id"));
-                term.setName(rs.getString("name"));
-                term.setDefinition(rs.getString("definition"));
-                term.setComment(rs.getString("comment"));
+                term.setName(rs.getString("term"));
                 phenotypes.add(term);
             }
             
@@ -401,8 +421,18 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             Disease disease = new Disease();
             
             while (rs.next()) {
-                disease.setDiseaseIdentifier(new DiseaseIdentifier(rs.getString("disease_id")));
-                disease.setTerm(rs.getString("disease_term"));
+                    disease = new Disease(rs.getString("disease_id"));
+                    disease.setTerm(rs.getString("disease_term"));
+                    List<String> loci = new ArrayList<String>();
+                    String diseaseloci = rs.getString("disease_locus");
+                    loci.addAll(Arrays.asList(diseaseloci.split(",")));
+                    disease.setLocations(loci);
+
+                    List<String> altTerms = new ArrayList<String>();
+                    String synonyms = rs.getString("disease_alts");
+                    altTerms.addAll(Arrays.asList(synonyms.split("\\|")));
+                    disease.setAlternativeTerms(altTerms);
+                    logger.debug("Made {}", disease);
             }
             
             return disease;

@@ -16,7 +16,6 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import com.googlecode.flyway.core.Flyway;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,30 +82,55 @@ public class PhenoDigmWebDaoJdbcImplTest {
         
 //        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:112600");
-        Map<Disease, List<GeneAssociationSummary>> expResult = null;
         Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
-//        assertEquals(expResult, result);
 
+        for (Disease resultDisease : result.keySet()) {
+            assertEquals("BRACHYDACTYLY, TYPE A2; BDA2", resultDisease.getTerm());
+            List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
+            assertEquals(17, geneAssociationSummaries.size());
+        }
     }
     
     /**
-     * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
+     * Test of getDiseaseToGeneAssociationSummariesNoKnownAssociations method, of class PhenoDigmWebDaoJdbcImpl.
      */
     @Test
-    public void testGetDiseaseToGeneAssociationSummariesNoAssociations() {
-        System.out.println("getDiseaseToGeneAssociationSummaries");
+    public void testGetDiseaseToGeneAssociationSummariesNoKnownAssociations() {
+        System.out.println("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
         
 //        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
-        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:243050");
-        Map<Disease, List<GeneAssociationSummary>> expResult = new HashMap<>();
-        Disease disease = new Disease(diseaseId);
-        disease.setTerm("INDOLYLACROYL GLYCINURIA WITH MENTAL RETARDATION");
-        expResult.put(disease, new ArrayList<GeneAssociationSummary>());
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
+        Disease expDisease = new Disease(diseaseId);
+        expDisease.setTerm("1P36 MICRODELETION SYNDROME");
+        
         Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
-        assertEquals(expResult, result);
+        for (Disease resultDisease : result.keySet()) {
+            assertEquals(expDisease.getTerm(), resultDisease.getTerm());
+            List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
+            assertEquals(4, geneAssociationSummaries.size());
+            for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummaries) {
+                assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
+            }
+        }
 
     }
 
+    /**
+     * Test of getDisease method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetDisease() {
+//        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:243050");
+//        Disease expected = new Disease(diseaseId);
+//        expected.setTerm("INDOLYLACROYL GLYCINURIA WITH MENTAL RETARDATION");
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
+        Disease expected = new Disease(diseaseId);
+        expected.setTerm("1P36 MICRODELETION SYNDROME");
+        Disease result = instance.getDisease(diseaseId);
+        
+        assertEquals(expected, result);
+    }
+    
     /**
      * Test of getGeneToDiseaseAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
      */
@@ -128,7 +152,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
         System.out.println("getDiseaseGeneAssociationDetail");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:144250");;
         GeneIdentifier geneId = new GeneIdentifier("MGI:96820", "MGI:96820");
-        DiseaseGeneAssociationDetail expResult = null;
+
         DiseaseGeneAssociationDetail result = instance.getDiseaseGeneAssociationDetail(diseaseId, geneId);
 //        assertEquals(expResult, result);
         System.out.println(result.getDiseaseId());
