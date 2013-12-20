@@ -63,7 +63,9 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         logger.info("Getting associated genes for disease {}", diseaseId);
 
 //        String sql = "select * from disease_gene_summary where disease_id = ? order by in_locus desc, max_mgi_disease_to_mouse_perc_score desc;";
-        String sql = "select d.*, mgo.*, mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
+        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
+                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+                + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
                 + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
@@ -88,7 +90,10 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         logger.info("Getting associated diseases for gene {}", geneId);
 
 //        String sql = "select * from disease_gene_summary where mgi_gene_id = ? order by in_locus desc, max_mgi_mouse_to_disease_perc_score desc;";
-        String sql = "select d.*, mgo.*, mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
+        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
+                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+                + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, "
+                + "mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
                 + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
@@ -136,7 +141,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
     @Override
     public Disease getDisease(DiseaseIdentifier diseaseId) {
-        String sql = "select d.* "
+        String sql = "select disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus "
                 + "from disease d "
                 + "where d.disease_id = ?;";
         
@@ -243,7 +248,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
                 //make the genes
                 GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
-                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
+                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_gene_id"));
                 
                 //make the association summary
                 double bestModScore = rs.getDouble("max_mod_score");
@@ -285,7 +290,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 //make the disease from the first row
                 if (!madeGene) {
                     GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
-                    GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
+                    GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_gene_id"));
                     gene = new Gene(mouseIdentifier, humanIdentifier);
                     madeGene = true;
                     logger.debug("Made {}", gene);

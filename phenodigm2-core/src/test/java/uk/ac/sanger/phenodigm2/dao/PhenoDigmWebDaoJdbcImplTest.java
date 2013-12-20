@@ -87,7 +87,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
         for (Disease resultDisease : result.keySet()) {
             assertEquals("BRACHYDACTYLY, TYPE A2; BDA2", resultDisease.getTerm());
             List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
-            assertEquals(17, geneAssociationSummaries.size());
+            assertTrue(geneAssociationSummaries.size() >= 17);
         }
     }
     
@@ -107,7 +107,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
         for (Disease resultDisease : result.keySet()) {
             assertEquals(expDisease.getTerm(), resultDisease.getTerm());
             List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
-            assertEquals(4, geneAssociationSummaries.size());
+            assertTrue(geneAssociationSummaries.size() >= 4);
             for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummaries) {
                 assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
             }
@@ -151,7 +151,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
     public void testGetDiseaseGeneAssociationDetail() {
         System.out.println("getDiseaseGeneAssociationDetail");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:144250");;
-        GeneIdentifier geneId = new GeneIdentifier("MGI:96820", "MGI:96820");
+        GeneIdentifier geneId = new GeneIdentifier("Lpl", "MGI:96820");
 
         DiseaseGeneAssociationDetail result = instance.getDiseaseGeneAssociationDetail(diseaseId, geneId);
 //        assertEquals(expResult, result);
