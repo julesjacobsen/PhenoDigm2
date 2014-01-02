@@ -275,8 +275,8 @@ public class PhenoDigmDaoNeo4jImplTest {
         String diseaseId = "OMIM:101200";
         List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setTermId("HP:0000175");
-        expectedTerm.setName("Cleft palate");
+        expectedTerm.setId("HP:0000175");
+        expectedTerm.setTerm("Cleft palate");
         expectedTerm.setDefinition("Cleft palate is a developmental defect of the `palate` (FMA:54549) resulting from a failure of fusion of the palatine processes and manifesting as a spearation of the roof of the mouth (soft and hard palate).");
         expectedTerm.setComment("Cleft palate is a developmental defect that occurs between the 7th and 12th week of pregnancy. Normally, the palatine processes fuse during this time to form the soft and hard palate. A failure of fusion results in a cleft palate. The clinical spectrum ranges from bifid uvula, to (incomplete or complete) cleft of the soft palate, up to (complete or incomplete) cleft of both the soft and hard palate.");
         assertTrue(result.contains(expectedTerm));
@@ -287,8 +287,8 @@ public class PhenoDigmDaoNeo4jImplTest {
         String mouseModelId = "1";
         List<PhenotypeTerm> result = instance.getMouseModelPhenotypeTerms(mouseModelId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setTermId("MP:0000609");
-        expectedTerm.setName("abnormal liver physiology");
+        expectedTerm.setId("MP:0000609");
+        expectedTerm.setTerm("abnormal liver physiology");
         expectedTerm.setDefinition("any functional anomaly of the bile-secreting organ that is important for detoxification, for fat, carbohydrate, and protein metabolism, and for glycogen storage");
         assertTrue(result.contains(expectedTerm));
     }
@@ -304,13 +304,13 @@ public class PhenoDigmDaoNeo4jImplTest {
         expectedMatch.setLcs("HP_0009702 Carpal synostosis ^ MP_0008915 fused carpal bones");
         
         PhenotypeTerm humanTerm = new PhenotypeTerm();
-        humanTerm.setTermId("HP:0005048");
-        humanTerm.setName("Synostosis of carpal bones");
+        humanTerm.setId("HP:0005048");
+        humanTerm.setTerm("Synostosis of carpal bones");
         expectedMatch.setHumanPhenotype(humanTerm);
         
         PhenotypeTerm mouseTerm = new PhenotypeTerm();
-        mouseTerm.setTermId("MP:0008915");
-        mouseTerm.setName("fused carpal bones");
+        mouseTerm.setId("MP:0008915");
+        mouseTerm.setTerm("fused carpal bones");
         expectedMatch.setMousePhenotype(mouseTerm);
         
         PhenotypeMatch matchResult = null;

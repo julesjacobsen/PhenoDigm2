@@ -201,9 +201,9 @@ public class PhenoDigmGraphBuilder {
                 }
                 //make disease ontology terms - SLOW!!!
                 for (PhenotypeTerm term : phenoDao.getDiseasePhenotypeTerms(disease.getDiseaseId())) {
-                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getTermId());
+                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getId());
                     if (!termNode.hasProperty("termName")) {
-                        termNode.setProperty("termName", term.getName());
+                        termNode.setProperty("termName", term.getTerm());
                     }
                     termNode.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_PHENOTYPE_OF);
 //                    diseaseNode.createRelationshipTo(termNode, PhenoDigmRelationshipType.HAS_PHENOTYPE);
@@ -233,9 +233,9 @@ public class PhenoDigmGraphBuilder {
                 //make the phenotype term nodes -- SLOW
                 List<PhenotypeTerm> mousePhenotypes = phenoDao.getMouseModelPhenotypeTerms(mouseModel.getMgiModelId());
                 for (PhenotypeTerm term : mousePhenotypes) {
-                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getTermId());
+                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getId());
                     if (!termNode.hasProperty("termName")) {
-                        termNode.setProperty("termName", term.getName());
+                        termNode.setProperty("termName", term.getTerm());
                     }
                     //link model to phenotype
                     termNode.createRelationshipTo(modelNode, PhenoDigmRelationshipType.IS_PHENOTYPE_OF);
@@ -339,8 +339,8 @@ public class PhenoDigmGraphBuilder {
 
                         List<PhenotypeMatch> phenotypeMatchList = phenoDao.getPhenotypeMatches(disease.getDiseaseId(), disAssoc.getMouseModel().getMgiModelId());
                         for (PhenotypeMatch phenotypeMatch : phenotypeMatchList) {
-                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getTermId());
-                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getTermId());
+                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getId());
+                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getId());
                             //matches between MP and HP nodes can be many to many so check that the match exists from the mp node
                             boolean hasMatch = false;
                             for (Relationship relationship : hp.getRelationships(PhenoDigmRelationshipType.PHENOTYPE_MATCH)) {
@@ -369,8 +369,8 @@ public class PhenoDigmGraphBuilder {
 
                         List<PhenotypeMatch> phenotypeMatchList = phenoDao.getPhenotypeMatches(disease.getDiseaseId(), disAssoc.getMouseModel().getMgiModelId());
                         for (PhenotypeMatch phenotypeMatch : phenotypeMatchList) {
-                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getTermId());
-                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getTermId());
+                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getId());
+                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getId());
                             //matches between MP and HP nodes can be many to many so check that the match exists from the hp node
                             boolean hasMatch = false;
                             for (Relationship relationship : hp.getRelationships(PhenoDigmRelationshipType.PHENOTYPE_MATCH)) {
