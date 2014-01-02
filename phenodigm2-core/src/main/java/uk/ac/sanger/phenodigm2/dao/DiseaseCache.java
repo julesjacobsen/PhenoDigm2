@@ -65,18 +65,18 @@ class DiseaseCache {
      */
     private void mapDiseaseToHgncGeneId(Disease disease) {
         
-        for (GeneIdentifier humanGeneIdentifier : disease.getAssociatedHumanGenes()) {
-        
-            String hgncGeneId = humanGeneIdentifier.getCompoundIdentifier();
-            if (!hgncGeneIdToDiseasesMap.containsKey(hgncGeneId)) {
-                Set<Disease> diseases = new TreeSet<Disease>();
-                diseases.add(disease);
-                hgncGeneIdToDiseasesMap.put(hgncGeneId, diseases);
-            }
-            else {
-                hgncGeneIdToDiseasesMap.get(hgncGeneId).add(disease);
-            }    
-        }
+//        for (GeneIdentifier humanGeneIdentifier : disease.getAssociatedHumanGenes()) {
+//        
+//            String hgncGeneId = humanGeneIdentifier.getCompoundIdentifier();
+//            if (!hgncGeneIdToDiseasesMap.containsKey(hgncGeneId)) {
+//                Set<Disease> diseases = new TreeSet<Disease>();
+//                diseases.add(disease);
+//                hgncGeneIdToDiseasesMap.put(hgncGeneId, diseases);
+//            }
+//            else {
+//                hgncGeneIdToDiseasesMap.get(hgncGeneId).add(disease);
+//            }    
+//        }
     }
     
     /**
@@ -92,6 +92,8 @@ class DiseaseCache {
     /**
      * Returns a Set of Diseases associated with the supplied HGNC gene id. Will
      * return an empty Set in cases where the cache doesn't contain the hgncGeneId.
+     * Human genetic diseases are primarily mapped to their native gene symbol
+     * - these are maintained by the HGNC <link>http://www.genenames.org/</link> 
      * 
      * @param hgncGeneId
      * @return Set of Diseases associated with the supplied HGNC gene id
