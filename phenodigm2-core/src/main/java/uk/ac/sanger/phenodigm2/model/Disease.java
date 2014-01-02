@@ -28,15 +28,10 @@ public class Disease implements Comparable<Disease>{
     private DiseaseIdentifier diseaseIdentifier;
     private String term;
     private List<String> alternativeTerms;
-    //Human GeneIdentifiers come from the HGNC
-    private List<GeneIdentifier> associatedHumanGenes;
-    //Mouse GeneIdentifiers come from the MGI
-    private List<GeneIdentifier> associatedMouseGenes;
     private List<String> locations;
+    private List<String> classes;
     private List<PhenotypeTerm> phenotypeTerms;
     
-    private CurationStatus curationStatus;
-
     public Disease() {
     }
     
@@ -82,28 +77,20 @@ public class Disease implements Comparable<Disease>{
         this.alternativeTerms = alternativeTerms;
     }
 
-    public List<GeneIdentifier> getAssociatedHumanGenes() {
-        return associatedHumanGenes;
-    }
-
-    public void setAssociatedHumanGenes(List<GeneIdentifier> associatedHumanGenes) {
-        this.associatedHumanGenes = associatedHumanGenes;
-    }
-
-    public List<GeneIdentifier> getAssociatedMouseGenes() {
-        return associatedMouseGenes;
-    }
-
-    public void setAssociatedMouseGenes(List<GeneIdentifier> associatedMouseGenes) {
-        this.associatedMouseGenes = associatedMouseGenes;
-    }
-    
     public List<String> getLocations() {
         return locations;
     }
 
     public void setLocations(List<String> locations) {
         this.locations = locations;
+    }
+
+    public List<String> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(List<String> classes) {
+        this.classes = classes;
     }
 
     public List<PhenotypeTerm> getPhenotypeTerms() {
@@ -114,14 +101,6 @@ public class Disease implements Comparable<Disease>{
         this.phenotypeTerms = phenotypeTerms;
     }
 
-    public CurationStatus getCurationStatus() {
-        return curationStatus;
-    }
-
-    public void setCurationStatus(CurationStatus curationStatus) {
-        this.curationStatus = curationStatus;
-    }
-    
     @Override
     public int hashCode() {
         int hash = 7;
@@ -156,7 +135,7 @@ public class Disease implements Comparable<Disease>{
     
     @Override
     public String toString() {
-        return "Disease{" + diseaseIdentifier + " - " + term + ", alternativeTerms=" + alternativeTerms + ", associatedHumanGenes=" + associatedHumanGenes + ", associatedMouseGenes=" + associatedMouseGenes + ", locations=" + locations + '}';
+        return "Disease{" + diseaseIdentifier + " - " + term + ", alternativeTerms=" + alternativeTerms + ", locations=" + locations + ", classes=" + classes + "}";
     }    
-   
+    
 }

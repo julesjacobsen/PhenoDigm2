@@ -19,9 +19,6 @@ public class Gene implements Comparable<Gene>{
     
     private GeneIdentifier orthologGeneId;
     private GeneIdentifier humanGeneId;
-    
-    private CurationStatus curationStatus;
-    private ProjectStatus projectStatus;
 
     /**
      * 
@@ -39,22 +36,6 @@ public class Gene implements Comparable<Gene>{
 
     public GeneIdentifier getHumanGeneId() {
         return humanGeneId;
-    }
-
-    public CurationStatus getCurationStatus() {
-        return curationStatus;
-    }
-
-    public void setCurationStatus(CurationStatus curationStatus) {
-        this.curationStatus = curationStatus;
-    }
-
-    public ProjectStatus getProjectStatus() {
-        return projectStatus;
-    }
-
-    public void setProjectStatus(ProjectStatus projectStatus) {
-        this.projectStatus = projectStatus;
     }
 
     /**
