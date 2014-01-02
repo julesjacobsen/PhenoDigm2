@@ -118,35 +118,6 @@ public class DiseaseTest {
     }
 
     /**
-     * Test of getAssociatedHumanGenes method, of class Disease.
-     */
-    @Test
-    public void testGetSetAssociatedHumanGenes() {
-        Disease instance = new Disease();
-        List<GeneIdentifier> expResult = new ArrayList<GeneIdentifier>();
-        GeneIdentifier geneId = new GeneIdentifier("1ABC", "HGNC:1234");
-        expResult.add(geneId);
-        instance.setAssociatedHumanGenes(expResult);
-        List<GeneIdentifier> result = instance.getAssociatedHumanGenes();
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getAssociatedMouseGenes method, of class Disease.
-     */
-    @Test
-    public void testGetSetAssociatedMouseGenes() {
-        Disease instance = new Disease();
-        List<GeneIdentifier> expResult = new ArrayList<GeneIdentifier>();
-        GeneIdentifier geneId = new GeneIdentifier("1Abc", "MGI:1234");
-        expResult.add(geneId);
-        instance.setAssociatedMouseGenes(expResult);
-        List<GeneIdentifier> result = instance.getAssociatedMouseGenes();
-        assertEquals(expResult, result);
-
-    }
-
-    /**
      * Test of getLocations method, of class Disease.
      */
     @Test
@@ -172,18 +143,6 @@ public class DiseaseTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getCurationStatus method, of class Disease.
-     */
-    @Test
-    public void testGetSetCurationStatus() {
-        Disease instance = new Disease();
-        CurationStatus expResult = new CurationStatus();
-        instance.setCurationStatus(expResult);
-        CurationStatus result = instance.getCurationStatus();
-        assertEquals(expResult, result);
-    }
-    
     /**
      * Test of hashCode method, of class Disease.
      */
@@ -227,7 +186,7 @@ public class DiseaseTest {
     public void testToString() {
         Disease instance = new Disease(new DiseaseIdentifier("OMIM:1234"));
         instance.setTerm("WIBBLE");
-        String expResult = "Disease{OMIM:1234 - WIBBLE, alternativeTerms=null, associatedHumanGenes=null, associatedMouseGenes=null, locations=null}";
+        String expResult = "Disease{OMIM:1234 - WIBBLE, alternativeTerms=null, locations=null, classes=null}";
         String result = instance.toString();
         assertEquals(expResult, result);
 
