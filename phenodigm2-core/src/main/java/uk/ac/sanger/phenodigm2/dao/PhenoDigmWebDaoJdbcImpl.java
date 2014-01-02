@@ -376,8 +376,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 }
                 //make the MP terms and attach to the diseaseAssociation (each row)
                 PhenotypeTerm term = new PhenotypeTerm();
-                term.setTermId(rs.getString("mp_id"));
-                term.setName(rs.getString("term"));
+                term.setId(rs.getString("mp_id"));
+                term.setTerm(rs.getString("term"));
                 if (currentAssociation != null) {
                     currentAssociation.getMouseModelPhenotypeTerms().add(term);
                 }
@@ -406,8 +406,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         
             while(rs.next()) {
                 PhenotypeTerm term = new PhenotypeTerm();
-                term.setTermId(rs.getString("term_id"));
-                term.setName(rs.getString("term"));
+                term.setId(rs.getString("term_id"));
+                term.setTerm(rs.getString("term"));
                 phenotypes.add(term);
             }
             

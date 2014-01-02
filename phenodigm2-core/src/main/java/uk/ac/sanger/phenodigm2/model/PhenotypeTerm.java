@@ -10,54 +10,34 @@ package uk.ac.sanger.phenodigm2.model;
  */
 public class PhenotypeTerm {
     
-    private String termId;
-    private String name;
-    //bit of overkill so for sanity issues 
-    private String definition;
-    //comments on the definition.
-    private String comment;
-    
+    private String id;
+    private String term;
+        
     //do we need an HPO/MP Enum too? I don't think so.
     public PhenotypeTerm() {
     }
 
-    public String getTermId() {
-        return termId;
+    public String getId() {
+        return id;
     }
 
-    public void setTermId(String termId) {
-        this.termId = termId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTerm() {
+        return term;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setTerm(String term) {
+        this.term = term;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + (this.termId != null ? this.termId.hashCode() : 0);
-        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 37 * hash + (this.term != null ? this.term.hashCode() : 0);
         return hash;
     }
 
@@ -70,10 +50,10 @@ public class PhenotypeTerm {
             return false;
         }
         final PhenotypeTerm other = (PhenotypeTerm) obj;
-        if ((this.termId == null) ? (other.termId != null) : !this.termId.equals(other.termId)) {
+        if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
             return false;
         }
-        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+        if ((this.term == null) ? (other.term != null) : !this.term.equals(other.term)) {
             return false;
         }
         return true;
@@ -82,7 +62,7 @@ public class PhenotypeTerm {
 
     @Override
     public String toString() {
-        return termId + " " + name;
+        return id + " " + term;
     }
       
 }

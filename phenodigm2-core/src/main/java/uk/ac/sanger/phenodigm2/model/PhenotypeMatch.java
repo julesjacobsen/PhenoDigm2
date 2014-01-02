@@ -100,7 +100,7 @@ public class PhenotypeMatch {
 
     @Override
     public String toString() {
-        return "PhenotypeMatch{" + "ic=" + ic + ", simJ=" + simJ + ", mousePhenotype=" + mousePhenotype.getTermId() + ", humanPhenotype=" + humanPhenotype.getTermId() + '}';
+        return "PhenotypeMatch{" + "ic=" + ic + ", simJ=" + simJ + ", mousePhenotype=" + mousePhenotype.getId() + ", humanPhenotype=" + humanPhenotype.getId() + '}';
     }
     
 }
