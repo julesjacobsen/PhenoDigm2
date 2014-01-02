@@ -73,7 +73,7 @@ public class GeneController {
             for (DiseaseAssociationSummary geneAssociationSummary : diseaseAssociationSummarys) {
                 AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
                 //always want the associations in the phenotypes list
-                if (associationSummary.getBestImpcScore() > 0.0 || associationSummary.getBestMgiScore() > 0.0) {
+                if (associationSummary.getBestHtpcScore() > 0.0 || associationSummary.getBestModScore() > 0.0) {
                     phenotypeAssociationSummaries.add(geneAssociationSummary);
                 }
                 //but only the curated ones in the curated list...
