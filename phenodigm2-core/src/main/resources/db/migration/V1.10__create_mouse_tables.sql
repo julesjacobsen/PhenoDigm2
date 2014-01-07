@@ -44,11 +44,11 @@ CREATE INDEX `model_id_mp_id` ON `mouse_model_mp` (`model_id` ASC, `mp_id` ASC);
 
 
 -- -----------------------------------------------------
--- Table `hp_mp_mappings`
+-- Table `hp_mp_mapping`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `hp_mp_mappings` ;
+DROP TABLE IF EXISTS `hp_mp_mapping` ;
 
-CREATE TABLE IF NOT EXISTS `hp_mp_mappings` (
+CREATE TABLE IF NOT EXISTS `hp_mp_mapping` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `hp_id` VARCHAR(12) NOT NULL,
   `hp_term` VARCHAR(200) NULL,
@@ -60,16 +60,16 @@ CREATE TABLE IF NOT EXISTS `hp_mp_mappings` (
   `ic_ratio` DOUBLE NULL,
   PRIMARY KEY (`id`));
 
-CREATE INDEX `hp_mp` ON `hp_mp_mappings` (`hp_id` ASC, `mp_id` ASC);
+CREATE INDEX `hp_mp` ON `hp_mp_mapping` (`hp_id` ASC, `mp_id` ASC);
 
 -- MODEL - DISEASE ASSOCIATIONS
 
 -- -----------------------------------------------------
--- Table `mouse_disease_model_association_details`
+-- Table `mouse_disease_model_association_detail`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mouse_disease_model_association_details` ;
+DROP TABLE IF EXISTS `mouse_disease_model_association_detail` ;
 
-CREATE TABLE IF NOT EXISTS `mouse_disease_model_association_details` (
+CREATE TABLE IF NOT EXISTS `mouse_disease_model_association_detail` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `disease_id` VARCHAR(20) NOT NULL,
   `model_id` INT(8) UNSIGNED NOT NULL,
@@ -93,6 +93,9 @@ CREATE TABLE IF NOT EXISTS `mouse_disease_model_association` (
   `lit_model` TINYINT(1) NOT NULL DEFAULT 0,
   `disease_to_model_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
   `model_to_disease_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
+  `raw_score` DOUBLE NOT NULL DEFAULT '0',
+  `hp_matched_terms` text,
+  `mp_matched_terms` text,
   PRIMARY KEY (`id`))
 COMMENT = 'Used to show the AJAX details view in IMPC portal.';
 
@@ -105,11 +108,11 @@ CREATE INDEX `m_disease_model` ON `mouse_disease_model_association` (`disease_id
 -- GENE / ORTHOLOG TABLES
 
 -- -----------------------------------------------------
--- Table `mouse_gene_orthologs`
+-- Table `mouse_gene_ortholog`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mouse_gene_orthologs` ;
+DROP TABLE IF EXISTS `mouse_gene_ortholog` ;
 
-CREATE TABLE IF NOT EXISTS `mouse_gene_orthologs` (
+CREATE TABLE IF NOT EXISTS `mouse_gene_ortholog` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `model_gene_id` VARCHAR(45) NULL,
   `model_gene_symbol` VARCHAR(255) NULL,

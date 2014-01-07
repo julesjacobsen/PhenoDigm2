@@ -68,7 +68,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
-                + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
+                + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
                 + "where d.disease_id = ? order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
@@ -96,7 +96,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 + "mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
-                + "join mouse_gene_orthologs mgo on mgo.model_gene_id = mdgs.model_gene_id "
+                + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
                 + "where mgo.model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneId.getCompoundIdentifier(), sql);

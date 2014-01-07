@@ -41,11 +41,11 @@ CREATE INDEX `model_id_zp_id` ON `fish_model_zp` (`model_id` ASC, `zp_id` ASC);
 
 
 -- -----------------------------------------------------
--- Table `hp_zp_mappings`
+-- Table `hp_zp_mapping`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `hp_zp_mappings` ;
+DROP TABLE IF EXISTS `hp_zp_mapping` ;
 
-CREATE TABLE IF NOT EXISTS `hp_zp_mappings` (
+CREATE TABLE IF NOT EXISTS `hp_zp_mapping` (
   `id` INT(11) NOT NULL,
   `hp_id` VARCHAR(12) NOT NULL,
   `hp_term` VARCHAR(200) NULL,
@@ -57,17 +57,17 @@ CREATE TABLE IF NOT EXISTS `hp_zp_mappings` (
   `ic_ratio` DOUBLE NULL,
   PRIMARY KEY (`id`));
 
-CREATE INDEX `hp_zp` ON `hp_zp_mappings` (`zp_id` ASC, `hp_id` ASC);
+CREATE INDEX `hp_zp` ON `hp_zp_mapping` (`zp_id` ASC, `hp_id` ASC);
 
 
 -- MODEL - DISEASE ASSOCIATIONS
 
 -- -----------------------------------------------------
--- Table `fish_disease_model_association_details`
+-- Table `fish_disease_model_association_detail`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `fish_disease_model_association_details` ;
+DROP TABLE IF EXISTS `fish_disease_model_association_detail` ;
 
-CREATE TABLE IF NOT EXISTS `fish_disease_model_association_details` (
+CREATE TABLE IF NOT EXISTS `fish_disease_model_association_detail` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `disease_id` VARCHAR(20) NOT NULL,
   `model_id` INT(8) UNSIGNED NOT NULL,
@@ -91,6 +91,9 @@ CREATE TABLE IF NOT EXISTS `fish_disease_model_association` (
   `lit_model` TINYINT(1) NOT NULL DEFAULT 0,
   `disease_to_model_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
   `model_to_disease_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
+  `raw_score` DOUBLE NOT NULL DEFAULT '0',
+  `hp_matched_terms` text,
+  `mp_matched_terms` text,
   PRIMARY KEY (`id`))
 COMMENT = 'Used to show the AJAX details view in IMPC portal.';
 
@@ -105,7 +108,7 @@ CREATE INDEX `f_disease_model` ON `fish_disease_model_association` (`disease_id`
 -- -----------------------------------------------------
 -- Table `fish_gene_orthologs`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `fish_gene_orthologs` ;
+DROP TABLE IF EXISTS `fish_gene_ortholog` ;
 
 CREATE TABLE IF NOT EXISTS `fish_gene_orthologs` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
