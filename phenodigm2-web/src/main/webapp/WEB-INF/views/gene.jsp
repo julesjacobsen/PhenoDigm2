@@ -129,10 +129,10 @@
                                         </td>
                                         <!--Mouse Phenotype Evidence (Phenodigm)-->
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestMgiScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestModScore}</b>   
                                         </td>
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestImpcScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestHtpcScore}</b>   
                                         </td>
                                         <td>
                                             <div class="arrow">+</div>
@@ -195,10 +195,10 @@
                                         </td>
                                         <!--Mouse Phenotype Evidence (Phenodigm)-->
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestMgiScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestModScore}</b>   
                                         </td>
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestImpcScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestHtpcScore}</b>   
                                         </td>
                                         <td>
                                             <div class="arrow">+</div>

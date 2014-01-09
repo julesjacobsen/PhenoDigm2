@@ -117,8 +117,8 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="association" items="${curatedAssociations}">
-                                    <c:set var="mouseGeneIdentifier" value="${association.mouseGeneIdentifier}"></c:set>
-                                    <c:set var="humanGeneIdentifier" value="${association.humanGeneIdentifier}"></c:set>
+                                    <c:set var="mouseGeneIdentifier" value="${association.modelGeneIdentifier}"></c:set>
+                                    <c:set var="humanGeneIdentifier" value="${association.hgncGeneIdentifier}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
                                         <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                             <td>
@@ -145,10 +145,10 @@
                                             </td>
                                             <!--Mouse Phenotype Evidence (Phenodigm)-->
                                             <td>
-                                                <b style="color:#FF9000">${associationSummary.bestMgiScore}</b>   
+                                                <b style="color:#FF9000">${associationSummary.bestModScore}</b>   
                                         </td>
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestImpcScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestHtpcScore}</b>   
                                         </td>
                                         <td>
                                             <div class="arrow">+</div>
@@ -189,8 +189,8 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="association" items="${phenotypeAssociations}">
-                                    <c:set var="mouseGeneIdentifier" value="${association.mouseGeneIdentifier}"></c:set>
-                                    <c:set var="humanGeneIdentifier" value="${association.humanGeneIdentifier}"></c:set>
+                                    <c:set var="mouseGeneIdentifier" value="${association.modelGeneIdentifier}"></c:set>
+                                    <c:set var="humanGeneIdentifier" value="${association.hgncGeneIdentifier}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
                                         <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="P${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                             <td>
@@ -217,10 +217,10 @@
                                             </td>
                                             <!--Mouse Phenotype Evidence (Phenodigm)-->
                                             <td>
-                                                <b style="color:#FF9000">${associationSummary.bestMgiScore}</b>   
+                                                <b style="color:#FF9000">${associationSummary.bestModScore}</b>   
                                         </td>
                                         <td>
-                                            <b style="color:#FF9000">${associationSummary.bestImpcScore}</b>   
+                                            <b style="color:#FF9000">${associationSummary.bestHtpcScore}</b>   
                                         </td>
                                         <td>
                                             <div class="arrow">+</div>
