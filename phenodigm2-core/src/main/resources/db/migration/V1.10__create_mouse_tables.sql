@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS `mouse_disease_model_association_detail` (
   `mp_id` VARCHAR(12) NOT NULL,
   `simJ` DOUBLE NULL,
   `ic` DOUBLE NULL,
+  `lcs` TEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `mdmad_disease_model` (`disease_id` ASC, `model_id` ASC));
 
@@ -93,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `mouse_disease_model_association` (
   `lit_model` TINYINT(1) NOT NULL DEFAULT 0,
   `disease_to_model_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
   `model_to_disease_perc_score` DOUBLE NOT NULL DEFAULT 0.0,
-  `raw_score` DOUBLE NOT NULL DEFAULT '0',
+  `raw_score` DOUBLE NOT NULL DEFAULT 0.0,
   `hp_matched_terms` text,
   `mp_matched_terms` text,
   PRIMARY KEY (`id`))

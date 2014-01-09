@@ -10001,4 +10001,4 @@ INSERT INTO `hp` (`hp_id`,`term`) VALUES
 ('HP:0200057','Marcus Gunn pupil'),
 ('HP:0200058','Angiosarcoma'),
 ('HP:0200059','Metastatic angiosarcoma'),
-('HP:0200060','Increased urine output'),
+('HP:0200060','Increased urine output');

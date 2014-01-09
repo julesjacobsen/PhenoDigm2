@@ -40,10 +40,11 @@ class DiseaseCache {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     
     private final Map<String, Disease> diseaseIdToDiseaseMap;    
-    private Map<String, Set<Disease>> hgncGeneIdToDiseasesMap;
+    private Map<String, Set<Disease>> hgncGeneIdToDiseaseMap;
 
-    protected DiseaseCache(Map<String, Disease> diseaseIdToDiseaseMap) {
+    protected DiseaseCache(Map<String, Disease> diseaseIdToDiseaseMap, Map<String, Set<Disease>> hgncGeneIdToDiseasesMap) {
         this.diseaseIdToDiseaseMap = diseaseIdToDiseaseMap;
+        this.hgncGeneIdToDiseaseMap = hgncGeneIdToDiseasesMap;
         init();
     }
     
@@ -51,11 +52,11 @@ class DiseaseCache {
      * Sets up the cache using the diseaseIdToDiseaseMap from the constructor.
      */
     private void init(){
-        hgncGeneIdToDiseasesMap = new HashMap<String, Set<Disease>>();
-        for (Disease disease : diseaseIdToDiseaseMap.values()) {
-            mapDiseaseToHgncGeneId(disease);
-        }
-        logger.info(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", diseaseIdToDiseaseMap.size(), hgncGeneIdToDiseasesMap.keySet().size()));
+//        hgncGeneIdToDiseaseMap = new HashMap<String, Set<Disease>>();
+//        for (Disease disease : diseaseIdToDiseaseMap.values()) {
+//            mapDiseaseToHgncGeneId(disease);
+//        }
+//        logger.info(String.format("DiseaseCache initialized. Mapped %d diseases to %d genes.", diseaseIdToDiseaseMap.size(), hgncGeneIdToDiseaseMap.keySet().size()));
     }
     
     /**
@@ -68,13 +69,13 @@ class DiseaseCache {
 //        for (GeneIdentifier humanGeneIdentifier : disease.getAssociatedHumanGenes()) {
 //        
 //            String hgncGeneId = humanGeneIdentifier.getCompoundIdentifier();
-//            if (!hgncGeneIdToDiseasesMap.containsKey(hgncGeneId)) {
+//            if (!hgncGeneIdToDiseaseMap.containsKey(hgncGeneId)) {
 //                Set<Disease> diseases = new TreeSet<Disease>();
 //                diseases.add(disease);
-//                hgncGeneIdToDiseasesMap.put(hgncGeneId, diseases);
+//                hgncGeneIdToDiseaseMap.put(hgncGeneId, diseases);
 //            }
 //            else {
-//                hgncGeneIdToDiseasesMap.get(hgncGeneId).add(disease);
+//                hgncGeneIdToDiseaseMap.get(hgncGeneId).add(disease);
 //            }    
 //        }
     }
@@ -85,7 +86,7 @@ class DiseaseCache {
      * @param diseaseId
      * @return the Disease associated with the supplied disease id
      */
-    protected Disease getDiseaseForDiseaseId(String diseaseId) {
+    protected Disease getDisease(String diseaseId) {
         return diseaseIdToDiseaseMap.get(diseaseId);
     }
 
@@ -99,7 +100,7 @@ class DiseaseCache {
      * @return Set of Diseases associated with the supplied HGNC gene id
      */
     protected Set<Disease> getDiseasesByHgncGeneId(String hgncGeneId) {
-        Set<Disease> diseases = hgncGeneIdToDiseasesMap.get(hgncGeneId);
+        Set<Disease> diseases = hgncGeneIdToDiseaseMap.get(hgncGeneId);
         if (diseases == null){ 
             logger.info(String.format("'%s' not mapped to any diseases", hgncGeneId));
             return new TreeSet<Disease>();

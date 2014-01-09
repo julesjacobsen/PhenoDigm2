@@ -2,7 +2,7 @@
 -- Query: select distinct mgi_gene_id as model_gene_id',' mgi_gene_symbol as model_gene_symbol',' hgnc_id',' human_gene_symbol as hgnc_gene_symbol',' gene_locus as hgnc_gene_locus from disease_gene_summary order by mgi_gene_symbol
 -- Date: 2013-12-06 17:20
 */
-INSERT INTO `mouse_gene_orthologs` (`model_gene_id`,`model_gene_symbol`,`hgnc_id`,`hgnc_gene_symbol`,`hgnc_gene_locus`) VALUES 
+INSERT INTO `mouse_gene_ortholog` (`model_gene_id`,`model_gene_symbol`,`hgnc_id`,`hgnc_gene_symbol`,`hgnc_gene_locus`) VALUES 
 ('MGI:1913300','0610009B22Rik','HGNC:10710','TRAPPC2P1','19q13.43'),
 ('MGI:1916142','1190003J15Rik','HGNC:43695','URAHP','16q24.3'),
 ('MGI:1919494','1600014C10Rik','HGNC:25443','C19orf12','19q12'),
@@ -4689,4 +4689,4 @@ INSERT INTO `mouse_gene_orthologs` (`model_gene_id`,`model_gene_symbol`,`hgnc_id
 ('MGI:2387863','Zmynd10','HGNC:19412','ZMYND10','3p21.31'),
 ('MGI:99215','Zp3','HGNC:13189','ZP3','7q11.23'),
 ('MGI:99215','Zp3','HGNC:9203','POMZP3','7q11.23'),
-('MGI:1858211','Zranb2','HGNC:13058','ZRANB2','1p31.1'),
+('MGI:1858211','Zranb2','HGNC:13058','ZRANB2','1p31.1');

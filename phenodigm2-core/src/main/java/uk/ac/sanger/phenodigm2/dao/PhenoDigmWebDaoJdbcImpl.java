@@ -69,7 +69,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
                 + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
-                + "where d.disease_id = ? order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
+                + "where mdgs.disease_id = ? order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
 
@@ -97,7 +97,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
                 + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
-                + "where mgo.model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
+                + "where mdgs.model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneId.getCompoundIdentifier(), sql);
 
@@ -155,7 +155,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         return disease;
     }
     
-    private List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         
         String sql = "select hp.hp_id as term_id, hp.term as term "
                 + "from hp hp "
@@ -287,7 +287,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             List<DiseaseAssociationSummary> diseaseAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
 
             while (rs.next()) {
-                //make the disease from the first row
+                //make the gene from the first row
                 if (!madeGene) {
                     GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
                     GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_gene_id"));

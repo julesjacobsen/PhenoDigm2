@@ -6737,4 +6737,4 @@ INSERT INTO `mouse_disease_summary` (`disease_id`,`human_curated`,`mod_curated`,
 ('OMIM:600118',1,0,0,0,0,0),
 ('OMIM:309530',1,0,0,0,0,0),
 ('OMIM:186350',0,0,1,0,0,0),
-('OMIM:607373',0,0,0,0,0,0),
+('OMIM:607373',0,0,0,0,0,0);

@@ -30136,4 +30136,4 @@ INSERT INTO `mouse_model_gene_ortholog` (`model_id`,`model_gene_id`) VALUES
 (30149,'MGI:98446'),
 (30150,'MGI:98446'),
 (30151,'MGI:1913560'),
-(30152,'MGI:1913560'),
+(30152,'MGI:1913560');

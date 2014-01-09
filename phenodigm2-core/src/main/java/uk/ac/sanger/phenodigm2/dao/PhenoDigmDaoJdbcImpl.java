@@ -26,10 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,13 +36,16 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 import uk.ac.sanger.phenodigm2.model.ProjectStatus;
+import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
+import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
+import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  *
@@ -80,19 +81,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         if (orthologCache == null) {
             logger.info("Setting up ortholog cache...");
 
-//            String sql = "select mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol, hgnc_id as hgnc_id from human2mouse_orthologs;";
-//            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id from mgi_genes mgi left join human2mouse_orthologs h2mo on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
-//            String sql = "select mgi.mgi_gene_id as mgi_gene_id, mgi.mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id, human_curated, mouse_curated, mgi_predicted, impc_predicted, mgi_mouse, impc_mouse, impc_pheno \n" +
-//                            "from mgi_genes mgi \n" +
-//                            "left join gene_summary h2mo \n" +
-//                            "on mgi.mgi_gene_id = h2mo.mgi_gene_id;";
-//            Map<GeneIdentifier, GeneIdentifier> orthologMap = this.jdbcTemplate.query(sql, new OrthologResultSetExtractor());
-//            //TODO: add the Curation and Project Statuses
 //            String sql = "select mgi_gene_id as mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id, human_curated, mouse_curated, mgi_predicted, impc_predicted, mgi_mouse, impc_mouse, impc_pheno \n" +
 //                            "from gene_summary;";
             
             String sql = "select mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus "
-                    + "from mouse_gene_orthologs mgo";
+                    + "from mouse_gene_ortholog mgo";
          
             Map<GeneIdentifier, Gene> orthologMap = this.jdbcTemplate.query(sql, new OrthologGeneResultSetExtractor());
             
@@ -103,17 +96,13 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     private void setUpDiseaseCache() {
         if (diseaseCache == null) {
             logger.info("Setting up disease cache...");
-
-//            String sql = "select distinct h2mo.*, d.*  from disease d left join disease_genes og on og.disease_id = d.disease_id left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id where d.type = 'disease';";
-//            String sql = "select distinct h2mo.*, ds.* \n" +
-//                            "from disease_summary ds \n" +
-//                            "left join disease_genes og on og.disease_id = ds.disease_id \n" +
-//                            "left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id;";
             
             String sql = "select * from disease;";
             
             Map<String, Disease> diseaseMap = this.jdbcTemplate.query(sql, new DiseaseResultSetExtractor());
-            diseaseCache = new DiseaseCache(diseaseMap);
+            logger.info("Made diseases.");
+            
+            diseaseCache = new DiseaseCache(diseaseMap, new HashMap());
         }
     }
 
@@ -129,93 +118,17 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    
     @Override
-    public GeneIdentifier getGeneIdentifierForMgiGeneId(String mgiGeneId) {
-        return orthologCache.getMouseGeneIdentifier(mgiGeneId);
-    }
-
-    @Override
-    public Disease getDiseaseByDiseaseId(String omimDiseaseId) {
-        return diseaseCache.getDiseaseForDiseaseId(omimDiseaseId);
-    }
-
-    @Override
-    public Set<Disease> getDiseasesByHgncGeneId(String omimGeneId) {
-        return diseaseCache.getDiseasesByHgncGeneId(omimGeneId);
-    }
-
-    @Override
-    public Set<Disease> getDiseasesByMgiGeneId(String mgiGeneId) {
-        GeneIdentifier humanOrtholog = orthologCache.getHumanOrthologOfMouseGene(mgiGeneId);
-        logger.info(String.format("%s maps to human ortholog %s", mgiGeneId, humanOrtholog));
-        
-        if (humanOrtholog == null) {
-            logger.info(String.format("%s has no known disease association as there are no mapped orthologs", mgiGeneId ));
-            return new TreeSet<Disease>();            
-        }
-        
-        if (humanOrtholog.getDatabaseAcc().isEmpty()) {
-            logger.info(String.format("%s has no known disease association as the mapped ortholog %s has no database accession",  mgiGeneId, humanOrtholog));
-            return new TreeSet<Disease>();            
-        }
-        return diseaseCache.getDiseasesByHgncGeneId(humanOrtholog.getCompoundIdentifier());
-
-    }
-
-    @Override
-    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
-
-        Map<Disease, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
-        String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgm.mgi_gene_id, od.mouse_model_id "
-                + "from disease_2_mgi_mouse_models od "
-                + "join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id "
-                + "left join disease_mouse_genotype_associations dmga on dmga.disease_id = od.disease_id and dmga.mouse_model_id = od.mouse_model_id "
-                + "where mgm.mgi_gene_id = ? order by od.disease_id;";
-        
-        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mgiGeneId, sql);
-
-        diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new DiseaseAssociationResultSetExtractor());
-        
-        logger.info(String.format("%s has %d known disease associations", mgiGeneId, diseaseAssociationsMap.size()));
-
-        //also add in the diseases with no known disease associations other than by gene orthology.
-        for (Disease disease : getDiseasesByMgiGeneId(mgiGeneId)) {
-            if (!diseaseAssociationsMap.keySet().contains(disease)) {
-                diseaseAssociationsMap.put(disease, new TreeSet<DiseaseModelAssociation>());
-            }
-        }
-        
-        return diseaseAssociationsMap;
-    }
-
-    @Override
-    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId) {
-
-        Map<Disease, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
-        
-        String sql = "select disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi_gene_id, mouse_model_id "
-                + "from disease_mouse_genotype_associations d where mgi_gene_id = ?;";
-        
-        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mgiGeneId, sql);
-
-        diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new DiseaseAssociationResultSetExtractor());
-
-        return diseaseAssociationsMap;
-
-    }
-
-    @Override
-    public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String mgiGeneId) {
-        return orthologCache.getHumanOrthologOfMouseGene(mgiGeneId);
+    public Disease getDisease(DiseaseIdentifier diseaseId) {
+        return diseaseCache.getDisease(diseaseId.toString());
     }
     
     @Override
-    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId) {
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         List<PhenotypeTerm> phenotypeList;
         String sql = "select hp.hp_id as id, hp.term as term from hp join disease_hp d on d.hp_id = hp.hp_id where d.disease_id = ?;";
         
-        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId, sql);
+        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId.toString(), sql);
 
         phenotypeList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeResultSetExtractor());
         
@@ -237,7 +150,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     @Override
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId) {
         List<PhenotypeMatch> phenotypeMatchList;
-        String sql = "select phenomap.disease_id as disease, phenomap.mouse_model_id as mouse_model_id, phenomap.ic as ic, phenomap.simJ as simJ, phenomap.mp_id as mp_term_id, phenomap.mp_term as mp_term, phenomap.hp_id as hp_term_id, phenomap.hp_term as hp_term, phenomap.lcs as lcs from disease_mouse_genotype_mappings phenomap where disease_id = ? and mouse_model_id = ?;";
+        String sql = "select phenomap.disease_id as disease, phenomap.model_id as model_id, phenomap.ic as ic, phenomap.simJ as simJ, phenomap.mp_id as mp_term_id, mp.term as mp_term, phenomap.hp_id as hp_term_id, hp.term as hp_term, phenomap.lcs as lcs "
+                + "from mouse_disease_model_association_detail phenomap "
+                + "join hp on hp.hp_id = phenomap.hp_id "
+                + "join mp on mp.mp_id = phenomap.mp_id "
+                + "where disease_id = ? and model_id = ?;";
         
         PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId, sql);
         
@@ -249,60 +166,6 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     @Override
     public Set<Disease> getAllDiseses() {
         return diseaseCache.getAllDiseses();
-    }
-
-    @Override
-    public Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
-        return orthologCache.getAllMouseGeneIdentifiers();
-    }
-
-    @Override
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId) {
-        
-        Map<GeneIdentifier, Set<DiseaseModelAssociation>> diseaseAssociationsMap = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
-                    //disease_2_mgi_mouse_models has literature curated data
-        String sql = "select od.disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, mgm.mgi_gene_id, od.mouse_model_id "
-                + "from disease_2_mgi_mouse_models od "
-                + "join mgi_gene_models mgm on mgm.mouse_model_id = od.mouse_model_id "
-                + "join mgi_genes mgi on mgi.mgi_gene_id = mgm.mgi_gene_id "
-                + "left join disease_mouse_genotype_associations dmga on dmga.disease_id = od.disease_id and dmga.mouse_model_id = od.mouse_model_id "
-                + "where od.disease_id = ? order by disease2mouse_score desc;";
-
-        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId, sql);
-
-        diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new GeneAssociationResultSetExtractor());
-        
-        //leave this in  - not sure why I commented this out - it's needed for cases where the known associations for a disease are 
-        //by orthology only i.e. with NO MGI curated evidence e.g. OMIM:101400 should be associated with both Twist1 and Fgfr2
-        //without this next section only Twist1 will be included in the known associations section
-        //UPDATE 2014/01/02 shouldn't be necessary now with the new Phenodigm2 schema as this information is contained in the
-        //disease_gene_summary table
-//        Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
-//        logger.info("Looking for associated gene orthologs of " + disease);
-//        for (GeneIdentifier geneIdentifier : disease.getAssociatedMouseGenes()) {
-//            Set<DiseaseModelAssociation> diseaseAssociations = getKnownDiseaseAssociationsForMgiGeneId(geneIdentifier.getCompoundIdentifier()).get(disease);
-//            diseaseAssociationsMap.put(geneIdentifier, diseaseAssociations);
-//        }
-        
-        return diseaseAssociationsMap;
-        
-    }
-
-    @Override
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId) {
-        Map<GeneIdentifier, Set<DiseaseModelAssociation>> diseaseAssociationsMap;
-                     //disease2mouse_gene_associations
-        String sql = "select dmga2.disease_id as disease_id, ifnull(mouse_to_disease_perc_score, 0.0) as mouse2disease_score, ifnull(disease_to_mouse_perc_score, 0.0) as disease2mouse_score, mgi.mgi_gene_symbol, d.mgi_gene_id, d.mouse_model_id \n" +
-                    "from disease_mouse_gene_associations dmga2 \n" +
-                    "join mgi_genes mgi on mgi.mgi_gene_id = dmga2.mgi_gene_id " +
-                    "join disease_mouse_genotype_associations d on d.disease_id = dmga2.disease_id and d.mgi_gene_id = dmga2.mgi_gene_id\n" +
-                    " where dmga2.disease_id= ? order by d.disease_to_mouse_perc_score desc;"; 
-        
-        PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId, sql);
-
-        diseaseAssociationsMap = this.jdbcTemplate.query(prepStatmentCreator, new GeneAssociationResultSetExtractor());
-                
-        return diseaseAssociationsMap;
     }
 
     @Override
@@ -319,45 +182,22 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     public Set<Gene> getAllGenes() {
         return orthologCache.getGenes();
     }
-    
-    private static class OrthologResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, GeneIdentifier>> {
 
-        private Map<GeneIdentifier, GeneIdentifier> resultsMap;
-
-        public OrthologResultSetExtractor() {
-            resultsMap = new HashMap<GeneIdentifier, GeneIdentifier>();
-        }
-
-        @Override
-        public Map<GeneIdentifier, GeneIdentifier> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            while (rs.next()) {
-                GeneIdentifier mouseGeneIdentifier = new GeneIdentifier(rs.getString("mouse_gene_symbol"), rs.getString("mgi_gene_id"));
-//                System.out.println(String.format("Made new Mouse GeneIdentifier: %s %s", mouseGeneIdentifier.getGeneSymbol(), mouseGeneIdentifier.getCompoundIdentifier()));
-
-                GeneIdentifier humanGeneIdentifier;
-                //there might not be any disease orthologs mapped to a mouse gene in OMIM so we'll need to make up the Human ortholog gene
-                //luckily the mouse and human gene symbols are simply case variants of the same string (apart from when they aren't, which is quite often).
-                String humanGeneSymbol = rs.getString("human_gene_symbol");
-                String hgncGeneId = rs.getString("hgnc_id");
-//                System.out.println(String.format("Making new Human GeneIdentifier: %s %s", humanGeneSymbol, hgncGeneId));
-                if (humanGeneSymbol == null) {
-                    humanGeneIdentifier = new GeneIdentifier(mouseGeneIdentifier.getGeneSymbol().toUpperCase(), "HGNC", "");
-                }
-                else if (hgncGeneId == null) {
-                    humanGeneIdentifier = new GeneIdentifier(humanGeneSymbol, "HGNC", "");
-                }
-                else {
-                    humanGeneIdentifier = new GeneIdentifier(humanGeneSymbol, hgncGeneId);
-                }
-//                System.out.println(String.format("Made new Human GeneIdentifier: %s %s", humanGeneIdentifier.getGeneSymbol(), humanGeneIdentifier.getCompoundIdentifier()));
-
-                resultsMap.put(mouseGeneIdentifier, humanGeneIdentifier);
-            }
-//            System.out.println("Made new ortholog map with " + resultsMap.keySet().size() + " orthologs");
-            return resultsMap;
-        }
+    @Override
+    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+        
     private static class OrthologGeneResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Gene>> {
 
         private Map<GeneIdentifier, Gene> resultsMap;
@@ -551,110 +391,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
             return mouseModelMap;
         }
     }
-
-    private static class DiseaseAssociationResultSetExtractor implements ResultSetExtractor<Map<Disease, Set<DiseaseModelAssociation>>> {
-
-        public DiseaseAssociationResultSetExtractor() {
-        }
-
-        @Override
-        public Map<Disease, Set<DiseaseModelAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<Disease, Set<DiseaseModelAssociation>> results = new TreeMap<Disease, Set<DiseaseModelAssociation>>();
-
-            while (rs.next()) {
-                DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
-                String diseaseId = rs.getString("disease_id");
-                Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
-                if (disease == null) {
-                    logger.info("Unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
-                } else {
-                    diseaseAssociation.setDiseaseIdentifier(disease.getDiseaseIdentifier());
-                    diseaseAssociation.setMouseModel(mouseModelCache.getModel(rs.getString("mouse_model_id")));
-                    diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(rs.getString("disease2mouse_score")));
-                    diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(rs.getString("mouse2disease_score")));
-                    diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());
-
-                    if (results.containsKey(disease)) {
-                        results.get(disease).add(diseaseAssociation);
-                    } else {
-                        Set<DiseaseModelAssociation> diseaseAssociations = new TreeSet<DiseaseModelAssociation>();
-                        diseaseAssociations.add(diseaseAssociation);
-                        results.put(disease, diseaseAssociations);
-                    }
-                }
-            }
-//            System.out.println("\nMade disease associations:");
-//            for (Disease disease : results.keySet()) {
-//                System.out.println("Disease associations for " + disease.getDiseaseId());
-//                for (DiseaseAssociation diseaseAssoc : results.get(disease)) {
-//                    System.out.println("\t" + diseaseAssoc);
-//                }               
-//                System.out.println("");
-//            }
-//                
-//            
-            return results;
-        }
-    }
-    
-    
-    private static class GeneAssociationResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Set<DiseaseModelAssociation>>> {
-
-        public GeneAssociationResultSetExtractor() {
-        }
-
-        @Override
-        public Map<GeneIdentifier, Set<DiseaseModelAssociation>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<GeneIdentifier, Set<DiseaseModelAssociation>> results = new TreeMap<GeneIdentifier, Set<DiseaseModelAssociation>>();
-
-            while (rs.next()) {
-                DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
-                String diseaseId = rs.getString("disease_id");
-                Disease disease = diseaseCache.getDiseaseForDiseaseId(diseaseId);
-                if (disease == null) {
-                    logger.info("Unable to find disease " + diseaseId + " in disease cache. Possibly the OMIM disease id has been moved?");
-                } else {
-                    diseaseAssociation.setDiseaseIdentifier(disease.getDiseaseIdentifier());
-                    MouseModel mouseModel = mouseModelCache.getModel(rs.getString("mouse_model_id"));
-                    //might not be a known ortholog?
-                    String geneSymbol = rs.getString("mgi_gene_symbol");
-                    String mgiGeneId = mouseModel.getMgiGeneId();
-//                    logger.info(geneSymbol + " " + mgiGeneId);
-                    GeneIdentifier mouseGeneId = orthologCache.getMouseGeneIdentifier(mgiGeneId);
-//                    logger.info("Found GeneIdentifier in orthologCache: " + mouseGeneId);
-                    if (mouseGeneId == null) {
-                        mouseGeneId = new GeneIdentifier(geneSymbol, mgiGeneId);
-                        logger.info(mouseGeneId + " not found in ortholog cache so made a new one: " + mouseGeneId);
-                    }
-                    diseaseAssociation.setMouseModel(mouseModel);
-                    diseaseAssociation.setDiseaseToModelScore(Double.parseDouble(rs.getString("disease2mouse_score")));
-                    diseaseAssociation.setModelToDiseaseScore(Double.parseDouble(rs.getString("mouse2disease_score")));
-                    diseaseAssociation.setPhenotypeMatches(new ArrayList<PhenotypeMatch>());
-
-                    if (results.containsKey(mouseGeneId)) {
-                        results.get(mouseGeneId).add(diseaseAssociation);
-                    } else {
-                        Set<DiseaseModelAssociation> diseaseAssociations = new TreeSet<DiseaseModelAssociation>();
-                        diseaseAssociations.add(diseaseAssociation);
-                        results.put(mouseGeneId, diseaseAssociations);
-                    }
-                }
-            }
-//            System.out.println("\nMade disease associations:");
-//            for (Disease disease : results.keySet()) {
-//                System.out.println("Disease associations for " + disease.getDiseaseId());
-//                for (DiseaseAssociation diseaseAssoc : results.get(disease)) {
-//                    System.out.println("\t" + diseaseAssoc);
-//                }               
-//                System.out.println("");
-//            }
-//                
-//            
-            return results;
-        }
-    }
         
-        private static class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
+    private static class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
 
         public PhenotypeResultSetExtractor() {
         }

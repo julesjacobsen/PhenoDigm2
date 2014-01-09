@@ -37,6 +37,7 @@ import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
@@ -78,7 +79,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseaseToGeneAssociationSummaries() {
-        System.out.println("getDiseaseToGeneAssociationSummaries");
+        logger.info("getDiseaseToGeneAssociationSummaries");
         
 //        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:112600");
@@ -96,7 +97,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseaseToGeneAssociationSummariesNoKnownAssociations() {
-        System.out.println("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
+        logger.info("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
         
 //        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
@@ -136,7 +137,7 @@ public class PhenoDigmWebDaoJdbcImplTest {
      */
     @Test
     public void testGetGeneToDiseaseAssociationSummaries() {
-        System.out.println("getGeneToDiseaseAssociationSummaries");
+        logger.info("getGeneToDiseaseAssociationSummaries");
         GeneIdentifier geneId = new GeneIdentifier("Apoe", "MGI:88057");
         Map<Gene, List<DiseaseAssociationSummary>> expResult = null;
         Map<Gene, List<DiseaseAssociationSummary>> result = instance.getGeneToDiseaseAssociationSummaries(geneId);
@@ -149,15 +150,37 @@ public class PhenoDigmWebDaoJdbcImplTest {
      */
     @Test
     public void testGetDiseaseGeneAssociationDetail() {
-        System.out.println("getDiseaseGeneAssociationDetail");
+        logger.info("getDiseaseGeneAssociationDetail");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:144250");;
         GeneIdentifier geneId = new GeneIdentifier("Lpl", "MGI:96820");
 
         DiseaseGeneAssociationDetail result = instance.getDiseaseGeneAssociationDetail(diseaseId, geneId);
 //        assertEquals(expResult, result);
-        System.out.println(result.getDiseaseId());
+        logger.info("{}", result.getDiseaseId());
+        assertEquals(diseaseId, result.getDiseaseId());
+        assertEquals(5, result.getDiseaseAssociations().size());
+        
+        DiseaseModelAssociation diseaseModelAssociation = result.getDiseaseAssociations().get(0);
+        logger.info("Testing: {}", diseaseModelAssociation);
+
+        assertEquals("MGI:96820", diseaseModelAssociation.getMouseModel().getMgiGeneId());
+        assertEquals("14434", diseaseModelAssociation.getMouseModel().getMgiModelId());
+        
+        assertEquals(74.18, diseaseModelAssociation.getDiseaseToModelScore(), 0.00);
+        assertEquals(84.48, diseaseModelAssociation.getModelToDiseaseScore(), 0.00);
+        
+        //test the phenotypes
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setId("MP:0001552");
+        expectedTerm.setTerm("increased circulating triglyceride level");
+        
+        assertNotNull("Expected a list, but got a null :(", diseaseModelAssociation.getMouseModelPhenotypeTerms());
+        assertFalse("Expected a full list, but got an empty one :(", diseaseModelAssociation.getMouseModelPhenotypeTerms().isEmpty());
+        assertTrue(String.format("Expected a list containing the term %s, but the term wasn't found :(", expectedTerm), diseaseModelAssociation.getMouseModelPhenotypeTerms().contains(expectedTerm));
+          
+        
         for (DiseaseModelAssociation diseaseAssociation : result.getDiseaseAssociations()) {
-            System.out.println(diseaseAssociation);
+            logger.info("{}", diseaseAssociation);
         }
 
     }

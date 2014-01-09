@@ -23,7 +23,11 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 public class DiseaseCacheTest {
 
+    private DiseaseCache instance;
+    
     private Map<String, Disease> diseaseMap;
+    private Map<String, Set<Disease>> hgncGeneIdToDiseasesMap;
+    
     Disease apertSyndrome;
     Disease pfeifferSyndrome;
 
@@ -57,6 +61,20 @@ public class DiseaseCacheTest {
         pfeifferSyndrome.setAlternativeTerms(pfeifferAlternativeTerms);
 
         diseaseMap.put("OMIM:101600", pfeifferSyndrome);
+        
+        hgncGeneIdToDiseasesMap = new HashMap<>();
+        
+        Set<Disease> fgfr1AssociatedDiseases = new TreeSet<>();
+        fgfr1AssociatedDiseases.add(pfeifferSyndrome);       
+        hgncGeneIdToDiseasesMap.put("HGNC:3688", fgfr1AssociatedDiseases);
+        
+        Set<Disease> fgfr2AssociatedDiseases = new TreeSet<>();
+        fgfr2AssociatedDiseases.add(apertSyndrome);
+        fgfr2AssociatedDiseases.add(pfeifferSyndrome);       
+        hgncGeneIdToDiseasesMap.put("HGNC:3689", fgfr2AssociatedDiseases);
+        
+        instance = new DiseaseCache(diseaseMap, hgncGeneIdToDiseasesMap);
+        
     }
 
     @After
@@ -64,14 +82,13 @@ public class DiseaseCacheTest {
     }
 
     /**
-     * Test of getDiseaseForDiseaseId method, of class DiseaseCache.
+     * Test of getDisease method, of class DiseaseCache.
      */
     @Test
     public void testGetDiseaseForOmimDiseaseId() {
         System.out.println("getDiseaseForOmimDiseaseId");
         String omimDiseaseId = "OMIM:101200";
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
-        Disease result = instance.getDiseaseForDiseaseId(omimDiseaseId);
+        Disease result = instance.getDisease(omimDiseaseId);
         assertEquals("OMIM:101200", result.getDiseaseId());
     }
 
@@ -79,8 +96,7 @@ public class DiseaseCacheTest {
     public void testGetDiseaseForUnknownOmimDiseaseId() {
         System.out.println("testGetDiseaseForUnknownOmimDiseaseId");
         String omimDiseaseId = "OMIM:WIBBLE";
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
-        Disease result = instance.getDiseaseForDiseaseId(omimDiseaseId);;
+        Disease result = instance.getDisease(omimDiseaseId);;
         assertNull(result);
     }
         
@@ -90,8 +106,7 @@ public class DiseaseCacheTest {
     @Test
     public void testGetDiseasesByHgncGeneId() {
         System.out.println("getDiseasesByHgncGeneId");
-        String hgncGeneId = "OMIM:136350";
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
+        String hgncGeneId = "HGNC:3688";
         Set<Disease> expResult = new TreeSet<Disease>();
         expResult.add(pfeifferSyndrome);
         Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
@@ -104,8 +119,7 @@ public class DiseaseCacheTest {
     @Test
     public void testGetDiseasesByHgncGeneIdTwoDiseasesForGene() {
         System.out.println("testGetDiseasesByHgncGeneIdTwoDiseasesForGene");
-        String hgncGeneId = "OMIM:176943";
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
+        String hgncGeneId = "HGNC:3689";
         Set<Disease> expResult = new TreeSet<Disease>();
         expResult.add(apertSyndrome);
         expResult.add(pfeifferSyndrome);
@@ -120,7 +134,6 @@ public class DiseaseCacheTest {
     public void testGetDiseasesByUnknownHgncGeneId() {
         System.out.println("testGetDiseasesByUnknownHgncGeneId");
         String hgncGeneId = "OMIM:WIBBLE";
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
  
         Set<Disease> expResult = new TreeSet<Disease>();
         Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
@@ -129,7 +142,6 @@ public class DiseaseCacheTest {
     
     @Test
     public void getAllDiseases() {
-        DiseaseCache instance = new DiseaseCache(diseaseMap);
         
         assertEquals(2, instance.getAllDiseses().size());
     }

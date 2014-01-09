@@ -4,8 +4,8 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -63,64 +63,26 @@ public class PhenoDigmDaoJdbcImplTest {
 
     @Test
     public void testDbSetup() {
-        String diseaseId = "OMIM:614298";
-        Disease disease = instance.getDiseaseByDiseaseId(diseaseId);
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:614298");
+        Disease disease = instance.getDisease(diseaseId);
         assertEquals(disease.getTerm(), "NEURODEGENERATION WITH BRAIN IRON ACCUMULATION 4; NBIA4");
     }
-    
-    @Test public void getAllGeneIdentifiers() {
-        int result = instance.getAllMouseGeneIdentifiers().size();
-        int expectedGeneIdentifiers = 4569;
-        assertEquals(String.format("Expected %s gene identifiers but got %s",expectedGeneIdentifiers, result), result, expectedGeneIdentifiers);
-    }
-    
+        
     @Test public void getAllDiseases() {
         Set<Disease> result = instance.getAllDiseses();
         int expectedDiseases = 5463;
         assertEquals("Expected " + expectedDiseases + " Disease objects, but got " + result.size() + " :(", result.size(), expectedDiseases);
         assertFalse("Expected a full set of Disease objects, but got an empty one :(", result.isEmpty());
     }
-    
-    @Test
-    public void getGeneIdentifierForMgiGeneId() {
-        String mgiGeneId = "MGI:95523";
-        GeneIdentifier expResult = new GeneIdentifier("Fgfr2", "MGI:95523");
-        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
-        assertEquals(expResult, result);
-    }
-   
-    @Test
-    public void getHumanOrthologIdentifierForMgiGeneId() {
-        String mgiGeneId = "MGI:95523";
-        GeneIdentifier expResult = new GeneIdentifier("FGFR2", "HGNC:3689");
-        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
-        assertEquals(expResult, result);
-    }
-    
-    @Test
-    public void getGeneIdentifierForMgiGeneIdUnmappedInHGNC() {
-        String mgiGeneId = "MGI:FOOP!";
-        GeneIdentifier expResult = null;
-        GeneIdentifier result = instance.getGeneIdentifierForMgiGeneId(mgiGeneId);
-        assertEquals(expResult, result);
-    }
-   
-    @Test
-    public void getHumanOrthologIdentifierForMgiGeneIdUnmappedInHGNC() {
-        String mgiGeneId = "MGI:FOOP!";
-        GeneIdentifier expResult = null;
-        GeneIdentifier result = instance.getHumanOrthologIdentifierForMgiGeneId(mgiGeneId);
-        assertEquals(expResult, result);
-    }
-    
+        
     /**
      * Test of setUpDiseaseCache method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testsetUpDiseaseCache() {
-        String omimDiseaseId = "OMIM:101600";
+        DiseaseIdentifier omimDiseaseId = new DiseaseIdentifier("OMIM:101600");
         Disease expectedResult = new Disease();
-        expectedResult.setDiseaseIdentifier(new DiseaseIdentifier(omimDiseaseId));
+        expectedResult.setDiseaseIdentifier(omimDiseaseId);
         expectedResult.setTerm("PFEIFFER SYNDROME");
         List<String> pfeifferAlternativeTerms = new ArrayList<String>();
         pfeifferAlternativeTerms.add("ACROCEPHALOSYNDACTYLY, TYPE V; ACS");
@@ -132,163 +94,117 @@ public class PhenoDigmDaoJdbcImplTest {
         locations.add("8p11.23-p11.22");
         locations.add("10q26.13");
         expectedResult.setLocations(locations);
-        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
+        Disease result = instance.getDisease(omimDiseaseId);
         assertEquals(expectedResult, result);
 
     }
 
     /**
-     * Test of getDiseaseByDiseaseId method, of class JdbcDiseaseDAOImpl.
+     * Test of getDisease method, of class JdbcDiseaseDAOImpl.
      */
     @Test
     public void testGetDiseaseByOmimDiseaseId() {
         String omimDiseaseId = "OMIM:101600";
 
-        Disease result = instance.getDiseaseByDiseaseId(omimDiseaseId);
+        Disease result = instance.getDisease(new DiseaseIdentifier(omimDiseaseId));
         assertEquals("PFEIFFER SYNDROME", result.getTerm());
 
     }
 
-    /**
-     * Test of getDiseasesByHgncGeneId method, of class JdbcDiseaseDAOImpl.
-     */
-    @Test
-    public void testGetDiseasesByHgncGeneId() {
-        String hgncGeneId = "HGNC:3689";
-
-        Set<Disease> result = instance.getDiseasesByHgncGeneId(hgncGeneId);
-//        System.out.println("Human diseases for gene " + hgncGeneId);
-//        for (Disease disease : result) {
-//            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
-//        }
-        assertTrue(result.size() >= 14);
-    }
-
-    /**
-     * Test of getDiseasesByMgiGeneId method, of class JdbcDiseaseDAOImpl.
-     */
-    @Test
-    public void testGetDiseasesByMgiGeneId() {
-        String mgiGeneId = "MGI:95523";
-
-        Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);
-        System.out.println("Human ortholog diseases for mouse gene " + mgiGeneId);
-        for (Disease disease : result) {
-            System.out.println(disease.getDiseaseId() + " - " + disease.getTerm());
-        }
-        assertTrue(result.size() >= 14);
-
-    }
-    
-    /**
-     * Test of getDiseasesByMgiGeneId method, of class
-     * JdbcDiseaseDAOImpl.
-     */
-    @Test
-    public void testGetDiseasesByMgiGeneIdNoMappedOrtholog() {
-        String mgiGeneId = "MGI:flipWooP!";
-
-        Set<Disease> result = instance.getDiseasesByMgiGeneId(mgiGeneId);   
-
-        assertTrue("Expected empty result, but got: " + result, result.isEmpty());
-        
-        
-    }
-    
-    /**
-     * Test of getKnownDiseaseAssociationsForMgiGeneId method, of class
-     * JdbcDiseaseDAOImpl.
-     */
-    @Test
-    public void testGetKnownDiseaseAssociationsForMgiGeneId() {
-        String mgiGeneId = "MGI:95523";
-
-        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
-
-        for (Disease disease : result.keySet()) {
-//            System.out.println(disease);
-            Set<DiseaseModelAssociation> diseaseAssociations = result.get(disease);
-            if (disease.getDiseaseId().equals("OMIM:101200")) {
-                assertEquals(2, diseaseAssociations.size());
-            }
-            for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
-//                System.out.println(String.format("    %s", diseaseAssociation));
-            }
-        }
-
-        assertTrue(result.keySet().size() >= 11);
-        
-        
-    }
-
-    /**
-     * Test of getPredictedDiseaseAssociationsForMgiGeneId method, of class
-     * JdbcDiseaseDAOImpl.
-     */
-    @Test
-    public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
-        String mgiGeneId = "MGI:95523";
-
-        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
-      
+//    /**
+//     * Test of getKnownDiseaseAssociationsForMgiGeneId method, of class
+//     * JdbcDiseaseDAOImpl.
+//     */
+//    @Test
+//    public void testGetKnownDiseaseAssociationsForMgiGeneId() {
+//        String mgiGeneId = "MGI:95523";
+//
+//        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+//
 //        for (Disease disease : result.keySet()) {
-//            System.out.println(disease);
-//            for (DiseaseAssociation diseaseAssociation : result.get(disease)) {
-//                System.out.println(String.format("    %s", diseaseAssociation));
+////            System.out.println(disease);
+//            Set<DiseaseModelAssociation> diseaseAssociations = result.get(disease);
+//            if (disease.getDiseaseId().equals("OMIM:101200")) {
+//                assertEquals(2, diseaseAssociations.size());
+//            }
+//            for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
+////                System.out.println(String.format("    %s", diseaseAssociation));
 //            }
 //        }
-        assertTrue(result.keySet().size() > 290);
-    }
-
-    @Test 
-    public void testGetKnownDiseaseAssociationsForDiseaseId() {
-        String diseaseId = "OMIM:101600";
-        
-        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
-        
-        int resultSize = result.keySet().size();
-        int expectSize = 2;
-        String sizeErrorMessage = String.format("Expected %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
-        assertEquals(sizeErrorMessage, resultSize, expectSize);
-        
-        GeneIdentifier fgfr1 = new GeneIdentifier("Fgfr1", "MGI:95522");
-        assertTrue("Expected gene " + fgfr1 + "to be in result set", result.keySet().contains(fgfr1));
-        
-        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
-        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
-        
-//        System.out.println(result);
-    }
-    
-    @Test 
-    public void testGetPredictedDiseaseAssociationsForDiseaseId() {
-        String diseaseId = "OMIM:101600";
-        
-        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
-
-//        System.out.println(result);
-
-        int resultSize = result.keySet().size();
-        int expectSize = 46;
-        String sizeErrorMessage = String.format("Expected more than %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
-        assertTrue(sizeErrorMessage, resultSize > expectSize);
-        
-        GeneIdentifier gja1 = new GeneIdentifier("Gja1", "MGI:95713");
-        assertTrue("Expected gene " + gja1 + "to be in result set", result.keySet().contains(gja1));
-        
-        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
-        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
-        
-        GeneIdentifier fgfr3 = new GeneIdentifier("Fgfr3", "MGI:95524");
-        assertTrue("Expected gene " + fgfr3 + "to be in result set", result.keySet().contains(fgfr3));
-        
-             
-    }
+//
+//        assertTrue(result.keySet().size() >= 11);
+//        
+//        
+//    }
+//
+//    /**
+//     * Test of getPredictedDiseaseAssociationsForMgiGeneId method, of class
+//     * JdbcDiseaseDAOImpl.
+//     */
+//    @Test
+//    public void testGetPredictedDiseaseAssociationsForMgiGeneId() {
+//        String mgiGeneId = "MGI:95523";
+//
+//        Map<Disease, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+//      
+////        for (Disease disease : result.keySet()) {
+////            System.out.println(disease);
+////            for (DiseaseAssociation diseaseAssociation : result.get(disease)) {
+////                System.out.println(String.format("    %s", diseaseAssociation));
+////            }
+////        }
+//        assertTrue(result.keySet().size() > 290);
+//    }
+//
+//    @Test 
+//    public void testGetKnownDiseaseAssociationsForDiseaseId() {
+//        String diseaseId = "OMIM:101600";
+//        
+//        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getKnownDiseaseAssociationsForDiseaseId(diseaseId);
+//        
+//        int resultSize = result.keySet().size();
+//        int expectSize = 2;
+//        String sizeErrorMessage = String.format("Expected %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+//        assertEquals(sizeErrorMessage, resultSize, expectSize);
+//        
+//        GeneIdentifier fgfr1 = new GeneIdentifier("Fgfr1", "MGI:95522");
+//        assertTrue("Expected gene " + fgfr1 + "to be in result set", result.keySet().contains(fgfr1));
+//        
+//        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+//        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+//        
+////        System.out.println(result);
+//    }
+//    
+//    @Test 
+//    public void testGetPredictedDiseaseAssociationsForDiseaseId() {
+//        String diseaseId = "OMIM:101600";
+//        
+//        Map<GeneIdentifier, Set<DiseaseModelAssociation>> result = instance.getPredictedDiseaseAssociationsForDiseaseId(diseaseId);
+//
+////        System.out.println(result);
+//
+//        int resultSize = result.keySet().size();
+//        int expectSize = 46;
+//        String sizeErrorMessage = String.format("Expected more than %d genes associated with %s. Found %d", expectSize, diseaseId, resultSize);
+//        assertTrue(sizeErrorMessage, resultSize > expectSize);
+//        
+//        GeneIdentifier gja1 = new GeneIdentifier("Gja1", "MGI:95713");
+//        assertTrue("Expected gene " + gja1 + "to be in result set", result.keySet().contains(gja1));
+//        
+//        GeneIdentifier fgfr2 = new GeneIdentifier("Fgfr2", "MGI:95523");
+//        assertTrue("Expected gene " + fgfr2 + "to be in result set", result.keySet().contains(fgfr2));
+//        
+//        GeneIdentifier fgfr3 = new GeneIdentifier("Fgfr3", "MGI:95524");
+//        assertTrue("Expected gene " + fgfr3 + "to be in result set", result.keySet().contains(fgfr3));
+//        
+//             
+//    }
     
     @Test
     public void testGetDiseasePhenotypeTerms() {
-        String diseaseId = "OMIM:101200";
-        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101200");
+        List<PhenotypeTerm> result = instance.getDiseasePhenotypes(diseaseId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
         expectedTerm.setId("HP:0000175");
         expectedTerm.setTerm("Cleft palate");
@@ -331,6 +247,8 @@ public class PhenoDigmDaoJdbcImplTest {
                 matchResult = phenotypeMatch;
             }
         }
+        logger.info(matchResult.toString());
+
         assertNotNull(matchResult);
         assertEquals(expectedMatch.getLcs(), matchResult.getLcs());
         //make sure there are other matches in there too!
@@ -346,8 +264,8 @@ public class PhenoDigmDaoJdbcImplTest {
         String mgiGeneId = "MGI:95523";
         System.out.println(String.format("\n\nGene: %s", mgiGeneId));
         System.out.println("Known Disease Associations:");
-        Map<Disease, Set<DiseaseModelAssociation>> knownDiseases = diseaseDao.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
-        Map<Disease, Set<DiseaseModelAssociation>> predictedDiseases = diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> knownDiseases = new HashMap<>();// diseaseDao.getKnownDiseaseAssociationsForMgiGeneId(mgiGeneId);
+        Map<Disease, Set<DiseaseModelAssociation>> predictedDiseases = new HashMap<>();// diseaseDao.getPredictedDiseaseAssociationsForMgiGeneId(mgiGeneId);
 
         if (knownDiseases.keySet().isEmpty()) {
             System.out.println("  No known disease associations for " + mgiGeneId);

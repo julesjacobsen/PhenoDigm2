@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import uk.ac.sanger.phenodigm2.model.Disease;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
+import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
+import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
+import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  * Disease data access manager interface.
@@ -26,27 +30,11 @@ public interface PhenoDigmDao {
     
     public Set<Gene> getAllGenes();
     
-    public Disease getDiseaseByDiseaseId(String diseaseId);
+    public Disease getDisease(DiseaseIdentifier diseaseId);
     
-    public Set<Disease> getDiseasesByHgncGeneId(String hgncGeneId);
-    
-    public Set<Disease> getDiseasesByMgiGeneId(String mgiGeneId);
-    
-    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String mgiGeneId);
-
-    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String mgiGeneId);
-    
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String diseaseId);
-    
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String diseaseId);
-
-    public Set<GeneIdentifier> getAllMouseGeneIdentifiers();
-    
-    public GeneIdentifier getGeneIdentifierForMgiGeneId(String acc);
-
-    public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String acc);
-    
-    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId);
+    public Gene getGene(GeneIdentifier geneIdentifier);
+               
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId);
     
     public Set<MouseModel> getAllMouseModels();
     
@@ -54,6 +42,10 @@ public interface PhenoDigmDao {
     
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
 
-    public Gene getGene(GeneIdentifier geneIdentifier);
+    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId);
+
+    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId);
+
+    public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId);
 
 }

@@ -5465,4 +5465,4 @@ INSERT INTO `disease` (`disease_id`,`disease_term`,`disease_alts`,`disease_locus
 ('ORPHANET:201','COWDEN SYNDROME','','','developmental anomalies embryogenesis,gastroenterological,skin,tumors'),
 ('OMIM:600118','WARBURG MICRO SYNDROME 1; WARBM1','MICRO SYNDROM','2q21.3',''),
 ('OMIM:309530','MENTAL RETARDATION, X-LINKED 1; MRX1','MR|MENTAL RETARDATION, X-LINKED 18, INCLUDED; MRX18, INCLUDED','Xp11.22',''),
-('OMIM:186350','SYNDACTYLY-POLYDACTYLY-EARLOBE SYNDROME','SPEL SYNDROM','','developmental anomalies embryogenesis'),
+('OMIM:186350','SYNDACTYLY-POLYDACTYLY-EARLOBE SYNDROME','SPEL SYNDROM','','developmental anomalies embryogenesis');

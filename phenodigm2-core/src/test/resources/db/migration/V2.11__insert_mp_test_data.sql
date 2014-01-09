@@ -9025,4 +9025,4 @@ INSERT INTO `mp` (`mp_id`,`term`) VALUES
 ('MP:0011973','abnormal circulating glycerol level'),
 ('MP:0011974','intestinal stenosis'),
 ('MP:0011975','neuronal cytoplasmic inclusions'),
-('MP:0011976','sweet preference'),
+('MP:0011976','sweet preference');

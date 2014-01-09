@@ -12,6 +12,7 @@ package uk.ac.sanger.phenodigm2.model;
  * 
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
+@Deprecated
 public class CurationStatus {
     
     private boolean isAssociatedInHuman = false;
