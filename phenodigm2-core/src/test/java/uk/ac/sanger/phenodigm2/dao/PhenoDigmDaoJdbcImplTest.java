@@ -204,7 +204,7 @@ public class PhenoDigmDaoJdbcImplTest {
     @Test
     public void testGetDiseasePhenotypeTerms() {
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101200");
-        List<PhenotypeTerm> result = instance.getDiseasePhenotypes(diseaseId);
+        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
         expectedTerm.setId("HP:0000175");
         expectedTerm.setTerm("Cleft palate");

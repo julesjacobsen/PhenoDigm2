@@ -83,15 +83,29 @@ public class PhenoDigmWebDaoJdbcImplTest {
         
 //        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:112600");
-        Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 0.0);
 
-        for (Disease resultDisease : result.keySet()) {
-            assertEquals("BRACHYDACTYLY, TYPE A2; BDA2", resultDisease.getTerm());
-            List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
-            assertTrue(geneAssociationSummaries.size() >= 17);
-        }
+        assertTrue(result.size() >= 17);
+
     }
     
+    /**
+     * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetDiseaseToGeneAssociationSummariesWithCutOff() {
+        logger.info("getDiseaseToGeneAssociationSummaries");
+        
+//        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101400");
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:112600");
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 1.98);
+
+        assertTrue(result.size() >= 17);
+        for (GeneAssociationSummary geneAssociationSummary : result) {
+            logger.info(geneAssociationSummary.toString());
+        }
+    }
+        
     /**
      * Test of getDiseaseToGeneAssociationSummariesNoKnownAssociations method, of class PhenoDigmWebDaoJdbcImpl.
      */
@@ -104,14 +118,11 @@ public class PhenoDigmWebDaoJdbcImplTest {
         Disease expDisease = new Disease(diseaseId);
         expDisease.setTerm("1P36 MICRODELETION SYNDROME");
         
-        Map<Disease, List<GeneAssociationSummary>> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId);
-        for (Disease resultDisease : result.keySet()) {
-            assertEquals(expDisease.getTerm(), resultDisease.getTerm());
-            List<GeneAssociationSummary> geneAssociationSummaries = result.get(resultDisease);
-            assertTrue(geneAssociationSummaries.size() >= 4);
-            for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummaries) {
-                assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
-            }
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 0.0);
+        
+        assertTrue(result.size() >= 4);
+        for (GeneAssociationSummary geneAssociationSummary : result) {
+            assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
         }
 
     }
@@ -133,16 +144,43 @@ public class PhenoDigmWebDaoJdbcImplTest {
     }
     
     /**
+     * Test of getGene method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetGene() {
+        GeneIdentifier modelGeneId = new GeneIdentifier("Apoe", "MGI:88057");
+        GeneIdentifier humanGeneId = new GeneIdentifier("APOE", "HGNC:613");
+        Gene expected = new Gene(modelGeneId, humanGeneId);
+
+        Gene result = instance.getGene(modelGeneId);
+        
+        assertEquals(expected, result);
+    }
+    
+    /**
      * Test of getGeneToDiseaseAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
      */
     @Test
     public void testGetGeneToDiseaseAssociationSummaries() {
         logger.info("getGeneToDiseaseAssociationSummaries");
         GeneIdentifier geneId = new GeneIdentifier("Apoe", "MGI:88057");
-        Map<Gene, List<DiseaseAssociationSummary>> expResult = null;
-        Map<Gene, List<DiseaseAssociationSummary>> result = instance.getGeneToDiseaseAssociationSummaries(geneId);
+        List<DiseaseAssociationSummary> expResult = null;
+        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, 0.0);
 //        assertEquals(expResult, result);
 
+    }
+    
+    /**
+     * Test of getGeneToDiseaseAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetGeneToDiseaseAssociationSummariesWithCutoff() {
+        logger.info("getGeneToDiseaseAssociationSummaries");
+        GeneIdentifier geneId = new GeneIdentifier("Apoe", "MGI:88057");
+        List<DiseaseAssociationSummary> expResult = null;
+        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, 1.98);
+//        assertEquals(expResult, result);
+        //TODO: Test MGI:1096550 as this has 1:n mouse:human orthologs 
     }
 
     /**

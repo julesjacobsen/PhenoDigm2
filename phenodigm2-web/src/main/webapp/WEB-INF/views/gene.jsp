@@ -106,14 +106,13 @@
                             </thead>                        
                             <tbody> 
                                 <c:forEach var="association" items="${curatedAssociations}" varStatus="loop">
-                                    <c:set var="disease" value="${association.disease}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
-                                    <tr id="${disease.diseaseIdentifier.databaseAcc}" targetRowId="${geneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
+                                    <tr id="${disease.diseaseIdentifier.databaseAcc}" targetRowId="${geneIdentifier.databaseAcc}_${association.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                         <!--Disease Name-->
-                                        <td><a href="../disease/${disease.diseaseId}">${disease.term}</a></td>
+                                        <td><a href="../disease/${association.diseaseIdentifier}">${association.diseaseTerm}</a></td>
                                         <!--Source-->
                                         <td>
-                                            <a id="diseaseId" href="${disease.diseaseIdentifier.externalUri}">${disease.diseaseId}</a></td>
+                                            <a id="diseaseId" href="${association.diseaseIdentifier.externalUri}">${association.diseaseIdentifier}</a></td>
                                         <!--Associated in Human --> 
                                         <td>
                                             <c:if test="${associationSummary.associatedInHuman}">Yes</c:if>
@@ -138,7 +137,7 @@
                                             <div class="arrow">+</div>
                                         </td>   
                                     </tr>
-                                    <tr id="${geneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" requestpagetype= "gene" geneid="${geneIdentifier.compoundIdentifier}" diseaseid="${disease.diseaseIdentifier.compoundIdentifier}">
+                                    <tr id="${geneIdentifier.databaseAcc}_${association.diseaseIdentifier.databaseAcc}" requestpagetype= "gene" geneid="${geneIdentifier.compoundIdentifier}" diseaseid="${association.diseaseIdentifier.compoundIdentifier}">
                                     </tr>
                                 </c:forEach>                            
                             </tbody>
@@ -173,13 +172,12 @@
                             </thead>                        
                             <tbody>
                                 <c:forEach var="association" items="${phenotypeAssociations}" varStatus="loop">
-                                    <c:set var="disease" value="${association.disease}"></c:set>
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
-                                    <tr id="${disease.diseaseIdentifier.databaseAcc}" targetRowId="P${geneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
+                                    <tr id="${disease.diseaseIdentifier.databaseAcc}" targetRowId="P${geneIdentifier.databaseAcc}_${association.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                         <!--Disease Name-->
                                         <td><a href="../disease/${disease.diseaseId}">${disease.term}</a></td>
                                         <!--Source-->
-                                        <td><a href="${disease.diseaseIdentifier.externalUri}">${disease.diseaseId}</a></td>
+                                        <td><a href="${association.diseaseIdentifier.externalUri}">${association.diseaseIdentifier}</a></td>
                                         <!--Associated in Human --> 
                                         <td>
                                             <c:if test="${associationSummary.associatedInHuman}">Yes</c:if>
@@ -204,7 +202,7 @@
                                             <div class="arrow">+</div>
                                         </td>   
                                     </tr>
-                                    <tr id="P${geneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" requestpagetype= "gene" geneid="${geneIdentifier.compoundIdentifier}" diseaseid="${disease.diseaseIdentifier.compoundIdentifier}">
+                                    <tr id="P${geneIdentifier.databaseAcc}_${association.diseaseIdentifier.databaseAcc}" requestpagetype= "gene" geneid="${geneIdentifier.compoundIdentifier}" diseaseid="${association.diseaseIdentifier.compoundIdentifier}">
                                     </tr>
                                 </c:forEach>
                             </tbody>

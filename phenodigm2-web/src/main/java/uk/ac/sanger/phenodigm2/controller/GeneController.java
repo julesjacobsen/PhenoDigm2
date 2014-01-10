@@ -36,7 +36,16 @@ public class GeneController {
     
     @Autowired
     private PhenoDigmWebDao phenoDigmDao;
-    
+    private double rawScoreCutoff;
+
+    public double getRawScoreCutoff() {
+        return rawScoreCutoff;
+    }
+
+    public void setRawScoreCutoff(double rawScoreCutoff) {
+        this.rawScoreCutoff = rawScoreCutoff;
+    }
+
     @RequestMapping("/")
     public String allGenes(Model model) {
         logger.info("Making all genes page");
@@ -57,32 +66,33 @@ public class GeneController {
         logger.info("Making gene page for " + mgiId);
         model.addAttribute("mgiId", mgiId);
         GeneIdentifier geneIdentifier = new GeneIdentifier(mgiId, mgiId);
-        logger.info("Found GeneIdentifier: " + geneIdentifier);
+        
+        Gene gene = phenoDigmDao.getGene(geneIdentifier);
+        logger.info("Found Gene: " + gene);
         model.addAttribute("geneIdentifier", geneIdentifier);
+        if (gene != null) {
+            model.addAttribute("humanOrtholog", gene.getHumanGeneId());
+            logger.info(String.format("Found gene: %s %s", gene.getOrthologGeneId().getCompoundIdentifier(), gene.getOrthologGeneId().getGeneSymbol()));
+        } else {
+            logger.info(String.format("No human ortholog found for gene: %s", geneIdentifier));                
+        }
         
         logger.info("Getting disease-gene associations for gene: " + mgiId);
-        Map<Gene, List<DiseaseAssociationSummary>> geneToDiseaseAssociationsMap = phenoDigmDao.getGeneToDiseaseAssociationSummaries(geneIdentifier);
+        List<DiseaseAssociationSummary> diseaseAssociationSummarys = phenoDigmDao.getGeneToDiseaseAssociationSummaries(geneIdentifier, rawScoreCutoff);
         
         List<DiseaseAssociationSummary> curatedAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
         List<DiseaseAssociationSummary> phenotypeAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
-        
-        for (Gene gene : geneToDiseaseAssociationsMap.keySet()) {
-            logger.info(String.format("Found gene: %s %s", gene.getOrthologGeneId().getCompoundIdentifier(), gene.getOrthologGeneId().getGeneSymbol()));
-            List<DiseaseAssociationSummary> diseaseAssociationSummarys = geneToDiseaseAssociationsMap.get(gene);
-            
-            for (DiseaseAssociationSummary geneAssociationSummary : diseaseAssociationSummarys) {
-                AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
-                //always want the associations in the phenotypes list
-                if (associationSummary.getBestHtpcScore() > 0.0 || associationSummary.getBestModScore() > 0.0) {
-                    phenotypeAssociationSummaries.add(geneAssociationSummary);
-                }
-                //but only the curated ones in the curated list...
-                if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
-                   curatedAssociationSummaries.add(geneAssociationSummary);
-                }
+          
+        for (DiseaseAssociationSummary geneAssociationSummary : diseaseAssociationSummarys) {
+            AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
+            //always want the associations in the phenotypes list
+            phenotypeAssociationSummaries.add(geneAssociationSummary);
+            //but only the curated ones in the curated list...
+            if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
+               curatedAssociationSummaries.add(geneAssociationSummary);
             }
         }
-            
+                   
         model.addAttribute("curatedAssociations", curatedAssociationSummaries);         
         model.addAttribute("phenotypeAssociations", phenotypeAssociationSummaries);
        

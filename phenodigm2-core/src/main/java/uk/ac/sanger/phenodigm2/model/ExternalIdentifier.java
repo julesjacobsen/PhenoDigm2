@@ -60,9 +60,12 @@ public class ExternalIdentifier {
         }
         
         public static ExternalLink getExternalLink(String identifier) {
-            for (ExternalLink externalLink : ExternalLink.values()) {
-                if (externalLink.identifier.equals(identifier)) {
-                    return externalLink;
+            
+            if (identifier != null) {           
+                for (ExternalLink externalLink : ExternalLink.values()) {
+                    if (externalLink.identifier.equals(identifier)) {
+                        return externalLink;
+                    }
                 }
             }
             return UNKNOWN;
@@ -78,10 +81,10 @@ public class ExternalIdentifier {
      */
     protected ExternalIdentifier(String compoundIdentifier) {
         
-        if (!compoundIdentifier.contains(":")) {
-            logger.warn(compoundIdentifier + " is not of the format GENE:ACCESSION - creating an empty external identifier");
-            this.databaseAcc = "";
-            this.databaseCode = "";
+        if (compoundIdentifier == null || !compoundIdentifier.contains(":")) {
+            logger.warn("'{}' is not of the format DBCODE:ACCESSION - creating an empty external identifier", compoundIdentifier);
+            this.databaseAcc = "-";
+            this.databaseCode = "-";
         } else {
             String[] database = compoundIdentifier.split(":");
             String dbCode = database[0];
@@ -122,7 +125,7 @@ public class ExternalIdentifier {
     public String getExternalUri() {
         ExternalLink externalLink = ExternalLink.getExternalLink(this.databaseCode);
         if (externalLink == ExternalLink.UNKNOWN) {
-            logger.info("{} not a known external resource - must be one of {}", this.databaseCode, ExternalLink.values());
+            logger.info("{} is of resource type {} - Returning empty external URI.", this.databaseCode, ExternalLink.UNKNOWN);
             return "";
         }
         return String.format("%s%s", externalLink.getLink(), this.databaseAcc);

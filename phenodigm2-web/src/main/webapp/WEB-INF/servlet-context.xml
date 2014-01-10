@@ -29,7 +29,15 @@
     </bean>
     
     <!--this is the DAO implementation we are looking for...-->
-    <bean id="phenoDigmWebDao" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl"/>     
+    <bean id="phenoDigmWebDao" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl"/>
+    
+    <bean id="diseaseController" class="uk.ac.sanger.phenodigm2.controller.DiseaseController">
+        <property name="rawScoreCutoff" value="1.97" />
+    </bean>
+    
+    <bean id="geneController" class="uk.ac.sanger.phenodigm2.controller.GeneController">
+        <property name="rawScoreCutoff" value="1.97" />
+    </bean>     
 
     <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/views/" />

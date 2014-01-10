@@ -29,9 +29,9 @@ public class GeneAssociationSummary {
     private GeneIdentifier modelGeneIdentifier;
     private AssociationSummary associationSummary;
 
-    public GeneAssociationSummary(GeneIdentifier humanGeneIdentifier, GeneIdentifier mouseGeneIdentifier, AssociationSummary associationSummary) {
-        this.hgncGeneIdentifier = humanGeneIdentifier;
-        this.modelGeneIdentifier = mouseGeneIdentifier;
+    public GeneAssociationSummary(GeneIdentifier hgncGeneIdentifier, GeneIdentifier modelGeneIdentifier, AssociationSummary associationSummary) {
+        this.hgncGeneIdentifier = hgncGeneIdentifier;
+        this.modelGeneIdentifier = modelGeneIdentifier;
         this.associationSummary = associationSummary;
     }
 
@@ -62,7 +62,7 @@ public class GeneAssociationSummary {
     
     @Override
     public String toString() {
-        return String.format("GeneAssociationSummary{ %s %s %s}", hgncGeneIdentifier, modelGeneIdentifier, associationSummary);
+        return String.format("GeneAssociationSummary{%s %s %s}", hgncGeneIdentifier, modelGeneIdentifier, associationSummary);
     }
     
 }

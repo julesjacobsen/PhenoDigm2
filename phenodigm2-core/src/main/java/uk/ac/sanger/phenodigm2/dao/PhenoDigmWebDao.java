@@ -22,6 +22,7 @@ import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
@@ -33,18 +34,37 @@ import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 public interface PhenoDigmWebDao {
     
     /**
-     * The disease page view.
+     * Returns a Disease object for a given DiseaseIdentifier.
      * @param diseaseId
-     * @return 
+     * @return
      */
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId);
+    public Disease getDisease(DiseaseIdentifier diseaseId);
+ 
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId);
+
+    public Gene getGene(GeneIdentifier geneIdentifier);
 
     /**
-     * The gene page view.
-     * @param geneId
+     * The disease page view. Use the minRawScoreCutoff to set the lower-level limit
+     * for the phenodigm score of a gene-disease association. High confidence scores 
+     * are generally above 2.0
+     * 
+     * @param diseaseId
+     * @param minRawScoreCutoff
      * @return 
      */
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId);
+    public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff);
+
+    /**
+     * The gene page view. Use the minRawScoreCutoff to set the lower-level limit
+     * for the phenodigm score of a gene-disease association. High confidence scores 
+     * are generally above 2.0
+     * 
+     * @param geneId
+     * @param minRawScoreCutoff
+     * @return 
+     */
+    public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff);
     
     /**
      * Returns details of the Disease-Gene association.
@@ -54,11 +74,4 @@ public interface PhenoDigmWebDao {
      */
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId);
 
-    /**
-     * Returns a Disease object for a given DiseaseIdentifier.
-     * @param diseaseId
-     * @return
-     */
-    public Disease getDisease(DiseaseIdentifier diseaseId);
-    
 }

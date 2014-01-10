@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.ac.sanger.phenodigm2.web;
 
 import org.junit.After;
@@ -23,24 +22,24 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 
 /**
  *
  * @author jj8
  */
-public class GeneAssociationSummaryTest {
+public class DiseaseAssociationSummaryTest {
     
-    GeneAssociationSummary instance;
-    GeneIdentifier mouseGeneIdentifier;
-    GeneIdentifier humanGeneIdentifier;
-    AssociationSummary summary;        
-
-    public GeneAssociationSummaryTest() {
-        mouseGeneIdentifier = new GeneIdentifier("Fgfr2", "MGI:1234");
-        humanGeneIdentifier = new GeneIdentifier("FGFR2", "HGNC:46785");
-        summary = new AssociationSummary(true, true, true, 89.00, 78.01);
-        instance = new GeneAssociationSummary(humanGeneIdentifier, mouseGeneIdentifier, summary);
+    DiseaseAssociationSummary instance;
+    DiseaseIdentifier diseaseIdentifier;
+    String diseaseTerm;
+    AssociationSummary summary; 
+    
+    public DiseaseAssociationSummaryTest() {
+        diseaseIdentifier = new DiseaseIdentifier("OMIM:12345");
+        diseaseTerm = "Wibble-wobble syndrome";
+        summary = new AssociationSummary(true, true, true, 89.34, 87.65);
+        instance = new DiseaseAssociationSummary(diseaseIdentifier, diseaseTerm, summary);
     }
     
     @BeforeClass
@@ -53,6 +52,7 @@ public class GeneAssociationSummaryTest {
     
     @Before
     public void setUp() {
+        
     }
     
     @After
@@ -60,42 +60,47 @@ public class GeneAssociationSummaryTest {
     }
 
     /**
-     * Test of getHumanGeneIdentifier method, of class GeneAssociationSummary.
+     * Test of getDiseaseIdentifier method, of class DiseaseAssociationSummary.
      */
     @Test
-    public void testGetHumanGeneIdentifier() {
-        GeneIdentifier expResult = humanGeneIdentifier;
-        GeneIdentifier result = instance.getHgncGeneIdentifier();
-        assertEquals(expResult, result);
-    }
-    /**
-     * Test of getModelGeneIdentifier method, of class GeneAssociationSummary.
-     */
-    @Test
-    public void testGetMouseGeneIdentifier() {
-        GeneIdentifier expResult = mouseGeneIdentifier;
-        GeneIdentifier result = instance.getModelGeneIdentifier();
+    public void testGetDiseaseIdentifier() {
+        System.out.println("getDiseaseIdentifier");
+        DiseaseIdentifier expResult = diseaseIdentifier;
+        DiseaseIdentifier result = instance.getDiseaseIdentifier();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of getAssociationSummary method, of class GeneAssociationSummary.
+     * Test of getDiseaseTerm method, of class DiseaseAssociationSummary.
+     */
+    @Test
+    public void testGetDiseaseTerm() {
+        System.out.println("getDiseaseTerm");
+        String expResult = diseaseTerm;
+        String result = instance.getDiseaseTerm();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getAssociationSummary method, of class DiseaseAssociationSummary.
      */
     @Test
     public void testGetAssociationSummary() {
+        System.out.println("getAssociationSummary");
         AssociationSummary expResult = summary;
         AssociationSummary result = instance.getAssociationSummary();
         assertEquals(expResult, result);
-
     }
 
     /**
-     * Test of toString method, of class GeneAssociationSummary.
+     * Test of toString method, of class DiseaseAssociationSummary.
      */
     @Test
     public void testToString() {
-        String expResult = "GeneAssociationSummary{FGFR2{HGNC:46785} Fgfr2{MGI:1234} AssociationSummary{associatedInHuman=true, hasLiteratureEvidence=true, inLocus=true, locus=null, bestMgiScore=89.0, bestImpcScore=78.01}}";
+        System.out.println("toString");
+        String expResult = "DiseaseAssociationSummary{OMIM:12345 AssociationSummary{associatedInHuman=true, hasLiteratureEvidence=true, inLocus=true, locus=null, bestMgiScore=89.34, bestImpcScore=87.65}}";
         String result = instance.toString();
+        System.out.println(result);
         assertEquals(expResult, result);
     }
     

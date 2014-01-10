@@ -16,7 +16,7 @@
  */
 package uk.ac.sanger.phenodigm2.web;
 
-import uk.ac.sanger.phenodigm2.model.Disease;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 
 
 /**
@@ -24,20 +24,31 @@ import uk.ac.sanger.phenodigm2.model.Disease;
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class DiseaseAssociationSummary {
-    private Disease disease;
+    
+    private DiseaseIdentifier diseaseId;
+    private String diseaseTerm;
     private AssociationSummary associationSummary;
     
-    public DiseaseAssociationSummary(Disease disease, AssociationSummary associationSummary) {
+    public DiseaseAssociationSummary(DiseaseIdentifier diseaseId, String diseaseTerm, AssociationSummary associationSummary) {
         this.associationSummary = associationSummary;
-        this.disease = disease;
+        this.diseaseId = diseaseId;
+        this.diseaseTerm = diseaseTerm;
     }
 
-    public Disease getDisease() {
-        return disease;
+    public DiseaseIdentifier getDiseaseIdentifier() {
+        return diseaseId;
     }
 
-    public void setDisease(Disease disease) {
-        this.disease = disease;
+    public void setDiseaseIdentifier(DiseaseIdentifier diseaseId) {
+        this.diseaseId = diseaseId;
+    }
+
+    public String getDiseaseTerm() {
+        return diseaseTerm;
+    }
+
+    public void setDiseaseTerm(String diseaseTerm) {
+        this.diseaseTerm = diseaseTerm;
     }
 
     public AssociationSummary getAssociationSummary() {
@@ -50,7 +61,7 @@ public class DiseaseAssociationSummary {
 
     @Override
     public String toString() {
-        return String.format("DiseaseAssociationSummary{ %s %s}", disease.getDiseaseIdentifier().getCompoundIdentifier(), associationSummary);
+        return String.format("DiseaseAssociationSummary{%s %s}", diseaseId.getCompoundIdentifier(), associationSummary);
     }
  
     

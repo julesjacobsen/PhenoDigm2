@@ -33,7 +33,16 @@ public class DiseaseController {
 
     @Autowired
     private PhenoDigmWebDao phenoDigmDao;
+    private double rawScoreCutoff;
 
+    public double getRawScoreCutoff() {
+        return rawScoreCutoff;
+    }
+
+    public void setRawScoreCutoff(double rawScoreCutoff) {
+        this.rawScoreCutoff = rawScoreCutoff;
+    }
+        
     @RequestMapping(value = "/disease")
     public String allDiseases(Model model) {
         Set<Disease> allDiseases = new TreeSet<Disease>();//phenoDigmDao.getAllDiseses();
@@ -45,31 +54,27 @@ public class DiseaseController {
 
     @RequestMapping(value = "/disease/{diseaseId}")
     public String disease(@PathVariable("diseaseId") String diseaseId, Model model) {
-
+        System.out.println("rawScoreCutoff=" + rawScoreCutoff);
         logger.info("Getting gene-disease associations for disease: " + diseaseId);
-        Map<Disease, List<GeneAssociationSummary>> diseaseToGeneAssociationsMap = phenoDigmDao.getDiseaseToGeneAssociationSummaries(new DiseaseIdentifier(diseaseId));
+        
+        DiseaseIdentifier diseaseIdentifier = new DiseaseIdentifier(diseaseId);
+        Disease disease = phenoDigmDao.getDisease(diseaseIdentifier);
+        logger.info(String.format("Found disease: %s %s", disease.getDiseaseId(), disease.getTerm()));
+        model.addAttribute("disease", disease);
+
+        List<GeneAssociationSummary> geneAssociationSummarys = phenoDigmDao.getDiseaseToGeneAssociationSummaries(diseaseIdentifier, rawScoreCutoff);
 
         List<GeneAssociationSummary> curatedAssociationSummaries = new ArrayList<GeneAssociationSummary>();
         List<GeneAssociationSummary> phenotypeAssociationSummaries = new ArrayList<GeneAssociationSummary>();
 
-        for (Disease disease : diseaseToGeneAssociationsMap.keySet()) {
-            model.addAttribute("disease", disease);
-            logger.info(String.format("Found disease: %s %s", disease.getDiseaseId(), disease.getTerm()));
-            List<GeneAssociationSummary> geneAssociationSummarys = diseaseToGeneAssociationsMap.get(disease);
-//            if (!geneAssociationSummarys.isEmpty()) {
-                for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummarys) {
-                    AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
-                    //always want the associations in the phenotypes list
-                    if (associationSummary.getBestHtpcScore() > 0.0 || associationSummary.getBestModScore() > 0.0) {
-                        phenotypeAssociationSummaries.add(geneAssociationSummary);
-                    }
-                    //but only the curated ones in the curated list...
-                    if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
-                        curatedAssociationSummaries.add(geneAssociationSummary);
-                    }
-                }
-//            }
-
+        for (GeneAssociationSummary geneAssociationSummary : geneAssociationSummarys) {
+            AssociationSummary associationSummary = geneAssociationSummary.getAssociationSummary();
+            //always want the associations in the phenotypes list
+            phenotypeAssociationSummaries.add(geneAssociationSummary);
+            //but only the curated ones in the curated list...
+            if (associationSummary.isAssociatedInHuman() || associationSummary.isHasLiteratureEvidence()) {
+                curatedAssociationSummaries.add(geneAssociationSummary);
+            }
         }
 
         model.addAttribute("curatedAssociations", curatedAssociationSummaries);

@@ -34,11 +34,10 @@ public class AssociationSummary {
     public AssociationSummary() {
     }
 
-    public AssociationSummary(boolean associatedInHuman, boolean hasLiteratureEvidence, boolean inLocus, String locus, double bestMgiScore, double bestImpcScore) {
+    public AssociationSummary(boolean associatedInHuman, boolean hasLiteratureEvidence, boolean inLocus, double bestMgiScore, double bestImpcScore) {
         this.associatedInHuman = associatedInHuman;
         this.hasLiteratureEvidence = hasLiteratureEvidence;
         this.inLocus = inLocus;
-        this.locus = locus;
         this.bestModScore = bestMgiScore;
         this.bestHtpcScore = bestImpcScore;
     }  

@@ -59,6 +59,20 @@ public class GeneIdentifierTest {
         String result = instance.toString();
         assertEquals(expResult, result);
     }
+    
+    /**
+     * Test of constructor for class GeneIdentifier.
+     */
+    @Test
+    public void testGeneIdentifierParserOverloadedConstructorUnclassifiedHumanOrtholog() {
+        System.out.println("testGeneIdentifierParserOverloadedConstructorUnclassifiedHumanOrtholog");
+        String geneSymbol = "";
+        String databaseCompoundIdentifier = "";
+        GeneIdentifier instance = new GeneIdentifier(geneSymbol, databaseCompoundIdentifier);
+        String expResult = "UNKNOWN{-:-}";
+        String result = instance.toString();
+        assertEquals(expResult, result);
+    }
 
     @Test
     public void testCompareTo(){

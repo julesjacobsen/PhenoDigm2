@@ -58,52 +58,82 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId) {
+    public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff) {
 
-        logger.info("Getting associated genes for disease {}", diseaseId);
+        logger.info("Getting associated genes for disease {} with raw score cutoff >= {}", diseaseId, minRawScoreCutoff);
 
+        String cutOffClause = "";
+        
+        if (minRawScoreCutoff > 0.0) {
+             cutOffClause = String.format("and ((human_curated is true or mod_curated is true) or (mod_raw_score >= %f or htpc_raw_score >= %f)) ", minRawScoreCutoff, minRawScoreCutoff);
+        }
+        
 //        String sql = "select * from disease_gene_summary where disease_id = ? order by in_locus desc, max_mgi_disease_to_mouse_perc_score desc;";
-        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
-                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+//        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
+//                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+//                + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
+//                + "from mouse_disease_gene_summary mdgs "
+//                + "join disease d on d.disease_id = mdgs.disease_id "
+//                + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
+//                + "where mdgs.disease_id = ? "
+//                + cutOffClause
+//                + "order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
+        
+        String sql = "select " 
+                + "mdgs.model_gene_id, mgo.model_gene_symbol, mgo.hgnc_id, mgo.hgnc_gene_symbol, "
                 + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_disease_to_model_perc_score as max_mod_score, mdgs.max_htpc_disease_to_model_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
-                + "join disease d on d.disease_id = mdgs.disease_id "
                 + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
-                + "where mdgs.disease_id = ? order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
+                + "where mdgs.disease_id = ? "
+                + cutOffClause
+                + "order by in_locus desc, max_mod_disease_to_model_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(diseaseId.getCompoundIdentifier(), sql);
 
-        Map<Disease, List<GeneAssociationSummary>> diseaseToGeneAssociationSummariesMap = jdbcTemplate.query(preparedStatement, new DiseaseToGeneAssociationSummariesResultSetExtractor());
+        List<GeneAssociationSummary> diseaseToGeneAssociationSummaries = jdbcTemplate.query(preparedStatement, new DiseaseToGeneAssociationSummariesResultSetExtractor());
 
-        if (diseaseToGeneAssociationSummariesMap.isEmpty()) {
-            logger.info("No GeneAssociations found for {}", diseaseId);
-            Disease disease = getDisease(diseaseId);
-            diseaseToGeneAssociationSummariesMap.put(disease, new ArrayList<GeneAssociationSummary>());
-            
+        if (diseaseToGeneAssociationSummaries.isEmpty()) {
+            logger.info("No GeneAssociations found for {}", diseaseId);            
         }
-        return diseaseToGeneAssociationSummariesMap;
+        return diseaseToGeneAssociationSummaries;
     }
-
+    
     @Override
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId) {
+    public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff) {
 
-        logger.info("Getting associated diseases for gene {}", geneId);
-
+        logger.info("Getting associated diseases for gene {} with raw score cutoff >= {}", geneId, minRawScoreCutoff);
+        
+        String cutOffClause = "";
+        
+        if (minRawScoreCutoff > 0.0) {
+             cutOffClause = String.format("and ((human_curated is true or mod_curated is true) or (mod_raw_score >= %f or htpc_raw_score >= %f)) ", minRawScoreCutoff, minRawScoreCutoff);
+        }
 //        String sql = "select * from disease_gene_summary where mgi_gene_id = ? order by in_locus desc, max_mgi_mouse_to_disease_perc_score desc;";
-        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
-                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+//        String sql = "select d.disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, "
+//                + "mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus, "
+//                + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, "
+//                + "mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
+//                + "from mouse_disease_gene_summary mdgs "
+//                + "join disease d on d.disease_id = mdgs.disease_id "
+//                + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
+//                + "where mdgs.model_gene_id = ? "
+//                + cutOffClause 
+//                + "order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
+        
+        String sql = "select mdgs.disease_id, disease_term, "
                 + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, "
                 + "mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "
                 + "join disease d on d.disease_id = mdgs.disease_id "
-                + "join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id "
-                + "where mdgs.model_gene_id = ? order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
+                + "where mdgs.model_gene_id = ? "
+                + cutOffClause 
+                + "order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
 
         PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneId.getCompoundIdentifier(), sql);
 
-        Map<Gene, List<DiseaseAssociationSummary>> geneToDiseaseAssociationSummariesMap = jdbcTemplate.query(preparedStatement, new GeneToDiseaseAssociationSummariesResultSetExtractor());
+        List<DiseaseAssociationSummary> geneToDiseaseAssociationSummaries = jdbcTemplate.query(preparedStatement, new GeneToDiseaseAssociationSummariesResultSetExtractor());
 
-        return geneToDiseaseAssociationSummariesMap;
+        return geneToDiseaseAssociationSummaries;
     }
 
     @Override
@@ -155,6 +185,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         return disease;
     }
     
+    @Override
     public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         
         String sql = "select hp.hp_id as term_id, hp.term as term "
@@ -168,6 +199,19 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         logger.info("Got disease phenotypes for {} {}", diseaseId, diseasePhenotypes);
         
         return diseasePhenotypes;
+    }
+
+    @Override
+    public Gene getGene(GeneIdentifier geneIdentifier) {
+        String sql = "select model_gene_id, model_gene_symbol, hgnc_id, hgnc_gene_symbol, hgnc_gene_locus "
+                + "from mouse_gene_ortholog "
+                + "where model_gene_id = ?;";
+        
+        PreparedStatementCreator preparedStatement = new SingleValuePreparedStatementCreator(geneIdentifier.getCompoundIdentifier(), sql);
+        
+        Gene gene = jdbcTemplate.query(preparedStatement, new GeneResultSetExtractor());
+        
+        return gene;
     }
     
     /**
@@ -213,115 +257,72 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         }
     }
 
-    private static class DiseaseToGeneAssociationSummariesResultSetExtractor implements ResultSetExtractor<Map<Disease, List<GeneAssociationSummary>>> {
+    private static class DiseaseToGeneAssociationSummariesResultSetExtractor implements ResultSetExtractor<List<GeneAssociationSummary>> {
 
-        Map<Disease, List<GeneAssociationSummary>> results;
+        List<GeneAssociationSummary> results;
 
         public DiseaseToGeneAssociationSummariesResultSetExtractor() {
             
         }
 
         @Override
-        public Map<Disease, List<GeneAssociationSummary>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            results = new HashMap<Disease, List<GeneAssociationSummary>>();
+        public List<GeneAssociationSummary> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            results = new ArrayList<GeneAssociationSummary>();
             
-            boolean madeDisease = false;
-            Disease disease = null;
-            List<GeneAssociationSummary> geneAssociationSummaries = new ArrayList<GeneAssociationSummary>();
             while (rs.next()) {
-                //make the disease from the first row
-                if (!madeDisease) {
-                    disease = new Disease(rs.getString("disease_id"));
-                    disease.setTerm(rs.getString("disease_term"));
-                    List<String> loci = new ArrayList<String>();
-                    String diseaseloci = rs.getString("disease_locus");
-                    loci.addAll(Arrays.asList(diseaseloci.split(",")));
-                    disease.setLocations(loci);
-
-                    List<String> altTerms = new ArrayList<String>();
-                    String synonyms = rs.getString("disease_alts");
-                    altTerms.addAll(Arrays.asList(synonyms.split("\\|")));
-                    disease.setAlternativeTerms(altTerms);
-                    madeDisease = true;
-                    logger.debug("Made {}", disease);
-                }
-
-                //make the genes
+                //make the gene identifier
                 GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
-                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_gene_id"));
-                
+                logger.info("Made {}", mouseIdentifier);
+                GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
+
                 //make the association summary
                 double bestModScore = rs.getDouble("max_mod_score");
                 double bestHtpcScore = rs.getDouble("max_htpc_score");
                 boolean associatedInHuman = rs.getBoolean("human_curated");
                 boolean hasLiteratureEvidence = rs.getBoolean("mod_curated");
                 boolean inLocus = rs.getBoolean("in_locus");
-                String locus = rs.getString("hgnc_gene_locus");
-                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestModScore, bestHtpcScore);
+                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, bestModScore, bestHtpcScore);
                 
                 //put genes and associations together
                 GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(humanIdentifier, mouseIdentifier, associationSummary);
-                geneAssociationSummaries.add(geneAssociationSummary);
+                results.add(geneAssociationSummary);
                 logger.debug("Made {}", geneAssociationSummary);
             }
-            if (disease != null) {
-                results.put(disease, geneAssociationSummaries);            
-            }
+            
             return results;
         }
 
     }
 
-    private static class GeneToDiseaseAssociationSummariesResultSetExtractor implements ResultSetExtractor<Map<Gene, List<DiseaseAssociationSummary>>> {
+    private static class GeneToDiseaseAssociationSummariesResultSetExtractor implements ResultSetExtractor<List<DiseaseAssociationSummary>> {
 
-        Map<Gene, List<DiseaseAssociationSummary>> results;
+        List<DiseaseAssociationSummary> results;
 
         public GeneToDiseaseAssociationSummariesResultSetExtractor() {
-            results = new HashMap<Gene, List<DiseaseAssociationSummary>>();
+            results = new ArrayList<DiseaseAssociationSummary>();
         }
 
         @Override
-        public Map<Gene, List<DiseaseAssociationSummary>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            boolean madeGene = false;
-            Gene gene = null;
-            List<DiseaseAssociationSummary> diseaseAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
-
+        public List<DiseaseAssociationSummary> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            
             while (rs.next()) {
-                //make the gene from the first row
-                if (!madeGene) {
-                    GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
-                    GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_gene_id"));
-                    gene = new Gene(mouseIdentifier, humanIdentifier);
-                    madeGene = true;
-                    logger.debug("Made {}", gene);
-                }
+                ///make the Disease details                
+                DiseaseIdentifier diseaseId = new DiseaseIdentifier(rs.getString("disease_id"));
+                String diseaseTerm = rs.getString("disease_term");
+                
                 //make the Association summary 
                 double bestModScore = rs.getDouble("max_mod_score");
                 double bestHtpcScore = rs.getDouble("max_htpc_score");
                 boolean associatedInHuman = rs.getBoolean("human_curated");
                 boolean hasLiteratureEvidence = rs.getBoolean("mod_curated");
                 boolean inLocus = rs.getBoolean("in_locus");
-                String locus = rs.getString("disease_locus");
-                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, locus, bestModScore, bestHtpcScore);
-
-                //make the Disease                 
-                Disease disease = new Disease(rs.getString("disease_id"));
-                disease.setTerm(rs.getString("disease_term"));
-                List<String> loci = new ArrayList<String>();
-                String diseaseloci = rs.getString("disease_locus");
-                loci.addAll(Arrays.asList(diseaseloci.split(",")));
-                disease.setLocations(loci);
-
-                List<String> altTerms = new ArrayList<String>();
-                String synonyms = rs.getString("disease_alts");
-                altTerms.addAll(Arrays.asList(synonyms.split("\\|")));
-                disease.setAlternativeTerms(altTerms);
-                //add them together...
-                DiseaseAssociationSummary diseaseAssociationSummary = new DiseaseAssociationSummary(disease, associationSummary);
-                diseaseAssociationSummaries.add(diseaseAssociationSummary);
+                AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, bestModScore, bestHtpcScore);
+  
+                //add them together and we have a DiseaseAssociaionSummary
+                DiseaseAssociationSummary diseaseAssociationSummary = new DiseaseAssociationSummary(diseaseId, diseaseTerm, associationSummary);
+                results.add(diseaseAssociationSummary);
                 logger.debug("Made {}", diseaseAssociationSummary);
             }
-            results.put(gene, diseaseAssociationSummaries);
             return results;
         }
     }
@@ -357,7 +358,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     //disease association scores
                     diseaseAssociation.setDiseaseToModelScore(rs.getDouble("disease_to_model_perc_score"));
                     diseaseAssociation.setModelToDiseaseScore(rs.getDouble("model_to_disease_perc_score"));
-                    //TODO: wire this in when the column is available in the DB
+
                     diseaseAssociation.setHasLiteratureEvidence(rs.getBoolean("lit_model"));
                     //make the mouseModel (several rows)
                     MouseModel model = new MouseModel();
@@ -445,4 +446,22 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
     
     }
 
+    private static class GeneResultSetExtractor implements ResultSetExtractor<Gene> {
+
+        public GeneResultSetExtractor() {           
+        }
+
+        @Override
+        public Gene extractData(ResultSet rs) throws SQLException, DataAccessException {
+            Gene gene = null;
+            while (rs.next()) {
+                GeneIdentifier modelGeneIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
+                
+                GeneIdentifier humanGeneIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
+                        
+                gene = new Gene(modelGeneIdentifier, humanGeneIdentifier);
+            }
+            return gene;
+        }
+    }
 }

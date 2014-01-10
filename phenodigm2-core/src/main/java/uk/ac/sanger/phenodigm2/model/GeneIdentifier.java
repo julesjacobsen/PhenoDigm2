@@ -14,11 +14,17 @@ public class GeneIdentifier extends ExternalIdentifier implements Comparable<Gen
     
     public GeneIdentifier(String geneSymbol, String databaseCode, String databaseAcc) {
         super(databaseCode, databaseAcc);
+        if (geneSymbol == null || geneSymbol.isEmpty()) {
+            geneSymbol = "UNKNOWN";
+        }
         this.geneSymbol = geneSymbol;
     }
 
     public GeneIdentifier(String geneSymbol, String compoundIdentifier) {
         super(compoundIdentifier);
+        if (geneSymbol == null || geneSymbol.isEmpty()) {
+            geneSymbol = "UNKNOWN";
+        }
         this.geneSymbol = geneSymbol;   
 
     }

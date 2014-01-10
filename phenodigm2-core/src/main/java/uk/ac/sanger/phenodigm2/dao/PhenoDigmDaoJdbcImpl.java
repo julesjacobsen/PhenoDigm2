@@ -111,7 +111,10 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
             logger.info("Setting up mouse model cache...");
 
 //            String sql = "select mgm.mgi_gene_id, mm.mouse_model_id, mm.allelic_composition, mm.genetic_background, mm.allcomp_link, mm.source from mouse_models mm join mgi_gene_models mgm on mgm.mouse_model_id = mm.mouse_model_id order by mgm.mgi_gene_id;";
-            String sql = "select mgm.model_gene_id, mm.model_id, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.source from mouse_model mm join mouse_model_gene_ortholog mgm on mgm.model_id = mm.model_id order by mgm.model_gene_id;";
+            String sql = "select mmgo.model_gene_id, mm.model_id, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.source "
+                    + "from mouse_model mm "
+                    + "join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id "
+                    + "order by mmgo.model_gene_id;";
 
             Map<String, MouseModel> mouseModels = this.jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
             mouseModelCache = new MouseModelCache(mouseModels);
@@ -124,7 +127,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
     
     @Override
-    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
+    public List<PhenotypeTerm> getDiseasePhenotypeTerms(DiseaseIdentifier diseaseId) {
         List<PhenotypeTerm> phenotypeList;
         String sql = "select hp.hp_id as id, hp.term as term from hp join disease_hp d on d.hp_id = hp.hp_id where d.disease_id = ?;";
         
@@ -184,15 +187,15 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId) {
+    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId) {
+    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

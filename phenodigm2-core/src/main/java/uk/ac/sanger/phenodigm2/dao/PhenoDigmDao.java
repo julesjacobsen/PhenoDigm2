@@ -27,24 +27,24 @@ import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 public interface PhenoDigmDao {
     
     public Set<Disease> getAllDiseses();
-    
+
+    public Disease getDisease(DiseaseIdentifier diseaseId);
+
+    public List<PhenotypeTerm> getDiseasePhenotypeTerms(DiseaseIdentifier diseaseId);
+
     public Set<Gene> getAllGenes();
     
-    public Disease getDisease(DiseaseIdentifier diseaseId);
-    
     public Gene getGene(GeneIdentifier geneIdentifier);
-               
-    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId);
-    
+        
     public Set<MouseModel> getAllMouseModels();
     
     public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId);
     
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
 
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId);
+    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff);
 
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId);
+    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff);
 
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId);
 
