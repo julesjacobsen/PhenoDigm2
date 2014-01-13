@@ -69,11 +69,12 @@ public class GeneController {
         
         Gene gene = phenoDigmDao.getGene(geneIdentifier);
         logger.info("Found Gene: " + gene);
-        model.addAttribute("geneIdentifier", geneIdentifier);
         if (gene != null) {
+            model.addAttribute("geneIdentifier", gene.getOrthologGeneId());
             model.addAttribute("humanOrtholog", gene.getHumanGeneId());
             logger.info(String.format("Found gene: %s %s", gene.getOrthologGeneId().getCompoundIdentifier(), gene.getOrthologGeneId().getGeneSymbol()));
         } else {
+            model.addAttribute("geneIdentifier", geneIdentifier);
             logger.info(String.format("No human ortholog found for gene: %s", geneIdentifier));                
         }
         

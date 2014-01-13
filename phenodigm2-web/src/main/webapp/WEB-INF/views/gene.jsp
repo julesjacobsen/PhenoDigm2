@@ -175,7 +175,7 @@
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
                                     <tr id="${disease.diseaseIdentifier.databaseAcc}" targetRowId="P${geneIdentifier.databaseAcc}_${association.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                         <!--Disease Name-->
-                                        <td><a href="../disease/${disease.diseaseId}">${disease.term}</a></td>
+                                        <td><a href="../disease/${association.diseaseIdentifier}">${association.diseaseTerm}</a></td>
                                         <!--Source-->
                                         <td><a href="${association.diseaseIdentifier.externalUri}">${association.diseaseIdentifier}</a></td>
                                         <!--Associated in Human --> 

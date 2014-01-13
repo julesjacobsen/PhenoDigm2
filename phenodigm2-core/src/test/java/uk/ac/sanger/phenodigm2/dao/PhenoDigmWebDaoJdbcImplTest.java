@@ -153,8 +153,14 @@ public class PhenoDigmWebDaoJdbcImplTest {
         Gene expected = new Gene(modelGeneId, humanGeneId);
 
         Gene result = instance.getGene(modelGeneId);
-        
+        logger.info("Made Gene: {}", result);
         assertEquals(expected, result);
+        //check the model oranism details
+        assertEquals("Apoe", result.getOrthologGeneId().getGeneSymbol());
+        assertEquals("MGI:88057", result.getOrthologGeneId().getCompoundIdentifier());
+        //check the human details
+        assertEquals("APOE", result.getHumanGeneId().getGeneSymbol());
+        assertEquals("HGNC:613", result.getHumanGeneId().getCompoundIdentifier());
     }
     
     /**
