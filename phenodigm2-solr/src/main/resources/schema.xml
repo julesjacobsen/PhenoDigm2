@@ -113,35 +113,50 @@
    <field name="disease_source" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="disease_term" type="text_en_splitting" indexed="true" stored="true"/>
    <field name="disease_alts" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   <field name="disease_locus" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="disease_classes" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="disease_phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
    
    <!--gene fields-->
    <field name="marker_accession" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="human_marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hgnc_id" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="hgnc_gene_locus" type="string" indexed="true" stored="true" multiValued="false" /> 
    
    <!--mouse model fields-->
    <field name="mouse_model_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="source" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="mouse_phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
-   
+   <field name="allelic_composition" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
+   <field name="genetic_background" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
+   <field name="allelic_composition_link" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="hom_het" type="string" indexed="true" stored="true" multiValued="false"/>
+  
    <!--project/curation status flags-->
-   <field name="human_curated" type="int" indexed="true" stored="true"/>
-   <field name="mouse_curated" type="int" indexed="true" stored="true"/>
-   <field name="mgi_predicted" type="int" indexed="true" stored="true"/>
-   <field name="impc_predicted" type="int" indexed="true" stored="true"/>
-   <field name="mgi_predicted_in_locus" type="int" indexed="true" stored="true"/>
-   <field name="impc_predicted_in_locus" type="int" indexed="true" stored="true"/>
+   <field name="human_curated" type="boolean" indexed="true" stored="true"/>
+   <field name="mouse_curated" type="boolean" indexed="true" stored="true"/>
+   <field name="mgi_predicted" type="boolean" indexed="true" stored="true"/>
+   <field name="impc_predicted" type="boolean" indexed="true" stored="true"/>
+   <field name="mgi_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
+   <field name="impc_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
+   <field name="mod_model" type="boolean" indexed="true" stored="true"/>
+   <field name="htpc_model" type="boolean" indexed="true" stored="true"/>
+   <field name="htpc_phenotype" type="boolean" indexed="true" stored="true"/>
    
+   <!--disease-gene summary fields-->
+   <field name="max_mod_score" type="float" indexed="true" stored="true"/>
+   <field name="raw_mod_score" type="float" indexed="true" stored="true"/>
+   <field name="max_htpc_score" type="float" indexed="true" stored="true"/>
+   <field name="raw_htpc_score" type="float" indexed="true" stored="true"/>
+   <field name="in_locus" type="boolean" indexed="true" stored="true"/>
+     
    <!--phenotypes-->
    <field name="mp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="mp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="hp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="hp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="definition" type="text_en_splitting" indexed="true" stored="true" multiValued="false" /> 
 
+   <field name="phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   <field name="phenotype" type="text_en_splitting" indexed="true" stored="true"/>
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.
      Some fields are multiValued only because Tika currently may return"
