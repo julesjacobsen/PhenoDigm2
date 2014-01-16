@@ -13,33 +13,43 @@
         <solr.version>4.4.0</solr.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jetty.version>9.0</jetty.version>
+        <!--SOLR PROPERTIES-->
+        <!--Configures the directory used to store the data and configuration of the Solr core-->
+        <solr.core.directory>solr</solr.core.directory>
+        <!--Configures the name of the Solr core.-->
+        <solr.core.name>phenodigm</solr.core.name>
+        <!--Filename of your data-config file-->
+        <solr.core.data.config>phenodigm-data-config.xml</solr.core.data.config>
+        <!--SYSTEM PROPERTIES-->
+        <!--Configures the home directory of Solr. Set the preferred directory path here.  C:/Users/jj8/solr/build ${project.build.directory}-->
+        <solr.home>${project.build.directory}</solr.home>
     </properties>
     
-    <profiles>
+<!--    <profiles>
         <profile>
             <id>dev</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <build.profile.id>dev</build.profile.id>
-                <!--SOLR PROPERTIES-->
-                <!--Configures the directory used to store the data and configuration of the Solr core-->
+                SOLR PROPERTIES
+                Configures the directory used to store the data and configuration of the Solr core
                 <solr.core.directory>solr</solr.core.directory>
-                <!--Configures the name of the Solr core.-->
+                Configures the name of the Solr core.
                 <solr.core.name>phenodigm</solr.core.name>
-                <!--Filename of your data-config file-->
+                Filename of your data-config file
                 <solr.core.data.config>phenodigm-data-config.xml</solr.core.data.config>
-                <!--SYSTEM PROPERTIES-->
-                <!--Configures the home directory of Solr. Set the preferred directory path here.-->
-                <solr.home>C:/Users/jj8/solr/build</solr.home>
+                SYSTEM PROPERTIES
+                Configures the home directory of Solr. Set the preferred directory path here.  C:/Users/jj8/solr/build ${project.build.directory}
+                <solr.home>${project.build.directory}</solr.home>
             </properties>
         </profile>
-    </profiles>
+    </profiles>-->
     
     <dependencies>
         <!-- SLF4J -->
-<!--        <dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
@@ -59,12 +69,12 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-         Log4j 
+        <!--Log4j--> 
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>-->
+        </dependency>
         <!-- Solr -->     
         <dependency>
             <groupId>org.apache.solr</groupId>
