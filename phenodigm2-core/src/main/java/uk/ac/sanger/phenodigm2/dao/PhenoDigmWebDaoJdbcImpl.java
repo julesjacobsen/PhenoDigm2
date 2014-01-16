@@ -120,7 +120,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 //                + cutOffClause 
 //                + "order by in_locus desc, max_mod_model_to_disease_perc_score desc;";
         
-        String sql = "select mdgs.disease_id, disease_term, "
+        String sql = "select mdgs.disease_id, d.disease_term, "
                 + "mdgs.human_curated, mdgs.mod_curated, mdgs.in_locus, mdgs.max_mod_model_to_disease_perc_score as max_mod_score, "
                 + "mdgs.max_htpc_model_to_disease_perc_score as max_htpc_score "
                 + "from mouse_disease_gene_summary mdgs "

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
-import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -30,7 +29,7 @@ public interface PhenoDigmDao {
 
     public Disease getDisease(DiseaseIdentifier diseaseId);
 
-    public List<PhenotypeTerm> getDiseasePhenotypeTerms(DiseaseIdentifier diseaseId);
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId);
 
     public Set<Gene> getAllGenes();
     
@@ -38,7 +37,8 @@ public interface PhenoDigmDao {
         
     public Set<MouseModel> getAllMouseModels();
     
-    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId);
+    //really needed?
+    public List<PhenotypeTerm> getMouseModelPhenotypes(String mouseModelId);
     
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
 

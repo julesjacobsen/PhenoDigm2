@@ -22,15 +22,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- *
- * @author jj8
+ * Test class for the Solr implementation of the PhenoDigmWebDao.
+ * 
+ * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jdbc-test-services.xml"})
-public class PhenoDigmWebDaoJdbcImplTest extends PhenoDigmWebDaoTest {
+@ContextConfiguration(locations = {"classpath:solr-test-context.xml"})
+public class PhenoDigmWebDaoSolrImplTest extends PhenoDigmWebDaoTest {
+      
+    public PhenoDigmWebDaoSolrImplTest() {
+        logger = LoggerFactory.getLogger(PhenoDigmWebDaoSolrImplTest.class);
+    }  
     
-    public PhenoDigmWebDaoJdbcImplTest() {
-        logger = LoggerFactory.getLogger(PhenoDigmWebDaoJdbcImplTest.class);
-    }
-
 }

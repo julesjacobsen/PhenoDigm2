@@ -127,7 +127,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
     
     @Override
-    public List<PhenotypeTerm> getDiseasePhenotypeTerms(DiseaseIdentifier diseaseId) {
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         List<PhenotypeTerm> phenotypeList;
         String sql = "select hp.hp_id as id, hp.term as term from hp join disease_hp d on d.hp_id = hp.hp_id where d.disease_id = ?;";
         
@@ -139,7 +139,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
     
     @Override
-    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String mouseModelId) {
+    public List<PhenotypeTerm> getMouseModelPhenotypes(String mouseModelId) {
         List<PhenotypeTerm> phenotypeList;
         String sql = "select mp.mp_id as id, mp.term as term from mouse_model_mp mm join mp on mp.mp_id = mm.mp_id where mm.model_id = ?;";
         

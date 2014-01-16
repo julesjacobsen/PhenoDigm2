@@ -204,7 +204,7 @@ public class PhenoDigmDaoJdbcImplTest {
     @Test
     public void testGetDiseasePhenotypeTerms() {
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101200");
-        List<PhenotypeTerm> result = instance.getDiseasePhenotypeTerms(diseaseId);
+        List<PhenotypeTerm> result = instance.getDiseasePhenotypes(diseaseId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
         expectedTerm.setId("HP:0000175");
         expectedTerm.setTerm("Cleft palate");
@@ -214,7 +214,7 @@ public class PhenoDigmDaoJdbcImplTest {
     @Test
     public void testGetMouseModelPhenotypeTerms() {
         String mouseModelId = "1";
-        List<PhenotypeTerm> result = instance.getMouseModelPhenotypeTerms(mouseModelId);
+        List<PhenotypeTerm> result = instance.getMouseModelPhenotypes(mouseModelId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
         expectedTerm.setId("MP:0000609");
         expectedTerm.setTerm("abnormal liver physiology");

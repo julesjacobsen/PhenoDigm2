@@ -17,7 +17,6 @@
 package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.List;
-import java.util.Map;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
