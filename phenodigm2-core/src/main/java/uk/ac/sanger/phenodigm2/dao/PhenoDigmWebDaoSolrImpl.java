@@ -184,6 +184,11 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff) {
         
         String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
+        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
+        //rather than a few tens of ms   
+        if (minRawScoreCutoff == 0) {
+            query = String.format("\"%s\"", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
+        }
         
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease_gene_summary\"");
@@ -238,7 +243,12 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff) {
         
         String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", geneId.getCompoundIdentifier(), minRawScoreCutoff);
-        
+        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
+        //rather than a few tens of ms   
+        if (minRawScoreCutoff == 0) {
+            query = String.format("\"%s\"", geneId.getCompoundIdentifier(), minRawScoreCutoff);
+        }
+
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"gene_disease_summary\"");
         solrQuery.addField("disease_id");
@@ -295,22 +305,22 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
      */
     private AssociationSummary makeAssociationSummary(SolrDocument solrDocument) {
         //make the association summary details
-        boolean associatedInHuman = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("human_curated"));
-        boolean hasLiteratureEvidence = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("mouse_curated"));
-        boolean inLocus = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("in_locus"));
+        boolean associatedInHuman = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("human_curated")).booleanValue();
+        boolean hasLiteratureEvidence = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("mouse_curated")).booleanValue();
+        boolean inLocus = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("in_locus")).booleanValue();
         
-        double bestModScore = 0.0;
+        float bestModScore = 0;
         if (solrDocument.getFieldValue("max_mod_score") != null) {
-            bestModScore = Float.valueOf( (Float) solrDocument.getFieldValue("max_mod_score"));  
+            bestModScore = (float) solrDocument.getFieldValue("max_mod_score");
         }
         
-        double bestHtpcScore = 0.0;
+        float bestHtpcScore = 0;
         if (solrDocument.getFieldValue("max_htpc_score") != null) {
-            bestHtpcScore = Float.valueOf( (Float) solrDocument.getFieldValue("max_htpc_score"));  
+            bestHtpcScore = (float) solrDocument.getFieldValue("max_htpc_score");  
         }
 
         AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, bestModScore, bestHtpcScore);
-        
+//        System.out.println(associationSummary);
         return associationSummary;
     }
     
