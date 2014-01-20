@@ -82,7 +82,8 @@ public class ExternalIdentifier {
     protected ExternalIdentifier(String compoundIdentifier) {
         
         if (compoundIdentifier == null || !compoundIdentifier.contains(":")) {
-            logger.warn("'{}' is not of the format DBCODE:ACCESSION - creating an empty external identifier", compoundIdentifier);
+            //there are quite a lot of null or empty compound identifiers so let's just handle them and not talk about it...
+//            logger.debug("'{}' is not of the format DBCODE:ACCESSION - creating an empty external identifier", compoundIdentifier);
             this.databaseAcc = "-";
             this.databaseCode = "-";
         } else {

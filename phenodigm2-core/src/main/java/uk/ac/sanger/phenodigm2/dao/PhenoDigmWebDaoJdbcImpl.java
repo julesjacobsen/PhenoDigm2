@@ -272,7 +272,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             while (rs.next()) {
                 //make the gene identifier
                 GeneIdentifier mouseIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
-                logger.info("Made {}", mouseIdentifier);
+//                logger.info("Made {}", mouseIdentifier);
                 GeneIdentifier humanIdentifier = new GeneIdentifier(rs.getString("hgnc_gene_symbol"), rs.getString("hgnc_id"));
 
                 //make the association summary
