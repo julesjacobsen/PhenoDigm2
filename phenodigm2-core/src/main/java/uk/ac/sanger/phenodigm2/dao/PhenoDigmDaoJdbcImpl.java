@@ -97,7 +97,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         if (diseaseCache == null) {
             logger.info("Setting up disease cache...");
             
-            String sql = "select * from disease;";
+            String sql = "select disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, disease_classes from disease;";
             
             Map<String, Disease> diseaseMap = this.jdbcTemplate.query(sql, new DiseaseResultSetExtractor());
             logger.info("Made diseases.");
