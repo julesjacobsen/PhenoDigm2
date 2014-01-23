@@ -41,14 +41,14 @@ public class MouseModelTest {
     public void setUp() {
         model1 = new MouseModel();
         model1.setMgiGeneId("MGI:1234");
-        model1.setMgiModelId("4321");
+        model1.setMgiModelId(4321);
         model1.setSource("MGI");
         model1.setAllelicComposition("hoopy");
         model1.setGeneticBackground("frood");
         
         model2 = new MouseModel();
         model2.setMgiGeneId("MGI:1233");
-        model2.setMgiModelId("888");
+        model2.setMgiModelId(888);
         model2.setSource("MGP");
         model2.setAllelicComposition("sass");
         model2.setGeneticBackground("that");
@@ -100,7 +100,7 @@ public class MouseModelTest {
         List<MouseModel> sortedList = new ArrayList<MouseModel>();
         sortedList.addAll(modelSet);
         //models are sorted according to their modelId only
-        assertEquals(model1, sortedList.get(0));
+        assertEquals(model2, sortedList.get(0));
     }
 
     /**

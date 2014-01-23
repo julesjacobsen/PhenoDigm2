@@ -14,7 +14,7 @@ public class MouseModel implements Comparable<MouseModel> {
     
     private String mgiGeneId;
     
-    private String mgiModelId;
+    private Integer mgiModelId;
     //source is the centre who did the phenotyping of the model.
     //MGI, MGP, IMPC, EUROPHENOME
     private String source;
@@ -36,11 +36,11 @@ public class MouseModel implements Comparable<MouseModel> {
         this.mgiGeneId = mgiGeneId;
     }
 
-    public String getMgiModelId() {
+    public Integer getMgiModelId() {
         return mgiModelId;
     }
 
-    public void setMgiModelId(String mgiModelId) {
+    public void setMgiModelId(Integer mgiModelId) {
         this.mgiModelId = mgiModelId;
     }
 

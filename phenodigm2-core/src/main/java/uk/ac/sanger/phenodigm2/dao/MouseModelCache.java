@@ -28,26 +28,26 @@ class MouseModelCache {
     
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static Map<String, MouseModel> mouseModelMap;
+    private static Map<Integer, MouseModel> mouseModelMap;
     private static Map<String, Set<MouseModel>> mgiGeneIdToModelsMap;
     
     /**
      * 
      * @param mouseModels 
      */
-    protected MouseModelCache(Map<String, MouseModel> mouseModels) {
+    protected MouseModelCache(Map<Integer, MouseModel> mouseModels) {
         mouseModelMap = mouseModels;
         init();
     }
 
     private void init() {
-        mgiGeneIdToModelsMap = new HashMap<String, Set<MouseModel>>();
+        mgiGeneIdToModelsMap = new HashMap();
         for (MouseModel mouseModel : mouseModelMap.values()) {
             String mgiGeneId = mouseModel.getMgiGeneId();
             if (mgiGeneIdToModelsMap.containsKey(mgiGeneId)) {
                 mgiGeneIdToModelsMap.get(mgiGeneId).add(mouseModel);
             } else {
-                Set<MouseModel> mouseModelSet = new HashSet<MouseModel>();
+                Set<MouseModel> mouseModelSet = new HashSet();
                 mouseModelSet.add(mouseModel);
                 mgiGeneIdToModelsMap.put(mgiGeneId, mouseModelSet);
             }
@@ -55,12 +55,12 @@ class MouseModelCache {
         logger.info(String.format("MouseModelCache initialized. Mapped %d models to %d genes.", mouseModelMap.size(), mgiGeneIdToModelsMap.keySet().size()));
     }
     
-    protected MouseModel getModel(String mouseModelId) {
+    protected MouseModel getModel(Integer mouseModelId) {
         return mouseModelMap.get(mouseModelId);
     }
     
     protected Set<MouseModel> getAllMouseModels() {
-        Set<MouseModel> allMouseModels = new TreeSet<MouseModel>();
+        Set<MouseModel> allMouseModels = new TreeSet();
         allMouseModels.addAll(mouseModelMap.values());
         return allMouseModels;
     }
@@ -72,11 +72,11 @@ class MouseModelCache {
      * @return a Set of MouseModel
      */
     protected Set<MouseModel> getModelsByMgiGeneId(String mgiGeneId) {
-        Set<MouseModel> results = null;
+        Set<MouseModel> results;
         results = mgiGeneIdToModelsMap.get(mgiGeneId);
         if (results == null) {
             logger.info(mgiGeneId + " not mapped to any mouse models" );
-            results = new HashSet<MouseModel>();
+            results = new HashSet<>();
         }
         return results;
     }
