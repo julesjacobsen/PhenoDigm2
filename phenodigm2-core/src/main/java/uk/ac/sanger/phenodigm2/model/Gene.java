@@ -17,8 +17,8 @@ package uk.ac.sanger.phenodigm2.model;
  */
 public class Gene implements Comparable<Gene>{
     
-    private GeneIdentifier orthologGeneId;
-    private GeneIdentifier humanGeneId;
+    private final GeneIdentifier orthologGeneId;
+    private final GeneIdentifier humanGeneId;
 
     /**
      * 
