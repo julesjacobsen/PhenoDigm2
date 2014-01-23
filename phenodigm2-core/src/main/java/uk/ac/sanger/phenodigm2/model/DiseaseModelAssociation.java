@@ -16,7 +16,6 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -34,16 +33,10 @@ public class DiseaseModelAssociation implements Comparable<DiseaseModelAssociati
     private double modelToDiseaseScore;
     private double diseaseToModelScore;
     private List<PhenotypeMatch> phenotypeMatches;
-    //Store the Mouse Model phenotypes here as they should be garbage-collected.
-    //Storing the PhenotypeTerms directly in the MouseModel will be more efficient
-    //for database calls, but will lead to ever-increasing (although eventuallly constant)
-    //memory usage as the MouseModels may be cached
-    //
-    private List<PhenotypeTerm> mouseModelPhenotypeTerms;
+
     private boolean hasLiteratureEvidence;
     
     public DiseaseModelAssociation() {
-        mouseModelPhenotypeTerms = new ArrayList<>();
         hasLiteratureEvidence = false;
     }
 
@@ -85,14 +78,6 @@ public class DiseaseModelAssociation implements Comparable<DiseaseModelAssociati
 
     public void setPhenotypeMatches(List<PhenotypeMatch> phenotypeMatches) {
         this.phenotypeMatches = phenotypeMatches;
-    }
-
-    public List<PhenotypeTerm> getMouseModelPhenotypeTerms() {
-        return mouseModelPhenotypeTerms;
-    }
-
-    public void setMouseModelPhenotypeTerms(List<PhenotypeTerm> mouseModelPhenotypeTerms) {
-        this.mouseModelPhenotypeTerms = mouseModelPhenotypeTerms;
     }
 
     public boolean hasLiteratureEvidence() {
@@ -143,7 +128,7 @@ public class DiseaseModelAssociation implements Comparable<DiseaseModelAssociati
         
     @Override
     public String toString() {
-        return String.format("DiseaseAssociation{%s %s_%s hasLiteratureEvidence: %s Scores: [m2d=%s, d2m=%s] PhenotypeMatches: %s MouseModelPhenotypes: %s}", diseaseIdentifier, mouseModel.getMgiGeneId(), mouseModel.getMgiModelId(), hasLiteratureEvidence, modelToDiseaseScore, diseaseToModelScore, phenotypeMatches, mouseModelPhenotypeTerms);
+        return String.format("DiseaseAssociation{%s %s_%s hasLiteratureEvidence: %s Scores: [m2d=%s, d2m=%s] PhenotypeMatches: %s MouseModelPhenotypes: %s}", diseaseIdentifier, mouseModel.getMgiGeneId(), mouseModel.getMgiModelId(), hasLiteratureEvidence, modelToDiseaseScore, diseaseToModelScore, phenotypeMatches, mouseModel.getPhenotypeTerms());
     }
 
     public static Comparator<DiseaseModelAssociation> DiseaseToGeneScoreComparator = new Comparator<DiseaseModelAssociation>() {

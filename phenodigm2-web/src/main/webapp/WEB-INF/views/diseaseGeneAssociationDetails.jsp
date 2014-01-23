@@ -32,7 +32,7 @@
                         <c:set var="score" value = "${diseaseAssociation.diseaseToModelScore}"/>                       
                     </c:if>
                     <b style="color:#FF9000">${score}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})<br/>
-                    <c:forEach var="phenotypeTerm" items="${diseaseAssociation.mouseModelPhenotypeTerms}">
+                    <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                         ${phenotypeTerm.term}<br/>
                     </c:forEach>
                     <br/>
@@ -48,7 +48,7 @@
                         <c:set var="score" value = "${diseaseAssociation.diseaseToModelScore}"/>                       
                     </c:if>
                     <b style="color:#FF9000">${score}</b>: ${mouseModel.allelicCompositionLink} ${mouseModel.geneticBackground} (Source: ${mouseModel.source})<br/>
-                    <c:forEach var="phenotypeTerm" items="${diseaseAssociation.mouseModelPhenotypeTerms}">
+                    <c:forEach var="phenotypeTerm" items="${mouseModel.phenotypeTerms}">
                         ${phenotypeTerm.term}<br/>
                     </c:forEach>
                     <br/>                                        

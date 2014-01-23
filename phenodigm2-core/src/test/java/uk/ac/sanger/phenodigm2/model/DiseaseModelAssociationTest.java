@@ -42,22 +42,25 @@ public class DiseaseModelAssociationTest {
         first.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:00001"));
         MouseModel firstModel = new MouseModel();
         firstModel.setMgiGeneId("MGI:0001");
-        firstModel.setMgiModelId("11111");
+        firstModel.setMgiModelId(11111);
+        firstModel.setPhenotypeTerms(new ArrayList());
         first.setMouseModel(firstModel);
                 
         second = new DiseaseModelAssociation();
         second.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:00002"));
         MouseModel secondModel = new MouseModel();
         secondModel.setMgiGeneId("MGI:0002");
-        secondModel.setMgiModelId("22222");
+        secondModel.setMgiModelId(22222);
+        secondModel.setPhenotypeTerms(new ArrayList());
         second.setMouseModel(secondModel);
         
         third = new DiseaseModelAssociation();
         third.setDiseaseIdentifier(new DiseaseIdentifier("OMIM:00003"));
         MouseModel thirdModel = new MouseModel();
         thirdModel.setMgiGeneId("MGI:0003");
-        thirdModel.setMgiModelId("33333");
-        third.setMouseModel(thirdModel);
+        thirdModel.setMgiModelId(33333);
+        thirdModel.setPhenotypeTerms(new ArrayList());
+      third.setMouseModel(thirdModel);
     }
     
     @Test
@@ -156,5 +159,12 @@ public class DiseaseModelAssociationTest {
         
         DiseaseModelAssociation firstElement = associationsList.get(0);
         assertEquals(first, firstElement);
+    }
+    
+    @Test
+    public void testToString() {
+        System.out.println("testToString");
+        String expected = "DiseaseAssociation{OMIM:00001 MGI:0001_11111 hasLiteratureEvidence: false Scores: [m2d=0.0, d2m=0.0] PhenotypeMatches: null MouseModelPhenotypes: []}";
+        assertEquals(expected, first.toString());
     }
 }
