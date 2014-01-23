@@ -21,7 +21,7 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
  */
 public class MouseModelCacheTest {
     
-    private Map<String, MouseModel> mouseModelMap;
+    private Map<Integer, MouseModel> mouseModelMap;
     private MouseModel Fgfr2_8135;
     private MouseModel Fgfr2_8136;
 //    private MouseModel Fgfr1_8136;
@@ -32,10 +32,10 @@ public class MouseModelCacheTest {
     
     @Before
     public void setUp() {
-        mouseModelMap = new HashMap<String, MouseModel>();
+        mouseModelMap = new HashMap<Integer, MouseModel>();
         Fgfr2_8135 = new MouseModel();
         Fgfr2_8135.setMgiGeneId("MGI:95523");
-        Fgfr2_8135.setMgiModelId("8135");
+        Fgfr2_8135.setMgiModelId(8135);
         Fgfr2_8135.setAllelicComposition("Fgfr2<m1Sgg>/Fgfr2<+>");
         Fgfr2_8135.setAllelicCompositionLink(null);
         Fgfr2_8135.setGeneticBackground("involves: C3H/HeJ * C57BL/6J");
@@ -45,7 +45,7 @@ public class MouseModelCacheTest {
         
         Fgfr2_8136 = new MouseModel();
         Fgfr2_8136.setMgiGeneId("MGI:95523");
-        Fgfr2_8136.setMgiModelId("8136");
+        Fgfr2_8136.setMgiModelId(8136);
         Fgfr2_8136.setAllelicComposition("Fgfr2<m1Sgg>/Fgfr2<m1Sgg>");
         Fgfr2_8136.setAllelicCompositionLink(null);
         Fgfr2_8136.setGeneticBackground("involves: C3H/HeJ * C57BL/6J");
@@ -60,7 +60,7 @@ public class MouseModelCacheTest {
     @Test
     public void testGetModel() {
         System.out.println("getModel");
-        String mouseModelId = "8135";
+        Integer mouseModelId = 8135;
         MouseModelCache instance = new MouseModelCache(mouseModelMap);
         MouseModel expResult = Fgfr2_8135;
         MouseModel result = instance.getModel(mouseModelId);
@@ -75,7 +75,7 @@ public class MouseModelCacheTest {
         System.out.println("getModelsByMgiGeneId");
         String mgiGeneId = "MGI:95523";
         MouseModelCache instance = new MouseModelCache(mouseModelMap);
-        Set<MouseModel> expResult = new HashSet<MouseModel>();
+        Set<MouseModel> expResult = new HashSet<>();
         expResult.add(Fgfr2_8136);
         expResult.add(Fgfr2_8135);
         Set result = instance.getModelsByMgiGeneId(mgiGeneId);
