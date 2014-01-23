@@ -91,6 +91,41 @@ public class AssociationSummary {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.associatedInHuman ? 1 : 0);
+        hash = 59 * hash + (this.hasLiteratureEvidence ? 1 : 0);
+        hash = 59 * hash + (int) (Double.doubleToLongBits(this.bestModScore) ^ (Double.doubleToLongBits(this.bestModScore) >>> 32));
+        hash = 59 * hash + (int) (Double.doubleToLongBits(this.bestHtpcScore) ^ (Double.doubleToLongBits(this.bestHtpcScore) >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AssociationSummary other = (AssociationSummary) obj;
+        if (this.associatedInHuman != other.associatedInHuman) {
+            return false;
+        }
+        if (this.hasLiteratureEvidence != other.hasLiteratureEvidence) {
+            return false;
+        }
+        if (this.inLocus != other.inLocus) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.bestModScore) != Double.doubleToLongBits(other.bestModScore)) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    @Override
     public String toString() {
         return "AssociationSummary{" + "associatedInHuman=" + associatedInHuman + ", hasLiteratureEvidence=" + hasLiteratureEvidence + ", inLocus=" + inLocus + ", locus=" + locus + ", bestMgiScore=" + bestModScore + ", bestImpcScore=" + bestHtpcScore + '}';
     }   
