@@ -17,7 +17,9 @@
 package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -29,8 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
+import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 import uk.ac.sanger.phenodigm2.web.AssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
@@ -38,25 +42,26 @@ import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
- * Implementation of PhenoDigmWebDao which uses Solr as the datasource. This 
- * enables both fast free-text searching of PhenoDigm and also means the data 
- * can be accessed using Solr as a web-service.   
- * 
+ * Implementation of PhenoDigmWebDao which uses Solr as the datasource. This
+ * enables both fast free-text searching of PhenoDigm and also means the data
+ * can be accessed using Solr as a web-service.
+ *
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 @Repository
 public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmWebDaoSolrImpl.class);
-    
+    private static final int ROWS = 10000;
+
     @Autowired
     private SolrServer solrServer;
 
     @Override
     public Disease getDisease(DiseaseIdentifier diseaseId) {
-        
+
         String query = String.format("\"%s\"", diseaseId.getCompoundIdentifier());
-        
+
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease\"");
         solrQuery.addField("disease_id");
@@ -67,12 +72,12 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("phenotypes");
 
         SolrDocumentList resultsDocumentList;
-        
+
         Disease disease = null;
-        
+
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
-            
+
             if (resultsDocumentList.isEmpty()) {
                 logger.info("Uh-oh! Query for disease {} was not found.", diseaseId);
                 return disease;
@@ -87,25 +92,24 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
             disease.setLocations((List<String>) solrDocument.getFieldValue("disease_locus"));
             disease.setClasses((List<String>) solrDocument.getFieldValue("disease_classes"));
 
-//            logger.info("Made {}", disease);
-            
+            logger.debug("Made {}", disease);
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
         }
-          
+
         return disease;
     }
 
     @Override
     public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         String query = String.format("\"%s\"", diseaseId.getCompoundIdentifier());
-        
+
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(query);
         solrQuery.addFilterQuery("type:\"disease\"");
         solrQuery.addField("phenotypes");
         SolrDocumentList resultsDocumentList;
-        
+
         List<PhenotypeTerm> phenotypeList = new ArrayList<>();
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
@@ -120,17 +124,14 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
             SolrDocument solrDocument = resultsDocumentList.get(0);
             List<String> phenotypes = (List<String>) solrDocument.getFieldValue("phenotypes");
             for (String string : phenotypes) {
-                String[] splitString = string.split("_");
-                PhenotypeTerm phenotype = new PhenotypeTerm();
-                phenotype.setId(splitString[0]);
-                phenotype.setTerm(splitString[1]);
+                PhenotypeTerm phenotype = makePhenotypeTerm(string);
                 phenotypeList.add(phenotype);
             }
 
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
         }
-        
+
         return phenotypeList;
     }
 
@@ -138,17 +139,17 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     public Gene getGene(GeneIdentifier geneIdentifier) {
 
         String query = String.format("\"%s\"", geneIdentifier.getCompoundIdentifier());
-        
+
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"gene\"");
         solrQuery.addField("marker_accession");
         solrQuery.addField("marker_symbol");
         solrQuery.addField("hgnc_id");
-        solrQuery.addField("human_marker_symbol");
+        solrQuery.addField("hgnc_gene_symbol");
         solrQuery.addField("hgnc_gene_locus");
 
         SolrDocumentList resultsDocumentList;
-        
+
         Gene gene = null;
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
@@ -165,37 +166,36 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
             String modGenId = (String) solrDocument.getFieldValue("marker_accession");
             String modGenSymbol = (String) solrDocument.getFieldValue("marker_symbol");
             String humanGenId = (String) solrDocument.getFieldValue("hgnc_id");
-            String humanGenSymbol = (String) solrDocument.getFieldValue("human_marker_symbol");
-            
+            String humanGenSymbol = (String) solrDocument.getFieldValue("hgnc_gene_symbol");
+
             GeneIdentifier modelGeneId = new GeneIdentifier(modGenSymbol, modGenId);
             GeneIdentifier humanGeneId = new GeneIdentifier(humanGenSymbol, humanGenId);
             gene = new Gene(modelGeneId, humanGeneId);
-        
-//            logger.info("Made {}", gene);
 
+            logger.debug("Made {}", gene);
         } catch (SolrServerException ex) {
             logger.error(ex.getMessage());
         }
-          
+
         return gene;
     }
 
     @Override
     public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff) {
-        
+
         String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
         if (minRawScoreCutoff == 0) {
             query = String.format("\"%s\"", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
         }
-        
+
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease_gene_summary\"");
         solrQuery.addField("marker_accession");
         solrQuery.addField("marker_symbol");
         solrQuery.addField("hgnc_id");
-        solrQuery.addField("human_marker_symbol");
+        solrQuery.addField("hgnc_gene_symbol");
         solrQuery.addField("hgnc_gene_locus");
         solrQuery.addField("in_locus");
         //common fields
@@ -205,13 +205,13 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("max_htpc_score");
 
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
-        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);      
-                
+        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
+
         //there will be more than 10 results for this - we want them all.
-        solrQuery.setRows(1000);
-        
+        solrQuery.setRows(ROWS);
+
         SolrDocumentList resultsDocumentList;
-        
+
         List<GeneAssociationSummary> geneAssociationSummaryList = new ArrayList<>();
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
@@ -221,16 +221,16 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 String modGenId = (String) solrDocument.getFieldValue("marker_accession");
                 String modGenSymbol = (String) solrDocument.getFieldValue("marker_symbol");
                 String humanGenId = (String) solrDocument.getFieldValue("hgnc_id");
-                String humanGenSymbol = (String) solrDocument.getFieldValue("human_marker_symbol");
-                
+                String humanGenSymbol = (String) solrDocument.getFieldValue("hgnc_gene_symbol");
+
                 GeneIdentifier modelGeneId = new GeneIdentifier(modGenSymbol, modGenId);
                 GeneIdentifier hgncGeneId = new GeneIdentifier(humanGenSymbol, humanGenId);
-                          
+
                 AssociationSummary associationSummary = makeAssociationSummary(solrDocument);
-                
+
                 GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(hgncGeneId, modelGeneId, associationSummary);
 //                logger.info("Made {}", geneAssociationSummary );
-                
+
                 geneAssociationSummaryList.add(geneAssociationSummary);
             }
         } catch (SolrServerException ex) {
@@ -241,7 +241,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
     @Override
     public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff) {
-        
+
         String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", geneId.getCompoundIdentifier(), minRawScoreCutoff);
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
@@ -261,13 +261,13 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("max_htpc_score");
 
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
-        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);      
-                
+        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
+
         //there will be more than 10 results for this - we want them all.
-        solrQuery.setRows(1000);
-        
+        solrQuery.setRows(ROWS);
+
         SolrDocumentList resultsDocumentList;
-        
+
         List<DiseaseAssociationSummary> diseaseAssociationSummaryList = new ArrayList<>();
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
@@ -276,13 +276,13 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 //make the geneIdentifiers
                 String diseaseId = (String) solrDocument.getFieldValue("disease_id");
                 String diseaseTerm = (String) solrDocument.getFieldValue("disease_term");
-                           
+
                 //make the association summary details
                 AssociationSummary associationSummary = makeAssociationSummary(solrDocument);
-                
+
                 DiseaseAssociationSummary diseaseAssociationSummary = new DiseaseAssociationSummary(new DiseaseIdentifier(diseaseId), diseaseTerm, associationSummary);
 //                logger.info("Made {}", diseaseAssociationSummary );
-                
+
                 diseaseAssociationSummaryList.add(diseaseAssociationSummary);
             }
         } catch (SolrServerException ex) {
@@ -293,35 +293,173 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
     @Override
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
-        return new DiseaseGeneAssociationDetail(diseaseId);
+
+        String query = String.format("\"%s\" AND \"%s\"", diseaseId.getCompoundIdentifier(), geneId.getCompoundIdentifier());
+
+        SolrQuery solrQuery = new SolrQuery(query);
+        solrQuery.addFilterQuery("type:\"disease_model_association\"");
+
+        solrQuery.addField("model_id");
+        solrQuery.addField("lit_model");
+        solrQuery.addField("disease_to_model_score");
+        solrQuery.addField("model_to_disease_score");
+
+        //there will be more than 10 results for this - we want them all.
+        solrQuery.setRows(ROWS);
+
+        SolrDocumentList resultsDocumentList;
+
+        List<DiseaseModelAssociation> diseaseAssociationSummaryList = new ArrayList<>();
+
+        //get the models needed for this geneIdentifier
+        Map<Integer, MouseModel> modelMap = getMouseModels(geneId);
+
+        try {
+            resultsDocumentList = solrServer.query(solrQuery).getResults();
+            for (SolrDocument solrDocument : resultsDocumentList) {
+                DiseaseModelAssociation diseaseModelAssociation = new DiseaseModelAssociation();
+                diseaseModelAssociation.setDiseaseIdentifier(diseaseId);
+
+                Integer modelId = (Integer) solrDocument.getFieldValue("model_id");
+                boolean litEvidence = (boolean) solrDocument.getFieldValue("lit_model");
+                double d2m = (double) solrDocument.getFieldValue("disease_to_model_score");
+                double m2d = (double) solrDocument.getFieldValue("model_to_disease_score");
+                diseaseModelAssociation.setHasLiteratureEvidence(litEvidence);
+                diseaseModelAssociation.setDiseaseToModelScore(d2m);
+                diseaseModelAssociation.setModelToDiseaseScore(m2d);
+
+                MouseModel model = modelMap.get(modelId);
+                diseaseModelAssociation.setMouseModel(model);
+
+                logger.debug("Made {}", diseaseModelAssociation);
+                diseaseAssociationSummaryList.add(diseaseModelAssociation);
+            }
+        } catch (SolrServerException ex) {
+            logger.error(ex.getMessage());
+        }
+
+        //build the DiseaseGeneAssociationDetail from the component parts
+        DiseaseGeneAssociationDetail diseaseGeneAssociationDetail = new DiseaseGeneAssociationDetail(diseaseId);
+        diseaseGeneAssociationDetail.setDiseasePhenotypes(getDiseasePhenotypes(diseaseId));
+        diseaseGeneAssociationDetail.setGene(getGene(geneId));
+        diseaseGeneAssociationDetail.setDiseaseAssociations(diseaseAssociationSummaryList);
+
+        return diseaseGeneAssociationDetail;
     }
 
     /**
      * Creates an AssociationSummary object from a solrDocument. Don't feed this
      * any old document otherwise there will be null pointer exceptions.
-     * 
+     *
      * @param solrDocument
-     * @return 
+     * @return
      */
     private AssociationSummary makeAssociationSummary(SolrDocument solrDocument) {
         //make the association summary details
-        boolean associatedInHuman = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("human_curated")).booleanValue();
-        boolean hasLiteratureEvidence = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("mouse_curated")).booleanValue();
-        boolean inLocus = Boolean.valueOf( (Boolean) solrDocument.getFieldValue("in_locus")).booleanValue();
-        
-        float bestModScore = 0;
+        boolean associatedInHuman = (boolean) solrDocument.getFieldValue("human_curated");
+        boolean hasLiteratureEvidence = (boolean) solrDocument.getFieldValue("mouse_curated");
+        boolean inLocus = (boolean) solrDocument.getFieldValue("in_locus");
+
+        double bestModScore = 0.0;
         if (solrDocument.getFieldValue("max_mod_score") != null) {
-            bestModScore = (float) solrDocument.getFieldValue("max_mod_score");
+            bestModScore = (double) solrDocument.getFieldValue("max_mod_score");
         }
-        
-        float bestHtpcScore = 0;
+
+        double bestHtpcScore = 0.0;
         if (solrDocument.getFieldValue("max_htpc_score") != null) {
-            bestHtpcScore = (float) solrDocument.getFieldValue("max_htpc_score");  
+            bestHtpcScore = (double) solrDocument.getFieldValue("max_htpc_score");
         }
 
         AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, bestModScore, bestHtpcScore);
 //        System.out.println(associationSummary);
         return associationSummary;
     }
-    
+
+    /**
+     * Returns a map of models indexed by model_id.
+     *
+     * @param geneIdentifier
+     * @return
+     */
+    private Map<Integer, MouseModel> getMouseModels(GeneIdentifier geneIdentifier) {
+
+        String query = String.format("\"%s\"", geneIdentifier.getCompoundIdentifier());
+
+        SolrQuery solrQuery = new SolrQuery(query);
+        solrQuery.addFilterQuery("type:\"mouse_model\"");
+
+        solrQuery.addField("model_id");
+        solrQuery.addField("marker_accession");
+        solrQuery.addField("marker_symbol");
+        solrQuery.addField("source");
+        solrQuery.addField("genetic_background");
+        solrQuery.addField("allelic_composition");
+        solrQuery.addField("allelic_composition_link");
+        solrQuery.addField("hom_het");
+        solrQuery.addField("phenotypes");
+
+        //there will be more than 10 results for this - we want them all.
+        solrQuery.setRows(ROWS);
+
+        SolrDocumentList resultsDocumentList;
+
+        Map<Integer, MouseModel> modelMap = new HashMap<>();
+
+        logger.info("making mouseModels for geneIdentifier: {}", geneIdentifier);
+
+        try {
+            resultsDocumentList = solrServer.query(solrQuery).getResults();
+            for (SolrDocument solrDocument : resultsDocumentList) {
+                MouseModel model = new MouseModel();
+
+                Integer modelId = (Integer) solrDocument.getFieldValue("model_id");
+                String modelGeneId = (String) solrDocument.getFieldValue("marker_accession");
+                String modelGeneSymbol = (String) solrDocument.getFieldValue("marker_symbol");
+                String source = (String) solrDocument.getFieldValue("source");
+                String geneticBackground = (String) solrDocument.getFieldValue("genetic_background");
+                String allelicComposition = (String) solrDocument.getFieldValue("allelic_composition");
+                String allelicCompositionLink = (String) solrDocument.getFieldValue("allelic_composition_link");
+                String homHet = (String) solrDocument.getFieldValue("hom_het");
+                List<String> phenotypes = (List<String>) solrDocument.getFieldValue("phenotypes");
+                //make the phenotype terms
+                List<PhenotypeTerm> phenotypeTerms = new ArrayList();
+
+                if (phenotypes != null) {
+                    for (String string : phenotypes) {
+                        PhenotypeTerm phenotype = makePhenotypeTerm(string);
+                        phenotypeTerms.add(phenotype);
+                        logger.debug("Made {}", phenotype);
+                    }
+                }
+                //make the model
+                model.setMgiModelId(modelId);
+                model.setMgiGeneId(modelGeneId);
+                model.setSource(source);
+                model.setGeneticBackground(geneticBackground);
+                model.setAllelicComposition(allelicComposition);
+                model.setAllelicCompositionLink(allelicCompositionLink);
+                model.setPhenotypeTerms(phenotypeTerms);
+
+                logger.debug("Made {}", model);
+                modelMap.put(model.getMgiModelId(), model);
+            }
+        } catch (SolrServerException ex) {
+            logger.error(ex.getMessage());
+        }
+
+        return modelMap;
+    }
+
+    private PhenotypeTerm makePhenotypeTerm(String string) {
+        PhenotypeTerm phenotype = new PhenotypeTerm();
+        String[] splitString = string.split("_");
+        if (splitString.length == 2) {
+            phenotype.setId(splitString[0]);
+            phenotype.setTerm(splitString[1]);
+        } else {
+            logger.warn("makePhenotypeTerm Parsing Error: '{}' should be of format MP:1234_Term", string);
+        }
+
+        return phenotype;
+    }
 }

@@ -147,7 +147,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 //                + "join mp_term_infos mp on mp.term_id = mmm.mp_id \n"
 //                + "where disease_id = ? and mgi_gene_id = ?;";
 
-        String sql = "select disease_id, model_gene_id, dmma.model_id, source, lit_model, allelic_composition, allelic_composition_link, genetic_background, disease_to_model_perc_score, model_to_disease_perc_score, mp.mp_id, mp.term "
+        String sql = "select disease_id, model_gene_id, dmma.model_id, source, lit_model, allelic_composition, allelic_composition_link, genetic_background, disease_to_model_perc_score, model_to_disease_perc_score, "
+                + "mp.mp_id, mp.term "
                 + "from mouse_disease_model_association dmma "
                 + "join mouse_model mm on mm.model_id = dmma.model_id "
                 + "join mouse_model_gene_ortholog mmgo on mm.model_id = mmgo.model_id "
@@ -336,7 +337,10 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
         public DiseaseGeneAssociationDetail extractData(ResultSet rs) throws SQLException, DataAccessException {
             DiseaseGeneAssociationDetail result = null;
             List<DiseaseModelAssociation> diseaseAssociations = new ArrayList<>();
-            String currentModelId = "";
+            Integer currentModelId = 0;
+            
+            List<PhenotypeTerm> modelPhenotypes = null;
+
             DiseaseModelAssociation currentAssociation = null;
             while (rs.next()) {
                 if (result == null) {
@@ -346,11 +350,11 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     result.setDiseaseAssociations(diseaseAssociations);
                     logger.debug("Making DiseaseGeneAssociationDetail for disease {}", result.getDiseaseId());
                 }
-                String mouseModelId = rs.getString("model_id");
+                Integer mouseModelId = rs.getInt("model_id");
                 if (!mouseModelId.equals(currentModelId)) {
                     currentModelId = mouseModelId;
                     if (currentAssociation != null) {
-                        logger.debug("Made DiseaseAssociation {} {} {} {}", currentAssociation.getDiseaseIdentifier(), currentAssociation.getMouseModel().getMgiGeneId(), currentAssociation.getMouseModel().getMgiModelId(), currentAssociation.getMouseModelPhenotypeTerms());
+                        logger.debug("Made {}", currentAssociation);
                     }
                     DiseaseModelAssociation diseaseAssociation = new DiseaseModelAssociation();
                     currentAssociation = diseaseAssociation;
@@ -368,30 +372,33 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     model.setGeneticBackground(rs.getString("genetic_background"));
                     model.setMgiGeneId(rs.getString("model_gene_id"));
                     model.setSource(rs.getString("source"));
+                    modelPhenotypes = new ArrayList();
+                    model.setPhenotypeTerms(modelPhenotypes);
                     
                     diseaseAssociation.setMouseModel(model);
 
                     diseaseAssociations.add(diseaseAssociation);
 
-                    logger.debug("Made new DiseaseAssociation {} {} {} {}", diseaseAssociation.getDiseaseIdentifier(), diseaseAssociation.getMouseModel().getMgiGeneId(), diseaseAssociation.getMouseModel().getMgiModelId(), diseaseAssociation.getMouseModelPhenotypeTerms());
+                    logger.debug("Made new {}", diseaseAssociation);
                 }
                 //make the MP terms and attach to the diseaseAssociation (each row)
                 PhenotypeTerm term = new PhenotypeTerm();
                 term.setId(rs.getString("mp_id"));
                 term.setTerm(rs.getString("term"));
-                if (currentAssociation != null) {
-                    currentAssociation.getMouseModelPhenotypeTerms().add(term);
+                if (modelPhenotypes != null) {
+                    modelPhenotypes.add(term);
                 }
             }
             
-            if (result != null) {
-                logger.debug("Made DiseaseGeneAssociationDetail for disease {}", result.getDiseaseId());
-                logger.debug("Disease phenotypes {}", result.getDiseasePhenotypes());
-                for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
-                    logger.debug("{}", diseaseAssociation);
+            if (logger.isDebugEnabled()) {
+                if (result != null) {
+                    logger.debug("Made DiseaseGeneAssociationDetail for disease {}", result.getDiseaseId());
+                    logger.debug("Disease phenotypes {}", result.getDiseasePhenotypes());
+                    for (DiseaseModelAssociation diseaseAssociation : diseaseAssociations) {
+                        logger.debug("{}", diseaseAssociation);
+                    }
                 }
             }
-
             return result;
         }
     }

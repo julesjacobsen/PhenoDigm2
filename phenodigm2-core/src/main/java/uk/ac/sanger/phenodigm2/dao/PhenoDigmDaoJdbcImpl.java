@@ -116,7 +116,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     + "join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id "
                     + "order by mmgo.model_gene_id;";
 
-            Map<String, MouseModel> mouseModels = this.jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
+            Map<Integer, MouseModel> mouseModels = this.jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
             mouseModelCache = new MouseModelCache(mouseModels);
         }
     }
@@ -369,20 +369,20 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    private static class MouseModelResultSetExtractor implements ResultSetExtractor<Map<String, MouseModel>> {
+    private static class MouseModelResultSetExtractor implements ResultSetExtractor<Map<Integer, MouseModel>> {
 
-        private Map<String, MouseModel> mouseModelMap;
+        private Map<Integer, MouseModel> mouseModelMap;
 
         public MouseModelResultSetExtractor() {
-            mouseModelMap = new HashMap<String, MouseModel>();
+            mouseModelMap = new HashMap();
         }
 
         @Override
-        public Map<String, MouseModel> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        public Map<Integer, MouseModel> extractData(ResultSet rs) throws SQLException, DataAccessException {
             while (rs.next()) {
                 MouseModel mouseModel = new MouseModel();
                 mouseModel.setMgiGeneId(rs.getString("model_gene_id"));
-                mouseModel.setMgiModelId(rs.getString("model_id"));
+                mouseModel.setMgiModelId(rs.getInt("model_id"));
                 mouseModel.setSource(rs.getString("source"));
                 mouseModel.setAllelicComposition(rs.getString("allelic_composition"));
                 mouseModel.setGeneticBackground(rs.getString("genetic_background"));

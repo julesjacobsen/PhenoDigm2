@@ -70,8 +70,8 @@ public class PhenoDigmDaoJdbcImplTest {
         
     @Test public void getAllDiseases() {
         Set<Disease> result = instance.getAllDiseses();
-        int expectedDiseases = 5463;
-        assertEquals("Expected " + expectedDiseases + " Disease objects, but got " + result.size() + " :(", result.size(), expectedDiseases);
+        int expectedDiseases = 7346;
+        assertEquals(String.format("Expected %s Disease objects, but got %s :(", expectedDiseases, result.size()), expectedDiseases, result.size());
         assertFalse("Expected a full set of Disease objects, but got an empty one :(", result.isEmpty());
     }
         
@@ -213,18 +213,18 @@ public class PhenoDigmDaoJdbcImplTest {
     
     @Test
     public void testGetMouseModelPhenotypeTerms() {
-        String mouseModelId = "1";
+        String mouseModelId = "114";
         List<PhenotypeTerm> result = instance.getMouseModelPhenotypes(mouseModelId);
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("MP:0000609");
-        expectedTerm.setTerm("abnormal liver physiology");
+        expectedTerm.setId("MP:0000111");
+        expectedTerm.setTerm("cleft palate");
         assertTrue(result.contains(expectedTerm));
     }
     
     @Test
     public void testGetDiseaseAssociationPhenotypeMatches() {
         String diseaseId = "OMIM:101600";
-        String mouseModelId = "27680";
+        String mouseModelId = "42";
         List<PhenotypeMatch> result = instance.getPhenotypeMatches(diseaseId, mouseModelId);
         PhenotypeMatch expectedMatch = new PhenotypeMatch();
         expectedMatch.setSimJ(0.853968);

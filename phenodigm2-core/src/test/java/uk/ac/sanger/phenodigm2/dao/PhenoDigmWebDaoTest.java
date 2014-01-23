@@ -18,6 +18,7 @@ package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,7 +31,9 @@ import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
+import uk.ac.sanger.phenodigm2.web.AssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
@@ -46,7 +49,7 @@ public abstract class PhenoDigmWebDaoTest {
     @Autowired
     PhenoDigmWebDao instance;
     
-    Logger logger;
+    static Logger logger;
     
     /**
      * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
@@ -56,12 +59,55 @@ public abstract class PhenoDigmWebDaoTest {
 //        logger.info("getDiseaseToGeneAssociationSummaries");
         
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101600");
-        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 0.0);
+        double cutoff = 0.0;
+        
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, cutoff);
+        logger.info("{} has {} GeneAssociationSummary using cutoff of {}", diseaseId, result.size(), cutoff);
+
+        assertFalse(result.isEmpty());
+        
+        GeneIdentifier expectedModelGeneIdentifier = new GeneIdentifier("Fgfr2", "MGI:95523");
+        GeneIdentifier expectedHgncGeneIdentifier = new GeneIdentifier("FGFR2", "HGNC:3689");
+        AssociationSummary expectedSummary = new AssociationSummary(true, true, true, 82.77, 0.0);
+        
+        GeneAssociationSummary expectedAssociationSummary = null;
         for (GeneAssociationSummary geneAssociationSummary : result) {
-
+            if (geneAssociationSummary.getModelGeneIdentifier().equals(expectedModelGeneIdentifier)) {
+                expectedAssociationSummary = geneAssociationSummary;
+                logger.info("Found expected {}", geneAssociationSummary);
+            }
         }
-        assertTrue(result.size() >= 17);
+        assertNotNull(expectedAssociationSummary);
+        assertEquals(expectedHgncGeneIdentifier, expectedAssociationSummary.getHgncGeneIdentifier());
+        assertEquals(expectedSummary, expectedAssociationSummary.getAssociationSummary());    }
+    
+    /**
+     * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetDiseaseToGeneAssociationSummariesWithCutOff() {
+//        logger.info("getDiseaseToGeneAssociationSummaries");
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101600");
+        double cutoff = 2.00;
+        
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, cutoff);
+        logger.info("{} has {} GeneAssociationSummary using cutoff of {}", diseaseId, result.size(), cutoff);
 
+        assertFalse(result.isEmpty());
+        GeneIdentifier expectedModelGeneIdentifier = new GeneIdentifier("Fgfr2", "MGI:95523");
+        GeneIdentifier expectedHgncGeneIdentifier = new GeneIdentifier("FGFR2", "HGNC:3689");
+        AssociationSummary expectedSummary = new AssociationSummary(true, true, true, 82.77, 0.0);
+        
+        GeneAssociationSummary expectedAssociationSummary = null;
+        for (GeneAssociationSummary geneAssociationSummary : result) {
+            if (geneAssociationSummary.getModelGeneIdentifier().equals(expectedModelGeneIdentifier)) {
+                expectedAssociationSummary = geneAssociationSummary;
+                logger.info("Found expected {}", geneAssociationSummary);
+            }
+        }
+        assertNotNull(expectedAssociationSummary);
+        assertEquals(expectedHgncGeneIdentifier, expectedAssociationSummary.getHgncGeneIdentifier());
+        assertEquals(expectedSummary, expectedAssociationSummary.getAssociationSummary());
     }
     
     @Test
@@ -74,22 +120,6 @@ public abstract class PhenoDigmWebDaoTest {
         assertTrue(result.contains(expectedTerm));
         assertTrue(result.size() >= 75);
     }
-    
-    /**
-     * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
-     */
-    @Test
-    public void testGetDiseaseToGeneAssociationSummariesWithCutOff() {
-//        logger.info("getDiseaseToGeneAssociationSummaries");
-        
-        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101600");
-        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 2.00);
-
-        assertTrue(result.size() >= 17);
-        for (GeneAssociationSummary geneAssociationSummary : result) {
-//            logger.info(geneAssociationSummary.toString());
-        }
-    }
         
     /**
      * Test of getDiseaseToGeneAssociationSummariesNoKnownAssociations method, of class PhenoDigmWebDaoJdbcImpl.
@@ -99,12 +129,15 @@ public abstract class PhenoDigmWebDaoTest {
 //        logger.info("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
         
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
+        double cutoff = 0.0;
+        
         Disease expDisease = new Disease(diseaseId);
         expDisease.setTerm("1P36 MICRODELETION SYNDROME");
         
-        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, 0.0);
-        
-        assertTrue(result.size() >= 4);
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, cutoff);
+        logger.info("{} has {} GeneAssociationSummary using cutoff of {}", diseaseId, result.size(), cutoff);
+
+        assertFalse(result.isEmpty());
         for (GeneAssociationSummary geneAssociationSummary : result) {
             assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
         }
@@ -165,9 +198,11 @@ public abstract class PhenoDigmWebDaoTest {
     public void testGetGeneToDiseaseAssociationSummaries() {
 //        logger.info("getGeneToDiseaseAssociationSummaries");
         GeneIdentifier geneId = new GeneIdentifier("Fgfr2", "MGI:95523");
-        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, 0.0);
-        assertTrue("Expected more than 290 results", result.size() > 290);
-
+        double cutoff = 0.00;
+        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, cutoff);
+        logger.info("{} has {} DiseaseAssociationSummary using cutoff of {}", geneId, result.size(), cutoff);
+        int expectSize = 7076;
+        assertFalse(result.isEmpty());
     }
     
     /**
@@ -177,10 +212,12 @@ public abstract class PhenoDigmWebDaoTest {
     public void testGetGeneToDiseaseAssociationSummariesWithCutoff() {
 //        logger.info("getGeneToDiseaseAssociationSummaries");
         GeneIdentifier geneId = new GeneIdentifier("Fgfr2", "MGI:95523");
-        List<DiseaseAssociationSummary> expResult = null;
-        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, 2.00);
-        assertTrue("Expected more than 250 results", result.size() > 250);
-        //TODO: Test MGI:1096550 as this has 1:n mouse:human orthologs 
+        double cutoff = 2.00;
+        List<DiseaseAssociationSummary> result = instance.getGeneToDiseaseAssociationSummaries(geneId, cutoff);
+        logger.info("{} has {} DiseaseAssociationSummary using cutoff of {}", geneId, result.size(), cutoff);
+        
+        int expectSize = 310;
+        assertFalse(result.isEmpty());
     }
 
     /**
@@ -189,37 +226,45 @@ public abstract class PhenoDigmWebDaoTest {
     @Test
     public void testGetDiseaseGeneAssociationDetail() {
 //        logger.info("getDiseaseGeneAssociationDetail");
-        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:144250");;
-        GeneIdentifier geneId = new GeneIdentifier("Lpl", "MGI:96820");
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101600");
+        GeneIdentifier geneId = new GeneIdentifier("Fgfr2", "MGI:95523");
 
         DiseaseGeneAssociationDetail result = instance.getDiseaseGeneAssociationDetail(diseaseId, geneId);
-//        assertEquals(expResult, result);
-        logger.info("{}", result.getDiseaseId());
-        assertEquals(diseaseId, result.getDiseaseId());
-        assertEquals(5, result.getDiseaseAssociations().size());
+        List<DiseaseModelAssociation> resultAssociations = result.getDiseaseAssociations();
+        assertNotNull(result);
+        assertNotNull(resultAssociations);
+        assertFalse(resultAssociations.isEmpty());
         
-        DiseaseModelAssociation diseaseModelAssociation = result.getDiseaseAssociations().get(0);
-        logger.info("Testing: {}", diseaseModelAssociation);
-
-        assertEquals("MGI:96820", diseaseModelAssociation.getMouseModel().getMgiGeneId());
-        assertEquals("14434", diseaseModelAssociation.getMouseModel().getMgiModelId());
-        
-        assertEquals(74.18, diseaseModelAssociation.getDiseaseToModelScore(), 0.00);
-        assertEquals(84.48, diseaseModelAssociation.getModelToDiseaseScore(), 0.00);
-        
-        //test the phenotypes
-        PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("MP:0001552");
-        expectedTerm.setTerm("increased circulating triglyceride level");
-        
-        assertNotNull("Expected a list, but got a null :(", diseaseModelAssociation.getMouseModelPhenotypeTerms());
-        assertFalse("Expected a full list, but got an empty one :(", diseaseModelAssociation.getMouseModelPhenotypeTerms().isEmpty());
-        assertTrue(String.format("Expected a list containing the term %s, but the term wasn't found :(", expectedTerm), diseaseModelAssociation.getMouseModelPhenotypeTerms().contains(expectedTerm));
-          
-        
-        for (DiseaseModelAssociation diseaseAssociation : result.getDiseaseAssociations()) {
-            logger.info("{}", diseaseAssociation);
+        logger.info("{} - {} have the following {} DiseaseModelAssociations:", diseaseId, geneId, resultAssociations.size());
+        for (DiseaseModelAssociation diseaseModelAssociation : resultAssociations) {
+            logger.info("{}", diseaseModelAssociation);
         }
-
+        assertEquals(diseaseId, result.getDiseaseId());
+//        assertEquals(22, result.getDiseaseAssociations().size());
+                
+        DiseaseModelAssociation diseaseModelAssociation = resultAssociations.get(0);
+        logger.info("Testing: {}", diseaseModelAssociation);
+        
+        assertEquals(72.65, diseaseModelAssociation.getDiseaseToModelScore(), 0.00);
+        assertEquals(74.90, diseaseModelAssociation.getModelToDiseaseScore(), 0.00);
+        
+        //test the mouseModel
+        MouseModel expectedModel = diseaseModelAssociation.getMouseModel(); 
+        
+        assertNotNull(expectedModel);
+        assertEquals("MGI:95523", expectedModel.getMgiGeneId());
+        assertEquals(114, expectedModel.getMgiModelId(), 0);
+        
+        //test the mouseModel phenotypes
+        PhenotypeTerm expectedTerm = new PhenotypeTerm();
+        expectedTerm.setId("MP:0000111");
+        expectedTerm.setTerm("cleft palate");
+     
+        List<PhenotypeTerm> resultList = expectedModel.getPhenotypeTerms();
+        
+        assertNotNull("Expected a list, but got a null :(", resultList);
+        assertFalse("Expected a full list, but got an empty one :(", resultList.isEmpty());
+        assertTrue(String.format("Expected a list containing the term %s, but the term wasn't found :(", expectedTerm), resultList.contains(expectedTerm));
+          
     }
 }
