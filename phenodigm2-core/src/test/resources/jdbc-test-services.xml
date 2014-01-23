@@ -30,7 +30,7 @@
         <property name="dataSource" ref="phenodigmDataSource"/>
         <property name="schemas" value="PHENODIGM2"/>
     </bean>
-     
-   <bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches" depends-on="flyway"/>
+   <!--setting lazy-init to true means the class will only be set-up when needed. This is nice when testing PhenoDigmWebDaoJdbcImpl which doesn't use the cache. -->  
+   <bean id="phenoDigmDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl" init-method="setUpCaches" depends-on="flyway" lazy-init="true"/>
    <bean id="phenoDigmWebDaoJdbcImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl" depends-on="flyway"/>
 </beans>
