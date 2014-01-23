@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="${solr.core.name}" version="1.5">
+<schema name="phenodigm" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -119,12 +119,12 @@
    <!--gene fields-->
    <field name="marker_accession" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
-   <field name="human_marker_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="hgnc_gene_symbol" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hgnc_id" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hgnc_gene_locus" type="string" indexed="true" stored="true" multiValued="false" /> 
    
    <!--mouse model fields-->
-   <field name="mouse_model_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="model_id" type="int" indexed="true" stored="true" multiValued="false" /> 
    <field name="source" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="allelic_composition" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
    <field name="genetic_background" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
@@ -143,17 +143,24 @@
    <field name="htpc_phenotype" type="boolean" indexed="true" stored="true"/>
    
    <!--disease-gene summary fields-->
-   <field name="max_mod_score" type="float" indexed="true" stored="true"/>
-   <field name="raw_mod_score" type="float" indexed="true" stored="true"/>
-   <field name="max_htpc_score" type="float" indexed="true" stored="true"/>
-   <field name="raw_htpc_score" type="float" indexed="true" stored="true"/>
+   <field name="max_mod_score" type="double" indexed="true" stored="true"/>
+   <field name="raw_mod_score" type="double" indexed="true" stored="true"/>
+   <field name="max_htpc_score" type="double" indexed="true" stored="true"/>
+   <field name="raw_htpc_score" type="double" indexed="true" stored="true"/>
    <field name="in_locus" type="boolean" indexed="true" stored="true"/>
-     
+   
+   <!--disease-model association fields-->
+   <field name="lit_model" type="boolean" indexed="true" stored="true"/>
+   <field name="disease_to_model_score" type="double" indexed="true" stored="true"/>
+   <field name="model_to_disease_score" type="double" indexed="true" stored="true"/>
+   <field name="raw_score" type="double" indexed="true" stored="true"/>
+   <field name="hp_matched_terms" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="mp_matched_terms" type="string" indexed="true" stored="true" multiValued="true"/>
+
    <!--phenotypes-->
    <field name="mp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="mp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="hp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="hp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="term" type="string" indexed="true" stored="true" multiValued="false" /> 
 
    <field name="phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
    <field name="phenotype" type="text_en_splitting" indexed="true" stored="true"/>
@@ -298,9 +305,8 @@
    <copyField source="marker_symbol" dest="text"/>
    <copyField source="marker_accession" dest="text"/>
    <copyField source="mp_id" dest="text"/>
-   <copyField source="mp_term" dest="text"/>
+   <copyField source="term" dest="text"/>
    <copyField source="hp_id" dest="text"/>
-   <copyField source="hp_term" dest="text"/>
 
    <!-- Copy the price into a currency enabled field (default USD) -->
    <!--<copyField source="price" dest="price_c"/>-->

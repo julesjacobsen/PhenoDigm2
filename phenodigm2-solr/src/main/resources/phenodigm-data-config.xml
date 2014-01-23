@@ -1,8 +1,10 @@
 <dataConfig>
-    <dataSource name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource" batchSize="-1"/>
+    <!-- <dataSource name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource" batchSize="-1"/> -->
+    <dataSource type="JdbcDataSource" driver="org.h2.Driver" url="jdbc:h2:file://C:/Users/jj8/Documents/GitHub/PhenoDigm2/target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2" user="sa" password=""/> 
+
     <document>       
         <!--disease_summary-->
-        <entity name="disease" transformer="RegexTransformer" query="select d.disease_id as id, 'disease' as type, d.disease_id, disease_term, disease_alts, disease_classes as disease_classes, human_curated, mod_curated, mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus from disease d join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
+        <entity name="disease" transformer="RegexTransformer" query="select d.disease_id as id, 'disease' as type, d.disease_id as disease_id, disease_term, disease_alts, disease_classes as disease_classes, human_curated, mod_curated as mod_curated, mod_predicted as mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus from disease d join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
             <field column="id" name="id"/>
             <field column="type" name="type"/>
             <field column="disease_id" name="disease_id"/>
@@ -14,7 +16,7 @@
             <!--summary fields-->
             <field column="human_curated" name="human_curated"/>
             <field column="mod_curated" name="mouse_curated"/>
-            <field column="mgi_predicted" name="mgi_predicted"/>
+            <field column="mod_predicted" name="mgi_predicted"/>
             <field column="htpc_predicted" name="impc_predicted"/>
             <field column="mod_predicted_in_locus" name="mgi_predicted_in_locus"/>
             <field column="htpc_predicted_in_locus" name="impc_predicted_in_locus"/>
@@ -26,14 +28,70 @@
             </entity>
         </entity>
         
+        <!--gene_summary-->
+        <entity name="gene" query="select mgo.model_gene_id as id, 'gene' as type, mgo.model_gene_id as model_gene_id, model_gene_symbol as model_gene_symbol, hgnc_id, hgnc_gene_symbol, hgnc_gene_locus as hgnc_gene_locus, human_curated, mod_curated as mod_curated, mod_predicted as mod_predicted, htpc_predicted as htpc_predicted, mod_predicted_in_locus as mod_predicted_in_locus, htpc_predicted_in_locus as htpc_predicted_in_locus, mod_model, htpc_model, htpc_phenotype from mouse_gene_summary mgs join mouse_gene_ortholog mgo on mgo.model_gene_id = mgs.model_gene_id;">
+            <field column="id" name="id"/>
+            <field column="type" name="type"/>
+            <field column="model_gene_id" name="marker_accession"/>
+            <field column="model_gene_symbol" name="marker_symbol"/>
+            <field column="hgnc_id" name="hgnc_id"/>
+            <field column="hgnc_gene_symbol" name="hgnc_gene_symbol"/>
+            <field column="hgnc_gene_locus" name="hgnc_gene_locus"/>
+			
+            <!--summary fields-->
+            <field column="human_curated" name="human_curated"/>
+            <field column="mod_curated" name="mouse_curated"/>
+            <field column="mod_predicted" name="mgi_predicted"/>
+            <field column="htpc_predicted" name="impc_predicted"/>
+            <field column="mod_predicted_in_locus" name="mgi_predicted_in_locus"/>
+            <field column="htpc_predicted_in_locus" name="impc_predicted_in_locus"/>
+            <!--Project status fields -->
+            <field column="mod_model" name="mod_model"/>
+            <field column="htpc_model" name="htpc_model"/>
+            <field column="htpc_phenotype" name="htpc_phenotype"/>	
+        </entity>
+        
+        <!--mouse_model-->
+        <entity name="mouse_model" query="select mm.model_id as id, mm.model_id as model_id, 'mouse_model' as type, mgo.model_gene_id as model_gene_id, mgo.model_gene_symbol as model_gene_symbol, mm.source, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.hom_het from mouse_model mm join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id join mouse_gene_ortholog mgo on mgo.model_gene_id = mmgo.model_gene_id;">
+            <field column="id" name="id"/>
+            <field column="type" name="type"/>
+            <field column="model_id" name="model_id"/>
+            <field column="source" name="source"/>
+            <field column="model_gene_id" name="marker_accession"/>
+            <field column="model_gene_symbol" name="marker_symbol"/>
+            <field column="allelic_composition" name="allelic_composition"/>
+            <field column="genetic_background" name="genetic_background"/>
+            <field column="allelic_composition_link" name="allelic_composition_link"/>
+            <field column="hom_het" name="hom_het"/>
+
+           <entity name="mouse_phenotypes" query="select concat(mp.mp_id, '_' , mp.term) as phenotype from mp join mouse_model_mp mmmp on mmmp.mp_id = mp.mp_id where mmmp.model_id = '${mouse_model.model_id}';">
+                <field column="phenotype" name="phenotypes"/>
+            </entity>
+        </entity>
+        
+        <!--human phenotypes-->
+        <entity name="human_phenotype" query="select hp_id as id, 'phenotype' as type, hp_id, term from hp;">
+            <field column="id" name="id"/>
+            <field column="type" name="type"/>         
+            <field column="hp_id" name="hp_id"/>
+            <field column="term" name="term"/>
+        </entity>
+       
+        <!--mouse phenotypes-->
+        <entity name="mouse_phenotype" query="select mp_id as id, 'phenotype' as type, mp_id, term from mp;">
+            <field column="id" name="id"/>
+            <field column="type" name="type"/>         
+            <field column="mp_id" name="mp_id"/>
+            <field column="term" name="term"/>
+        </entity>
 			
         <!--disease_gene_summary i.e. query by disease_id get back associated genes-->
-        <entity name="disease_gene_summary" transformer="RegexTransformer" query="select concat(disease_id, '_', mdgs.model_gene_id) as id, disease_id, 'disease_gene_summary' as type, mdgs.model_gene_id, mgo.model_gene_symbol, hgnc_id, hgnc_gene_symbol, human_curated, mod_curated, in_locus, max_mod_disease_to_model_perc_score as max_mod_score, max_htpc_disease_to_model_perc_score as max_htpc_score, mod_raw_score as raw_mod_score, htpc_raw_score as raw_htpc_score from mouse_disease_gene_summary mdgs join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id;">
+        <entity name="disease_gene_summary" query="select concat(disease_id, '_', mdgs.model_gene_id) as id, disease_id, 'disease_gene_summary' as type, mdgs.model_gene_id as model_gene_id, mgo.model_gene_symbol as model_gene_symbol, hgnc_id, hgnc_gene_symbol, human_curated, mod_curated as mod_curated, in_locus, max_mod_disease_to_model_perc_score as max_mod_score, max_htpc_disease_to_model_perc_score as max_htpc_score, mod_raw_score as raw_mod_score, htpc_raw_score as raw_htpc_score from mouse_disease_gene_summary mdgs join mouse_gene_ortholog mgo on mgo.model_gene_id = mdgs.model_gene_id;">
             <field column="id" name="id"/>
-            <field column="type" splitBy="," name="type"/>            
+            <field column="type" name="type"/>            
             <field column="disease_id" name="disease_id"/>
             <field column="hgnc_id" name="hgnc_id"/>
-            <field column="hgnc_gene_symbol" name="human_marker_symbol"/>
+            <field column="hgnc_gene_symbol" name="hgnc_gene_symbol"/>
             <field column="model_gene_id" name="marker_accession"/>
             <field column="model_gene_symbol" name="marker_symbol"/>
 
@@ -49,9 +107,9 @@
 
 
         <!--gene_disease_summary i.e. query by mod_gene_id get back associated diseases-->
-        <entity name="gene_disease_summary" transformer="RegexTransformer" query="select concat(model_gene_id, '_', d.disease_id) as id, model_gene_id, 'gene_disease_summary' as type, d.disease_id, disease_term, human_curated, mod_curated, in_locus, max_mod_model_to_disease_perc_score as max_mod_score, max_htpc_model_to_disease_perc_score as max_htpc_score, mod_raw_score as raw_mod_score, htpc_raw_score as raw_htpc_score from mouse_disease_gene_summary mdgs join disease d on d.disease_id = mdgs.disease_id;">
+        <entity name="gene_disease_summary" query="select concat(model_gene_id, '_', d.disease_id) as id, model_gene_id as model_gene_id, 'gene_disease_summary' as type, d.disease_id, disease_term, human_curated, mod_curated as mod_curated, in_locus, max_mod_model_to_disease_perc_score as max_mod_score, max_htpc_model_to_disease_perc_score as max_htpc_score, mod_raw_score as raw_mod_score, htpc_raw_score as raw_htpc_score from mouse_disease_gene_summary mdgs join disease d on d.disease_id = mdgs.disease_id;">
             <field column="id" name="id"/>
-            <field column="type" splitBy="," name="type"/>            
+            <field column="type" name="type"/>            
             <field column="model_gene_id" name="marker_accession"/>
             <field column="disease_id" name="disease_id"/>
             <field column="disease_term" name="disease_term"/>
@@ -65,63 +123,24 @@
             <field column="raw_mod_score" name="raw_mod_score"/>
             <field column="raw_htpc_score" name="raw_htpc_score"/>
         </entity>
-
-        
-        <!--gene_summary-->
-        <entity name="gene" query="select mgo.model_gene_id as id, 'gene' as type, mgo.model_gene_id, model_gene_symbol, hgnc_id, hgnc_gene_symbol, hgnc_gene_locus, human_curated, mod_curated, mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus, mod_model, htpc_model, htpc_phenotype from mouse_gene_summary mgs join mouse_gene_ortholog mgo on mgo.model_gene_id = mgs.model_gene_id;">
-            <field column="id" name="id"/>
-            <field column="type" name="type"/>
-            <field column="model_gene_id" name="marker_accession"/>
-            <field column="model_gene_symbol" name="marker_symbol"/>
-            <field column="hgnc_id" name="hgnc_id"/>
-            <field column="hgnc_gene_symbol" name="human_marker_symbol"/>
-            <field column="hgnc_gene_locus" name="hgnc_gene_locus"/>
-			
-            <!--summary fields-->
-            <field column="human_curated" name="human_curated"/>
-            <field column="mod_curated" name="mouse_curated"/>
-            <field column="mgi_predicted" name="mgi_predicted"/>
-            <field column="htpc_predicted" name="impc_predicted"/>
-            <field column="mod_predicted_in_locus" name="mgi_predicted_in_locus"/>
-            <field column="htpc_predicted_in_locus" name="impc_predicted_in_locus"/>
-            <!--Project status fields -->
-            <field column="mod_model" name="mod_model"/>
-            <field column="htpc_model" name="htpc_model"/>
-            <field column="htpc_phenotype" name="htpc_phenotype"/>	
-        </entity>
-        
-        <!--mouse_model-->
-        <entity name="mouse_model" transformer="RegexTransformer" query="select mm.model_id as id, mm.model_id, 'mouse_model' as type, mgo.model_gene_id, mgo.model_gene_symbol, mm.source, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.hom_het from mouse_model mm join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id join mouse_gene_ortholog mgo on mgo.model_gene_id = mmgo.model_gene_id;">
-            <field column="id" name="id"/>
-            <field column="type" name="type"/>
-            <field column="mouse_model_id" name="mouse_model_id"/>
-            <field column="source" name="source"/>
-            <field column="model_gene_id" name="marker_accession"/>
-            <field column="model_gene_symbol" name="marker_symbol"/>
-            <field column="allelic_composition" name="allelic_composition"/>
-            <field column="genetic_background" name="genetic_background"/>
-            <field column="allelic_composition_link" name="allelic_composition_link"/>
-            <field column="hom_het" name="hom_het"/>
-
-            <entity name="mouse_phenotypes" query="select concat(mp.mp_id,  '_' , mp.term) as phenotype from mp join mouse_model_mp mmmp on mmmp.mp_id = mp.mp_id where mmmp.model_id = '${mouse_model.model_id}';">
-                <field column="phenotype" name="phenotypes"/>
-            </entity>
-        </entity>
-        
-        <!--human phenotypes-->
-        <entity name="human_phenotype" query="select hp_id as id, 'phenotype' as type, hp_id, term from hp;">
-            <field column="id" name="id"/>
-            <field column="type" name="type"/>         
-            <field column="hp_id" name="hp_id"/>
-            <field column="term" name="hp_term"/>
-        </entity>
        
-        <!--mouse phenotypes-->
-        <entity name="mouse_phenotype" query="select mp_id as id, 'phenotype' as type, mp_id, term from mp;">
+        <!--disease_model_association these are the details of how a disease is associated with a gene via it's models 
+        i.e. query by disease_id and gene_id to get back associated models and phenotype terms-->
+        <entity name="disease_model_association" transformer="RegexTransformer" query="select concat(mdma.disease_id, '_', mmgo.model_gene_id, '_', mdma.model_id) as id, 'disease_model_association' as type, mdma.disease_id, mmgo.model_gene_id as model_gene_id, mdma.model_id, mdma.lit_model, mdma.disease_to_model_perc_score as disease_to_model_perc_score, mdma.model_to_disease_perc_score as model_to_disease_perc_score, mdma.raw_score, mdma.hp_matched_terms, mdma.mp_matched_terms from mouse_disease_model_association mdma join mouse_model_gene_ortholog mmgo on mmgo.model_id = mdma.model_id;">
             <field column="id" name="id"/>
-            <field column="type" name="type"/>         
-            <field column="mp_id" name="mp_id"/>
-            <field column="term" name="mp_term"/>
+            <field column="type" name="type"/>            
+            <field column="disease_id" name="disease_id"/>
+            <field column="model_gene_id" name="marker_accession"/>
+            <field column="model_id" name="model_id"/>
+            <field column="lit_model" name="lit_model"/>
+            <field column="disease_to_model_perc_score" name="disease_to_model_score"/>
+            <field column="model_to_disease_perc_score" name="model_to_disease_score"/>
+            <field column="raw_score" name="raw_score"/>
+            <field column="hp_matched_terms" splitBy="," name="hp_matched_terms"/>
+            <field column="mp_matched_terms" splitBy="," name="mp_matched_terms"/>
         </entity>
+        
+        
+        <!-- HP-MP mappings too? -->
     </document>
 </dataConfig>
