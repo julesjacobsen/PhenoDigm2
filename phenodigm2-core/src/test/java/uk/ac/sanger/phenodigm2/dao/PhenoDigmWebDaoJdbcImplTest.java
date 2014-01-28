@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jdbc-test-services.xml"})
+@ContextConfiguration(locations = {"classpath:jdbc-test-context.xml"})
 public class PhenoDigmWebDaoJdbcImplTest extends PhenoDigmWebDaoTest {
     
     public PhenoDigmWebDaoJdbcImplTest() {

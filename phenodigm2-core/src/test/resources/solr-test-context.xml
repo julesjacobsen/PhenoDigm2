@@ -2,11 +2,33 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+      
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+            http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+            http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
 ">
     
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    
+    <bean id="phenodigmSolrJdbcDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${pheno.driverClassName}" />
+        <!-- For Solr there are idiosyncracies when using H2 de to case sensitivity of column names so the DB needs some custom settings-->
+        <property name="url" value="${pheno.url}${solr.h2.args}" />
+        <property name="username" value="${pheno.username}" />
+        <property name="password" value="${pheno.password}" />
+    </bean>
+            
+    <bean id="jndiDataSource" class="uk.ac.sanger.phenodigm2.dao.MockJndiDataSource">
+        <constructor-arg ref="phenodigmSolrJdbcDataSource"/>
+    </bean>
+
+    <!-- Put this mock JNDI datasource AFTER the jndiDataSource bean declaration as it needs creating before being registered 
+        if you don't there will be a Failure to load ApplicationContext error -->
+    <jee:jndi-lookup id="mockJndiDataSource" jndi-name="java:comp/env/jdbc/phenodigmDataSource" expected-type="javax.sql.DataSource"/>
+
     <!-- Using an embedded solr server -->
     <bean id="solrServer" class="org.apache.solr.client.solrj.embedded.EmbeddedSolrServer"> 
         <constructor-arg index="0" ref="coreContainer"/>
@@ -16,14 +38,24 @@
         This isn't ideal as there is a bit of a chicken-and-egg problem with integration testing the solr DAO
     -->
     <bean id="coreContainer" class="org.apache.solr.core.CoreContainer" init-method="load"> 
-        <constructor-arg index="0" value="../target/solr/"/>
+        <constructor-arg index="0" value="../phenodigm2-solr/target/solr/"/>
     </bean>
     
     <!-- Using an external solr server via HTTP -->    
-    <!--    <bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer"> 
-        <constructor-arg index="0" value="http://localhost:8084/phenodigm2/solr/phenodigm"/>
-    </bean>-->
-   
-    <bean id="phenoDigmWebDaoSolrImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoSolrImpl"/>
+    <!--<bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">--> 
+        <!--<constructor-arg index="0" value="http://localhost:8084/phenodigm2/solr/phenodigm"/>-->
+        <!--<constructor-arg index="0" value="http://web-solrdev-01.internal.sanger.ac.uk:8000/solr451/phenodigm"/>-->
+    <!--</bean>-->
+      
+    <!-- Now we're ready to set-up the solr core -->
+    <bean id="solrTestSetup" class="uk.ac.sanger.phenodigm2.dao.SolrTestSetup">
+        <constructor-arg index="0" ref="solrServer"/>
+        <!-- set this to false to disable clean and re-loading of the core -->
+        <constructor-arg index="1" value="false"/>
+    </bean>
+    
+    <!-- With the system in the correct state we can finally run the tests -->    
+    <bean id="phenoDigmWebDaoSolrImpl" class="uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoSolrImpl" depends-on="solrTestSetup"/>
+     
 
 </beans>

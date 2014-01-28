@@ -23,11 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
-import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
@@ -37,7 +35,7 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jdbc-test-services.xml"})
+@ContextConfiguration(locations = {"classpath:jdbc-test-context.xml"})
 public class PhenoDigmDaoJdbcImplTest {
     
     Logger logger = LoggerFactory.getLogger(PhenoDigmDaoJdbcImplTest.class);

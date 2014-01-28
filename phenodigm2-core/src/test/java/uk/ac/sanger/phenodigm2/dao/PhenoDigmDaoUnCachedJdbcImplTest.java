@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/jdbc-test-services.xml"})
+@ContextConfiguration(locations = {"classpath:/jdbc-test-context.xml"})
 public class PhenoDigmDaoUnCachedJdbcImplTest {
     
     Logger logger = LoggerFactory.getLogger(PhenoDigmDaoUnCachedJdbcImplTest.class);
