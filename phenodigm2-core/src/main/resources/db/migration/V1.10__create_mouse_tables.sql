@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS `mouse_model` (
   `genetic_background` VARCHAR(255) NULL,
   `allelic_composition_link` TEXT NULL,
   `hom_het` VARCHAR(3) NULL,
-  `model_phenotype_terms` TEXT NULL,
   PRIMARY KEY (`model_id`));
 
 

@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS `disease` (
   `disease_alts` TEXT NULL,
   `disease_locus` VARCHAR(255) NULL,
   `disease_classes` VARCHAR(255) NULL DEFAULT 'unclassified',
-  `disease_phenotype_terms` TEXT NULL,
   PRIMARY KEY (`disease_id`));
 
 
