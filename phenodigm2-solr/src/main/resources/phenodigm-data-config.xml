@@ -1,10 +1,14 @@
 <dataConfig>
     <!-- <dataSource name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource" batchSize="-1"/> -->
-    <dataSource type="JdbcDataSource" driver="org.h2.Driver" url="jdbc:h2:file://C:/Users/jj8/Documents/GitHub/PhenoDigm2/target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2" user="sa" password=""/> 
+    <dataSource type="JdbcDataSource" 
+                driver="org.h2.Driver" 
+                url="jdbc:h2:file:../target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2;DB_CLOSE_ON_EXIT=FALSE" 
+                user="sa" 
+                password=""/> 
 
     <document>       
         <!--disease_summary-->
-        <entity name="disease" transformer="RegexTransformer" query="select d.disease_id as id, 'disease' as type, d.disease_id as disease_id, disease_term, disease_alts, disease_classes as disease_classes, human_curated, mod_curated as mod_curated, mod_predicted as mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus from disease d join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
+        <entity name="disease" transformer="RegexTransformer" query="select d.disease_id as id, 'disease' as type, d.disease_id as disease_id, disease_term, disease_alts, disease_locus, disease_classes as disease_classes, human_curated, mod_curated as mod_curated, mod_predicted as mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus from disease d join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
             <field column="id" name="id"/>
             <field column="type" name="type"/>
             <field column="disease_id" name="disease_id"/>
