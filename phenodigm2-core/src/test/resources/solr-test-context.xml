@@ -51,7 +51,7 @@
     <bean id="solrTestSetup" class="uk.ac.sanger.phenodigm2.dao.SolrTestSetup">
         <constructor-arg index="0" ref="solrServer"/>
         <!-- set this to false to disable clean and re-loading of the core -->
-        <constructor-arg index="1" value="false"/>
+        <constructor-arg index="1" value="true"/>
     </bean>
     
     <!-- With the system in the correct state we can finally run the tests -->    
