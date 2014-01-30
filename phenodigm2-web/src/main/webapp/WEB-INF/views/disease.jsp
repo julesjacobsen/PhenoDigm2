@@ -76,7 +76,7 @@
         </p>
         
         <div class='topic'>Gene associations for ${disease.term} <a href="${disease.diseaseIdentifier.externalUri}">(${disease.diseaseId})</a> </div>
-<!--        <div class="container span12">
+        <div class="container span12">
             <div class="row-fluid dataset">
                 <h4 class="topic">Disease Details</h4>
                 <dl>
@@ -85,14 +85,19 @@
                         <dd>${synonym}</dd>
                     </c:forEach>
 
-                    <b style="color:#27408B">Locations:</b><br> 
-                    <c:forEach var="location" items="${disease.locations}">
-                        <dd>${location}</dd>
-                    </c:forEach>
+                    <b style="color:#27408B">Locus:</b><br> 
+                    <c:choose>
+                        <c:when test="${empty disease.locus}">
+                            -
+                        </c:when>
+                        <c:otherwise>
+                            <dd>${disease.locus}</dd>
+                        </c:otherwise>
+                    </c:choose>
                 </dl>
             </div>
-        </div>-->
-        <div class="container span12">
+        </div>
+<!--        <div class="container span12">
             <div class="row-fluid dataset">
                 <h4 class="topic">Curated Gene Associations</h4>
 
@@ -122,20 +127,20 @@
                                     <c:set var="associationSummary" value="${association.associationSummary}"></c:set>
                                         <tr id="${mouseGeneIdentifier.compoundIdentifier}" targetRowId="${humanGeneIdentifier.databaseAcc}_${mouseGeneIdentifier.databaseAcc}_${disease.diseaseIdentifier.databaseAcc}" style="cursor:help;color:#27408B;" rel="tooltip" data-placement="top" title="Click anywhere on row display phenotype terms" alt="Click row to display phenotype terms">
                                             <td>
-                                                <!--Human Gene Symbol-->
+                                                Human Gene Symbol
                                                 <a href="${humanGeneIdentifier.externalUri}">${humanGeneIdentifier.geneSymbol}</a> 
                                         </td>
                                         <td>
-                                            <!--Mouse Gene Symbol-->
+                                            Mouse Gene Symbol
                                             <a href="../gene/${mouseGeneIdentifier.databaseCode}:${mouseGeneIdentifier.databaseAcc}">${mouseGeneIdentifier.geneSymbol}</a> 
                                         </td>
 
-                                        <!--Associated in Human - Yes or empty-->   
+                                        Associated in Human - Yes or empty   
                                         <td>
                                             <c:if test="${associationSummary.associatedInHuman}">Yes</c:if>
                                             </td>  
                                             <td>
-                                                <!--Mouse Literature Evidence (MGI) - Yes or empty-->
+                                                Mouse Literature Evidence (MGI) - Yes or empty
                                             <c:if test="${associationSummary.hasLiteratureEvidence}">Yes</c:if>
                                             </td>                                    
                                             <td>
@@ -143,7 +148,7 @@
                                                     Yes
                                                 </c:if>
                                             </td>
-                                            <!--Mouse Phenotype Evidence (Phenodigm)-->
+                                            Mouse Phenotype Evidence (Phenodigm)
                                             <td>
                                                 <b style="color:#FF9000">${associationSummary.bestModScore}</b>   
                                         </td>
@@ -164,7 +169,7 @@
                     </c:otherwise>
                 </c:choose>
             </div>
-        </div>
+        </div>-->
         <div class="row-fluid dataset">
             <div class="container span12">
                 <h4 class="topic">Phenotypic Gene Associations <a href='http://www.sanger.ac.uk/resources/databases/phenodigm/'></a></h4>

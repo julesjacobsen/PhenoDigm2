@@ -89,7 +89,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
             disease = new Disease(diseaseId);
             disease.setTerm((String) solrDocument.getFieldValue("disease_term"));
             disease.setAlternativeTerms((List<String>) solrDocument.getFieldValue("disease_alts"));
-            disease.setLocations((List<String>) solrDocument.getFieldValue("disease_locus"));
+            disease.setLocus((String) solrDocument.getFieldValue("disease_locus"));
             disease.setClasses((List<String>) solrDocument.getFieldValue("disease_classes"));
 
             logger.debug("Made {}", disease);

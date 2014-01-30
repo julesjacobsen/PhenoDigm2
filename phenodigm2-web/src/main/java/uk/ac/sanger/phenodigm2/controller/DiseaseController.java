@@ -62,7 +62,9 @@ public class DiseaseController {
         logger.info(String.format("Found disease: %s %s", disease.getDiseaseId(), disease.getTerm()));
         model.addAttribute("disease", disease);
 
+        logger.info(String.format("%s - getting gene-disease associations using cutoff %s", diseaseId, rawScoreCutoff));
         List<GeneAssociationSummary> geneAssociationSummarys = phenoDigmDao.getDiseaseToGeneAssociationSummaries(diseaseIdentifier, rawScoreCutoff);
+        logger.info(String.format("%s - recieved %s gene-disease associations", diseaseId, geneAssociationSummarys.size()));
 
         List<GeneAssociationSummary> curatedAssociationSummaries = new ArrayList<GeneAssociationSummary>();
         List<GeneAssociationSummary> phenotypeAssociationSummaries = new ArrayList<GeneAssociationSummary>();

@@ -436,10 +436,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
             while (rs.next()) {
                     disease = new Disease(rs.getString("disease_id"));
                     disease.setTerm(rs.getString("disease_term"));
-                    List<String> loci = new ArrayList<String>();
-                    String diseaseloci = rs.getString("disease_locus");
-                    loci.addAll(Arrays.asList(diseaseloci.split(",")));
-                    disease.setLocations(loci);
+                    String locus = rs.getString("disease_locus");
+                    disease.setLocus(locus);
 
                     List<String> altTerms = new ArrayList<String>();
                     String synonyms = rs.getString("disease_alts");

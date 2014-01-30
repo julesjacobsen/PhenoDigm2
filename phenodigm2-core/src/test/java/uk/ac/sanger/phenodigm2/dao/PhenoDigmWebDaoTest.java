@@ -153,16 +153,16 @@ public abstract class PhenoDigmWebDaoTest {
         Disease expectedResult = new Disease();
         expectedResult.setDiseaseIdentifier(omimDiseaseId);
         expectedResult.setTerm("PFEIFFER SYNDROME");
-        List<String> pfeifferAlternativeTerms = new ArrayList<String>();
+        List<String> pfeifferAlternativeTerms = new ArrayList();
         pfeifferAlternativeTerms.add("ACROCEPHALOSYNDACTYLY, TYPE V; ACS");
         pfeifferAlternativeTerms.add("ACS V");
         pfeifferAlternativeTerms.add("NOACK SYNDROME");
         pfeifferAlternativeTerms.add("CRANIOFACIAL-SKELETAL-DERMATOLOGIC DYSPLASIA, INCLUDED");
         expectedResult.setAlternativeTerms(pfeifferAlternativeTerms);
-        List<String> locations = new ArrayList();
-        locations.add("8p11.23-p11.22");
-        locations.add("10q26.13");
-        expectedResult.setLocations(locations);
+        expectedResult.setLocus("10q26.13");
+        List<String> pfeifferClasses = new ArrayList();
+        pfeifferClasses.add("unclassified");
+        expectedResult.setClasses(pfeifferClasses);
         
         Disease result = instance.getDisease(omimDiseaseId);
         logger.info("Made {}", result);

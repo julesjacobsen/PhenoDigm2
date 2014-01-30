@@ -118,15 +118,14 @@ public class DiseaseTest {
     }
 
     /**
-     * Test of getLocations method, of class Disease.
+     * Test of getLocus method, of class Disease.
      */
     @Test
-    public void testGetSetLocations() {
+    public void testGetSetLocus() {
         Disease instance = new Disease();
-        List<String> expResult = new ArrayList<String>();
-        expResult.add("location");
-        instance.setLocations(expResult);
-        List<String> result = instance.getLocations();
+        String expResult = "location";
+        instance.setLocus(expResult);
+        String result = instance.getLocus();
         assertEquals(expResult, result);
     }
 
@@ -186,7 +185,7 @@ public class DiseaseTest {
     public void testToString() {
         Disease instance = new Disease(new DiseaseIdentifier("OMIM:1234"));
         instance.setTerm("WIBBLE");
-        String expResult = "Disease{OMIM:1234 - WIBBLE, alternativeTerms=null, locations=null, classes=null}";
+        String expResult = "Disease{OMIM:1234 - WIBBLE, alternativeTerms=null, locus=null, classes=null}";
         String result = instance.toString();
         assertEquals(expResult, result);
 

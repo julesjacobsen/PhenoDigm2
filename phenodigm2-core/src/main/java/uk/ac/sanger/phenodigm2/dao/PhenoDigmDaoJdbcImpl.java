@@ -264,10 +264,10 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     if (!altTerms.isEmpty()) {
                         disease.setAlternativeTerms(makeStringListFromDelimitedString(altTerms, "\\|"));
                     }
-                    String loci = rs.getString("disease_locus");
-                    //add known disease loci - if there are any
-                    if (!loci.isEmpty()) {
-                        disease.setLocations(makeStringListFromDelimitedString(loci, ","));
+                    String locus = rs.getString("disease_locus");
+                    //add known disease locus - if there are any
+                    if (!locus.isEmpty()) {
+                        disease.setLocus(locus);
                     }
                     
                     String classes = rs.getString("disease_classes");

@@ -78,9 +78,10 @@ public class GeneController {
             logger.info(String.format("No human ortholog found for gene: %s", geneIdentifier));                
         }
         
-        logger.info("Getting disease-gene associations for gene: " + mgiId);
+        logger.info(String.format("%s - getting disease-gene associations using cutoff %s", geneIdentifier, rawScoreCutoff));
         List<DiseaseAssociationSummary> diseaseAssociationSummarys = phenoDigmDao.getGeneToDiseaseAssociationSummaries(geneIdentifier, rawScoreCutoff);
-        
+        logger.info(String.format("%s - recieved %s disease-gene associations", geneIdentifier, diseaseAssociationSummarys.size()));
+
         List<DiseaseAssociationSummary> curatedAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
         List<DiseaseAssociationSummary> phenotypeAssociationSummaries = new ArrayList<DiseaseAssociationSummary>();
           

@@ -28,7 +28,7 @@ public class Disease implements Comparable<Disease>{
     private DiseaseIdentifier diseaseIdentifier;
     private String term;
     private List<String> alternativeTerms;
-    private List<String> locations;
+    private String locus;
     private List<String> classes;
     private List<PhenotypeTerm> phenotypeTerms;
     
@@ -77,12 +77,12 @@ public class Disease implements Comparable<Disease>{
         this.alternativeTerms = alternativeTerms;
     }
 
-    public List<String> getLocations() {
-        return locations;
+    public String getLocus() {
+        return locus;
     }
 
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
+    public void setLocus(String locus) {
+        this.locus = locus;
     }
 
     public List<String> getClasses() {
@@ -135,7 +135,7 @@ public class Disease implements Comparable<Disease>{
     
     @Override
     public String toString() {
-        return "Disease{" + diseaseIdentifier + " - " + term + ", alternativeTerms=" + alternativeTerms + ", locations=" + locations + ", classes=" + classes + "}";
+        return "Disease{" + diseaseIdentifier + " - " + term + ", alternativeTerms=" + alternativeTerms + ", locus=" + locus + ", classes=" + classes + "}";
     }    
     
 }
