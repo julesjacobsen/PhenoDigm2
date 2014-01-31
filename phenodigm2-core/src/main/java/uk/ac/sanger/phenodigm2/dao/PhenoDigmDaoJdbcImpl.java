@@ -151,7 +151,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     }
 
     @Override
-    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId) {
+    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, Integer mouseModelId) {
         List<PhenotypeMatch> phenotypeMatchList;
         String sql = "select phenomap.disease_id as disease, phenomap.model_id as model_id, phenomap.ic as ic, phenomap.simJ as simJ, phenomap.mp_id as mp_term_id, mp.term as mp_term, phenomap.hp_id as hp_term_id, hp.term as hp_term, phenomap.lcs as lcs "
                 + "from mouse_disease_model_association_detail phenomap "
@@ -159,7 +159,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 + "join mp on mp.mp_id = phenomap.mp_id "
                 + "where disease_id = ? and model_id = ?;";
         
-        PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId, sql);
+        PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId.toString(), sql);
         
         phenotypeMatchList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeMatchesResultSetExtractor());
         

@@ -40,7 +40,7 @@ public interface PhenoDigmDao {
     //really needed?
     public List<PhenotypeTerm> getMouseModelPhenotypes(String mouseModelId);
     
-    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, String mouseModelId);
+    public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, Integer mouseModelId);
 
     public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff);
 

@@ -215,7 +215,7 @@ public abstract class PhenoDigmDaoTest {
     @Test
     public void testGetDiseaseAssociationPhenotypeMatches() {
         String diseaseId = "OMIM:101600";
-        String mouseModelId = "42";
+        Integer mouseModelId = 42;
         List<PhenotypeMatch> result = instance.getPhenotypeMatches(diseaseId, mouseModelId);
         PhenotypeMatch expectedMatch = new PhenotypeMatch();
         expectedMatch.setSimJ(0.853968);
