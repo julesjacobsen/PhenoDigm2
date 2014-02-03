@@ -15,6 +15,22 @@
         <version>1.3</version>
     </parent>
     
+    
+    <properties>
+        <jetty.version>9.0</jetty.version>
+        <!--NEO4J PROPERTIES-->
+        <neo4j.version>2.0.0</neo4j.version>
+        <!--Configures the name of the graph database-->
+        <neo4j.graph.name>phenodigm</neo4j.graph.name>
+        <!--Configures the buil directory of the graph db-->
+        <neo4j.build.dir>${project.build.directory}</neo4j.build.dir>
+        <!--Set the home directory of the Neo4J server--> 
+        <neo4j.server.home></neo4j.server.home>
+        <!--Set the url path of the Neo4J server--> 
+        <neo4j.server.url></neo4j.server.url>
+    </properties>
+    
+    
     <dependencies>
         <dependency>
             <groupId>uk.ac.sanger</groupId>
@@ -28,23 +44,30 @@
             <!--1.9.4 is needed for the spring-data-neo4j-rest to work-->
             <version>2.0.0</version>
         </dependency>
-<!--        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            1.9.4 is needed for the spring-data-neo4j-rest to work
-            <version>1.9.4</version>
-        </dependency>-->
-<!--        <dependency>
+        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-neo4j</artifactId>
-            <version>2.3.1.RELEASE</version>
-        </dependency>
--->        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-neo4j-rest</artifactId>
             <version>2.3.2.RELEASE</version>
-        </dependency>  
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-rest-graphdb</artifactId>
+            <version>1.9</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
-    
+    <repositories>
+        <repository>
+            <id>neo4j-release-repository</id>
+            <name>Neo4j Maven 2 release repository</name>
+            <url>http://m2.neo4j.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
     
