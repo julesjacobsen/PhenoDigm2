@@ -58,6 +58,7 @@ public class PhenoDigmGraphBuilder {
         logger.info(graphDb.toString());
         startDb(graphDb);
 //        clearDb();
+        initUniqueNodeFactories();
         loadGeneOrthologs();
         loadMouseModels();
         loadDiseases();
@@ -80,8 +81,6 @@ public class PhenoDigmGraphBuilder {
 
         try (Transaction tx = graphDb.beginTx()) {
 
-            initUniqueNodeFactories();
-
             String sql = "select model_gene_id, model_gene_symbol, hgnc_id, hgnc_gene_symbol, ifnull(hgnc_gene_locus, '-') as hgnc_gene_locus from mouse_gene_ortholog";
             
             this.jdbcTemplate.query(sql, new GeneOrthologRowCallbackHandler());
@@ -96,11 +95,9 @@ public class PhenoDigmGraphBuilder {
 
         try (Transaction tx = graphDb.beginTx()) {
 
-            initUniqueNodeFactories();
-
             String sql = "select hp_id, term from hp";
             
-            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(hpTermFactory, "hpId", "hp_id"));
+            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(hpTermFactory, "hp_id", "hp_id"));
             
             tx.success();
             logger.info("Done loading HP terms");
@@ -112,11 +109,9 @@ public class PhenoDigmGraphBuilder {
 
         try (Transaction tx = graphDb.beginTx()) {
 
-            initUniqueNodeFactories();
-
             String sql = "select mp_id, term from mp";
             
-            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(mpTermFactory, "mpId", "mp_id"));
+            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(mpTermFactory, "mp_id", "mp_id"));
             
             tx.success();
             logger.info("Done loading MP terms");
@@ -127,7 +122,6 @@ public class PhenoDigmGraphBuilder {
     public void loadMouseModels() {
         logger.info("Loading mouse models...");
         try (Transaction tx = graphDb.beginTx()) {
-            initUniqueNodeFactories();
 
             String sql = "select model_id, source, allelic_composition, genetic_background, ifnull(allelic_composition_link, '') as  allelic_composition_link, hom_het from mouse_model;";
 
@@ -147,7 +141,6 @@ public class PhenoDigmGraphBuilder {
     public void loadDiseases() {
         logger.info("Loading Diseases...");
         try (Transaction tx = graphDb.beginTx()) {
-            initUniqueNodeFactories();
 
             String sql = "select disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, disease_classes from disease;";
 
@@ -160,10 +153,13 @@ public class PhenoDigmGraphBuilder {
     }
 
     private void initUniqueNodeFactories() {
-        hpTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "hp") {
+        logger.info("Initializing unique node factories");
+        try (Transaction tx = graphDb.beginTx()) {
+
+            hpTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "hp") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("hpId", properties.get("hpId"));
+                created.setProperty("hp_id", properties.get("hp_id"));
                 created.addLabel(PhenoDigmLabel.HP);
             }
         };
@@ -171,7 +167,7 @@ public class PhenoDigmGraphBuilder {
         mpTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mp") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("mpId", properties.get("mpId"));
+                created.setProperty("mp_id", properties.get("mp_id"));
                 created.addLabel(PhenoDigmLabel.MP);
             }
         };
@@ -179,7 +175,7 @@ public class PhenoDigmGraphBuilder {
         mouseModelFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mouseModels") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("modelId", properties.get("modelId"));
+                created.setProperty("model_id", properties.get("model_id"));
                 created.addLabel(PhenoDigmLabel.MouseModel);
             }
         };
@@ -187,7 +183,7 @@ public class PhenoDigmGraphBuilder {
         geneFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "genes") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("geneId", properties.get("geneId"));
+                created.setProperty("gene_id", properties.get("gene_id"));
                 created.addLabel(PhenoDigmLabel.Gene);
             }
         };
@@ -195,10 +191,14 @@ public class PhenoDigmGraphBuilder {
         diseaseFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "diseases") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("diseaseId", properties.get("diseaseId"));
+                created.setProperty("disease_id", properties.get("disease_id"));
                 created.addLabel(PhenoDigmLabel.Disease);
             }
         };
+        tx.success();
+        }
+        logger.info("Unique node factories - initialized.");
+        
     }
 
     private void startDb(GraphDatabaseService graphDb) {
@@ -238,15 +238,15 @@ public class PhenoDigmGraphBuilder {
             int nodes = 0;
             while (rs.next()) {
                 //add the new nodes to the graph database
-                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", rs.getString("disease_id"));
+                Node diseaseNode = diseaseFactory.getOrCreate("disease_id", rs.getString("disease_id"));
 
-                diseaseNode.setProperty("diseaseTerm", rs.getString("disease_term"));
-                diseaseNode.setProperty("diseaseAlts", rs.getString("disease_alts"));
-                diseaseNode.setProperty("diseaseLocus", rs.getString("disease_locus"));
-                diseaseNode.setProperty("diseaseClasses", rs.getString("disease_classes"));
+                diseaseNode.setProperty("disease_term", rs.getString("disease_term"));
+                diseaseNode.setProperty("disease_alts", rs.getString("disease_alts"));
+                diseaseNode.setProperty("disease_locus", rs.getString("disease_locus"));
+                diseaseNode.setProperty("disease_classes", rs.getString("disease_classes"));
 
                 nodes++;
-                logger.debug("Made Disease node {} {}", diseaseNode.getProperty("diseaseId"), diseaseNode.getProperty("diseaseTerm"));
+                logger.debug("Made Disease node {} {}", diseaseNode.getProperty("disease_id"), diseaseNode.getProperty("disease_term"));
 
             }
             logger.info("Made {} disease nodes", nodes);
@@ -265,12 +265,12 @@ public class PhenoDigmGraphBuilder {
             logger.info("Creating mouse_model nodes");
 
             while (rs.next()) {
-                Node modelNode = mouseModelFactory.getOrCreate("modelId", rs.getInt("model_id"));
+                Node modelNode = mouseModelFactory.getOrCreate("model_id", rs.getInt("model_id"));
                 modelNode.setProperty("source", rs.getString("source"));
-                modelNode.setProperty("allelicComposition", rs.getString("allelic_composition"));
-                modelNode.setProperty("geneticBackground", rs.getString("genetic_background"));
-                modelNode.setProperty("allelicCompositionLink", rs.getString("allelic_composition_link"));
-                modelNode.setProperty("homHet", rs.getString("hom_het"));
+                modelNode.setProperty("allelic_composition", rs.getString("allelic_composition"));
+                modelNode.setProperty("genetic_background", rs.getString("genetic_background"));
+                modelNode.setProperty("allelic_composition_link", rs.getString("allelic_composition_link"));
+                modelNode.setProperty("hom_het", rs.getString("hom_het"));
                 nodes++;
             }
             logger.info("Made {} mouse_model nodes", nodes);
@@ -289,15 +289,15 @@ public class PhenoDigmGraphBuilder {
             logger.info("Making gene orthologs");
             while(rs.next()) {
                 
-                Node mouseGene = geneFactory.getOrCreate("geneId", rs.getString("model_gene_id"));
-                mouseGene.setProperty("geneSymbol", rs.getString("model_gene_symbol"));
+                Node mouseGene = geneFactory.getOrCreate("gene_id", rs.getString("model_gene_id"));
+                mouseGene.setProperty("model_gene_symbol", rs.getString("model_gene_symbol"));
                 mouseNodes++;
                 
                 String hgnc_id = rs.getString("hgnc_id");
                 if (hgnc_id != null) {
-                    Node humanGene = geneFactory.getOrCreate("geneId", hgnc_id);
-                    humanGene.setProperty("geneSymbol", rs.getString("hgnc_gene_symbol"));
-                    humanGene.setProperty("geneLocus", rs.getString("hgnc_gene_locus"));
+                    Node humanGene = geneFactory.getOrCreate("gene_id", hgnc_id);
+                    humanGene.setProperty("hgnc_gene_symbol", rs.getString("hgnc_gene_symbol"));
+                    humanGene.setProperty("hgnc_gene_locus", rs.getString("hgnc_gene_locus"));
                     humanNodes++;
                     mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
                 }                
