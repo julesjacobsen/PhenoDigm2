@@ -13,5 +13,5 @@ import org.neo4j.graphdb.Label;
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public enum PhenoDigmLabel implements Label {
-    Disease, Gene, MouseModel, Phenotype;
+    Disease, Gene, MouseModel, HP, MP;
 }

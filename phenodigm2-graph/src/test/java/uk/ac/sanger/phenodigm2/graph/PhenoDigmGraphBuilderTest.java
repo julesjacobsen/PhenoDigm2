@@ -18,24 +18,21 @@ import org.neo4j.kernel.impl.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
-import uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl;
+
 
 /**
  *
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/jdbc-test-services.xml"})
+@ContextConfiguration(locations = {"classpath:/application-test-context.xml"})
 public class PhenoDigmGraphBuilderTest {
     
     @Autowired
-    PhenoDigmDao phenoDigmDao;// = new PhenoDigmDaoStubImpl();
-    
-//    private static final String TEST_DB_PATH = "target/phenodigm_graph_test.db";
-    private static final String TEST_DB_PATH = "target/phenodigm.graphdb";
-    
+    PhenoDigmGraphBuilder instance;
+
     public PhenoDigmGraphBuilderTest() {
+        instance = new PhenoDigmGraphBuilder();
     }
     
     @BeforeClass
@@ -62,17 +59,6 @@ public class PhenoDigmGraphBuilderTest {
     @Test
     public void testBuildGraphDatabase() {
         System.out.println("buildGraphDatabase");
-        String dbPath = TEST_DB_PATH;
-        PhenoDigmGraphBuilder instance = new PhenoDigmGraphBuilder();
-        instance.buildGraphDatabase(phenoDigmDao, dbPath);
-    }
-  
-    private void clearDb() {
-        System.out.println("Clearing DB at " + TEST_DB_PATH);
-        try {
-            FileUtils.deleteRecursively(new File(TEST_DB_PATH));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        instance.buildGraphDatabase();
     }
 }

@@ -37,7 +37,7 @@ import uk.ac.sanger.phenodigm2.model.Disease;
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/applicationContext-Graph.xml"})
+@ContextConfiguration(locations = {"classpath:/application-test-context.xml"})
 public class RestQueryExamplesTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

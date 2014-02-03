@@ -41,12 +41,16 @@ import uk.ac.sanger.phenodigm2.graph.converter.DiseaseNodeConverter;
 import uk.ac.sanger.phenodigm2.graph.converter.NodeConverter;
 import uk.ac.sanger.phenodigm2.graph.converter.PhenotypeNodeConverter;
 import uk.ac.sanger.phenodigm2.model.Disease;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
+import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
+import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
+import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  *
@@ -57,16 +61,15 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
 
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmDaoNeo4jImpl.class);
 
-    @Autowired
     private RestGraphDatabase graphDatabaseService;
 
     private RestCypherQueryEngine queryEngine;
 
-    private void init() {
+    public PhenoDigmDaoNeo4jImpl(RestGraphDatabase graphDatabaseService) {
+        this.graphDatabaseService = graphDatabaseService;
         RestAPI restAPI = ((RestGraphDatabase) graphDatabaseService).getRestAPI();
         queryEngine = new RestCypherQueryEngine(restAPI);
     }
-
     
     @Override
     public Set<Disease> getAllDiseses() {
@@ -113,101 +116,12 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
     }
 
     @Override
-    public Disease getDiseaseByDiseaseId(String string) {
+    public Disease getDisease(uk.ac.sanger.phenodigm2.model.DiseaseIdentifier diseaseId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Set<Disease> getDiseasesByHgncGeneId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Set<Disease> getDiseasesByMgiGeneId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<Disease, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForMgiGeneId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<Disease, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForMgiGeneId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getKnownDiseaseAssociationsForDiseaseId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<GeneIdentifier, Set<DiseaseModelAssociation>> getPredictedDiseaseAssociationsForDiseaseId(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Set<GeneIdentifier> getAllMouseGeneIdentifiers() {
-        String cypher = "MATCH (mouseGene:Gene) WHERE mouseGene.geneId =~ 'MGI:.*' RETURN mouseGene.geneSymbol, mouseGene.geneId;";
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
-        Iterator<Map<String, Object>> results = queryEngine.query(cypher, null).iterator();
-
-        Set<GeneIdentifier> returnSet = new TreeSet<GeneIdentifier>();
-        
-        while (results.hasNext()) {
-            Map<String, Object> result = results.next();
-            String geneSymbol = (String) result.get("mouseGene.geneSymbol");
-            String geneId = (String) result.get("mouseGene.geneId");
-//            logger.info("{} {}", geneSymbol, geneId);
-            GeneIdentifier mouseIdentifier = new GeneIdentifier(geneSymbol, geneId);
-//            logger.info("Made {}", mouseIdentifier);
-            returnSet.add(mouseIdentifier);
-        }
-        
-        return returnSet;
-    }
-
-    @Override
-    public GeneIdentifier getGeneIdentifierForMgiGeneId(String mgiGeneId) {
-        String cypher = "MATCH (gene:Gene) WHERE gene.geneId ={mgiGeneId} RETURN gene.geneSymbol;";
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
-        Iterator<Map<String, Object>> results = queryEngine.query(cypher, MapUtil.map("mgiGeneId", mgiGeneId)).iterator();
-
-        GeneIdentifier geneIdentifier = null;
-        while (results.hasNext()) {
-            Map<String, Object> result = results.next();
-            geneIdentifier = new GeneIdentifier( (String) result.get("gene.geneSymbol"), mgiGeneId);
-//        logger.info("{}", geneIdentifier);
-            return geneIdentifier;
-        }
-        logger.info("No gene identifier found for query: {}", mgiGeneId);
-        return geneIdentifier;
-    }
-
-    @Override
-    public GeneIdentifier getHumanOrthologIdentifierForMgiGeneId(String mgiGeneId) {
-        String cypher = "MATCH (gene:Gene)-[:IS_ORTHOLOG_OF]-> humanGene WHERE gene.geneId ={mgiGeneId} RETURN humanGene.geneSymbol, humanGene.geneId;";
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
-        QueryResult<Map<String, Object>> result = queryEngine.query(cypher, MapUtil.map("mgiGeneId", mgiGeneId));
-        
-        GeneIdentifier geneIdentifier = null;
-        
-        for (Map<String, Object> map : result) {
-//            logger.info("{}", map);
-            geneIdentifier = new GeneIdentifier((String) map.get("humanGene.geneSymbol"), (String) map.get("humanGene.geneId"));
-        }
-        
-        if (geneIdentifier == null) {
-            logger.info("Unable to fund human ortholog of {}", mgiGeneId);   
-
-        }
-//        logger.info("{}", geneIdentifier);   
-        return geneIdentifier;    
-    }
-
-    @Override
-    public List<PhenotypeTerm> getDiseasePhenotypeTerms(String diseaseId) {
+    public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
         String cypher = "MATCH (disease:Disease) <- [:IS_PHENOTYPE_OF] - phenotype "
                 + "WHERE disease.diseaseId = {diseaseId} "
                 + "RETURN phenotype";
@@ -235,12 +149,12 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
     }
 
     @Override
-    public List<PhenotypeTerm> getMouseModelPhenotypeTerms(String string) {
+    public List<PhenotypeTerm> getMouseModelPhenotypes(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<PhenotypeMatch> getPhenotypeMatches(String string, String string1) {
+    public List<PhenotypeMatch> getPhenotypeMatches(String string, Integer modelId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -272,6 +186,22 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
         logger.info("No gene matching {} found.", geneIdentifier);
         return null;
     }
+
+    @Override
+    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
     private static class DiseaseResultSetExtractor implements ResultSetExtractor<Set<Disease>> {
 

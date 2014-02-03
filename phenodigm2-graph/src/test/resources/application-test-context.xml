@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/data/neo4j http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+">
+
+    
+    <context:property-placeholder location="classpath:neo4j.properties"/>
+
+    <import resource="jdbc-test-services.xml"/>
+
+<!--    <bean class="org.springframework.context.annotation.ConfigurationClassPostProcessor"/>
+
+        <bean id="restGraphDatabaseService"
+          class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
+        <constructor-arg index="0" value="${neo4j.server.url}" />
+        <constructor-arg index="1" value="${neo4j.server.login}" />
+        <constructor-arg index="2" value="${neo4j.server.password}" />
+    </bean>-->
+
+    <util:map id="config">
+        <entry key="enable_remote_shell" value="true"/>
+    </util:map>
+ 
+    <bean id="graphDbFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory"/>
+ 
+    <bean id="graphDbBuilder" factory-bean="graphDbFactory" factory-method="newEmbeddedDatabaseBuilder">
+        <constructor-arg value="../target/phenodigm2.graphdb"/>
+    </bean>
+ 
+    <bean id="graphDbBuilderFinal" factory-bean="graphDbBuilder" factory-method="setConfig">
+        <constructor-arg ref="config"/>
+    </bean>
+ 
+    <bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
+    
+<!--     cofigure the components of the application 
+    <bean id="phenodigmDaoNeo4jImpl" class="uk.ac.sanger.phenodigm2.graph.PhenoDigmDaoNeo4jImpl">
+        <constructor-arg ref="restGraphDatabaseService"/>
+    </bean>-->
+    
+    <bean id="phenoDigmGraphBuilder" class="uk.ac.sanger.phenodigm2.graph.PhenoDigmGraphBuilder"></bean>
+</beans>

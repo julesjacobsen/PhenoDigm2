@@ -5,6 +5,8 @@
  */
 package uk.ac.sanger.phenodigm2.graph;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,13 +19,19 @@ import org.neo4j.graphdb.index.UniqueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
-import uk.ac.sanger.phenodigm2.model.Disease;
-import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
-import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
-import uk.ac.sanger.phenodigm2.model.MouseModel;
-import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
-import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
+//import uk.ac.sanger.phenodigm2.dao.PhenoDigmDao;
+//import uk.ac.sanger.phenodigm2.model.Disease;
+//import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
+//import uk.ac.sanger.phenodigm2.model.Gene;
+//import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
+//import uk.ac.sanger.phenodigm2.model.MouseModel;
+//import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
+//import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
+//import uk.ac.sanger.phenodigm2.web.AssociationSummary;
+//import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  * Builds the PhenoDigm graph database.
@@ -35,82 +43,100 @@ public class PhenoDigmGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmGraphBuilder.class);
 
     @Autowired
-    PhenoDigmDao phenoDao;
-
+    JdbcTemplate jdbcTemplate;
+    @Autowired
     GraphDatabaseService graphDb;
 
-    UniqueFactory<Node> ontologyTermFactory;
-    UniqueFactory<Node> mouseModelFactory;
-    UniqueFactory<Node> geneFactory;
-    UniqueFactory<Node> diseaseFactory;
+    static UniqueFactory<Node> hpTermFactory;
+    static UniqueFactory<Node> mpTermFactory;
+    static UniqueFactory<Node> mouseModelFactory;
+    static UniqueFactory<Node> geneFactory;
+    static UniqueFactory<Node> diseaseFactory;
 
-    //TODO: use proper Builder pattern to enable selective build and test of database
-    public void buildGraphDatabase(PhenoDigmDao phenoDao, String dbPath) {
-
-        this.phenoDao = phenoDao;
-
-        startDb(dbPath);
+    public void buildGraphDatabase() {
+        logger.info(jdbcTemplate.toString());
+        logger.info(graphDb.toString());
+        startDb(graphDb);
 //        clearDb();
-        loadGeneIdentifiers();
+        loadGeneOrthologs();
         loadMouseModels();
         loadDiseases();
-        loadOrthologousDiseases();
-        loadPredictedDiseaseAssociations();
-        //these next ones might make things really slow...
-        loadDiseasePhenotypeTerms();
-        loadMouseModelPhenotypeTerms();
-        //this could take a long time too...
-        loadHpMpMappings();
+        loadHpTerms();
+        loadMpTerms();        
+//        loadOrthologousDiseases();
+//        loadDiseaseGeneAssociations();
+//        //these next ones might make things really slow...
+//        loadDiseasePhenotypeTerms();
+//        loadMouseModelPhenotypeTerms();
+//        //this could take a long time too...
+//        loadHpMpMappings();
 
         shutDown();
 
     }
 
-    private void loadGeneIdentifiers() {
+    public void loadGeneOrthologs() {
         logger.info("Loading gene orthologs...");
 
         try (Transaction tx = graphDb.beginTx()) {
 
             initUniqueNodeFactories();
 
-            //make the ortholog associations
-            for (GeneIdentifier mouseGeneIdentifier : phenoDao.getAllMouseGeneIdentifiers()) {
-                //get the humn ortholog
-                GeneIdentifier humanGeneIdentifier = phenoDao.getHumanOrthologIdentifierForMgiGeneId(mouseGeneIdentifier.getCompoundIdentifier());
-                //add the new nodes to the graph database
-                Node mouseGene = geneFactory.getOrCreate("geneId", mouseGeneIdentifier.getCompoundIdentifier());
-                mouseGene.setProperty("geneSymbol", mouseGeneIdentifier.getGeneSymbol());
-                if (humanGeneIdentifier != null) {
-                    Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
-                    humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
-
-                    mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
-                }
-
-//                humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
-            }
+            String sql = "select model_gene_id, model_gene_symbol, hgnc_id, hgnc_gene_symbol, ifnull(hgnc_gene_locus, '-') as hgnc_gene_locus from mouse_gene_ortholog";
+            
+            this.jdbcTemplate.query(sql, new GeneOrthologRowCallbackHandler());
+            
             tx.success();
             logger.info("Done loading gene orthologs");
         }
-        // END SNIPPET: transaction
+    }
+    
+    public void loadHpTerms() {
+        logger.info("Loading HP terms...");
+
+        try (Transaction tx = graphDb.beginTx()) {
+
+            initUniqueNodeFactories();
+
+            String sql = "select hp_id, term from hp";
+            
+            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(hpTermFactory, "hpId", "hp_id"));
+            
+            tx.success();
+            logger.info("Done loading HP terms");
+        }
+    }
+    
+        public void loadMpTerms() {
+        logger.info("Loading MP terms...");
+
+        try (Transaction tx = graphDb.beginTx()) {
+
+            initUniqueNodeFactories();
+
+            String sql = "select mp_id, term from mp";
+            
+            this.jdbcTemplate.query(sql, new PhenotypeRowCallbackHandler(mpTermFactory, "mpId", "mp_id"));
+            
+            tx.success();
+            logger.info("Done loading MP terms");
+        }
     }
 
-    private void loadMouseModels() {
+
+    public void loadMouseModels() {
         logger.info("Loading mouse models...");
         try (Transaction tx = graphDb.beginTx()) {
             initUniqueNodeFactories();
 
-            Set<MouseModel> mouseModels = phenoDao.getAllMouseModels();
-            for (MouseModel mouseModel : mouseModels) {
+            String sql = "select model_id, source, allelic_composition, genetic_background, ifnull(allelic_composition_link, '') as  allelic_composition_link, hom_het from mouse_model;";
 
-                Node modelNode = mouseModelFactory.getOrCreate("modelId", mouseModel.getMgiModelId());
-                modelNode.setProperty("geneId", mouseModel.getMgiGeneId());
+            this.jdbcTemplate.query(sql, new MouseModelRowCallbackHandler());
+
                 //link the model to the gene 
-                Node geneNode = geneFactory.getOrCreate("geneId", mouseModel.getMgiGeneId());
-                modelNode.createRelationshipTo(geneNode, PhenoDigmRelationshipType.IS_MOUSE_MODEL_OF);
-//                geneNode.createRelationshipTo(modelNode, PhenoDigmRelationshipType.HAS_MOUSE_MODEL);
-
-            }
+//                Node geneNode = geneFactory.getOrCreate("geneId", mouseModel.getMgiGeneId());
+//                modelNode.createRelationshipTo(geneNode, PhenoDigmRelationshipType.IS_MOUSE_MODEL_OF);
+            
             tx.success();
 
         }
@@ -118,22 +144,14 @@ public class PhenoDigmGraphBuilder {
         logger.info("Done loading mouse models");
     }
 
-    private void loadDiseases() {
+    public void loadDiseases() {
         logger.info("Loading Diseases...");
         try (Transaction tx = graphDb.beginTx()) {
             initUniqueNodeFactories();
 
-            for (Disease disease : phenoDao.getAllDiseses()) {
-                //add the new nodes to the graph database
-                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
+            String sql = "select disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, disease_classes from disease;";
 
-                if (!diseaseNode.hasProperty("diseaseTerm")) {
-                    diseaseNode.setProperty("diseaseTerm", disease.getTerm());
-                }
-
-                System.out.println("Made Disease node " + diseaseNode.getProperty("diseaseTerm"));
-
-            }
+            this.jdbcTemplate.query(sql, new DiseasRowCallbackHandler());
 
             tx.success();
         }
@@ -141,264 +159,20 @@ public class PhenoDigmGraphBuilder {
 
     }
 
-    private void loadOrthologousDiseases() {
-        logger.info("Loading orthologous gene disease associations...");
-        try (Transaction tx = graphDb.beginTx()) {
-            initUniqueNodeFactories();
-
-            //make the ortholog associations
-            for (Disease disease : phenoDao.getAllDiseses()) {
-                //add the new nodes to the graph database
-                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
-
-                for (GeneIdentifier mouseGeneIdentifier : disease.getAssociatedMouseGenes()) {
-                    //add the new nodes to the graph database
-                    Node mouseGene = geneFactory.getOrCreate("geneId", mouseGeneIdentifier.getCompoundIdentifier());
-                    if (!mouseGene.hasProperty("geneSymbol")) {
-                        mouseGene.setProperty("geneSymbol", mouseGeneIdentifier.getGeneSymbol());
-                        System.out.println("Made mouseGene node " + mouseGene.getProperty("geneSymbol"));
-                    }
-
-                    GeneIdentifier humanGeneIdentifier = phenoDao.getHumanOrthologIdentifierForMgiGeneId(mouseGeneIdentifier.getCompoundIdentifier());
-
-                    if (humanGeneIdentifier != null) {
-                        Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
-                        if (!humanGene.hasProperty("geneSymbol")) {
-                            humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
-                            System.out.println("Made humanGene node " + humanGene.getProperty("geneSymbol"));
-                        }
-
-                        if (!mouseGene.hasRelationship(PhenoDigmRelationshipType.IS_ORTHOLOG_OF)) {
-                            mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
-                            //                        humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
-                        }
-                        humanGene.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH);
-                    }
-                    mouseGene.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH_BY_ORTHOLOGY);
-
-//                    diseaseNode.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.HAS_ORTHOLOGOUS_GENE_ASSOCIATION);
-//                    diseaseNode.createRelationshipTo(humanGene, PhenoDigmRelationshipType.HAS_GENE_ASSOCIATION);
-                }
-
-            }
-            tx.success();
-            logger.info("Done loading orthologous gene disease associations.");
-        }
-    }
-
-    private void loadDiseasePhenotypeTerms() {
-        logger.info("Loading Disease phenotype terms...");
-        try (Transaction tx = graphDb.beginTx()) {
-
-            initUniqueNodeFactories();
-
-            for (Disease disease : phenoDao.getAllDiseses()) {
-                //add the new nodes to the graph database
-                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
-
-                if (!diseaseNode.hasProperty("diseaseTerm")) {
-                    diseaseNode.setProperty("diseaseTerm", disease.getTerm());
-                }
-                //make disease ontology terms - SLOW!!!
-                for (PhenotypeTerm term : phenoDao.getDiseasePhenotypeTerms(disease.getDiseaseId())) {
-                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getId());
-                    if (!termNode.hasProperty("termName")) {
-                        termNode.setProperty("termName", term.getTerm());
-                    }
-                    termNode.createRelationshipTo(diseaseNode, PhenoDigmRelationshipType.IS_PHENOTYPE_OF);
-//                    diseaseNode.createRelationshipTo(termNode, PhenoDigmRelationshipType.HAS_PHENOTYPE);
-                }
-
-            }
-
-            tx.success();
-        }
-        logger.info("Done loading disease phenotype terms");
-
-    }
-
-    private void loadMouseModelPhenotypeTerms() {
-        logger.info("Loading mouse model phenotypes...");
-        try (Transaction tx = graphDb.beginTx()) {
-            initUniqueNodeFactories();
-
-            Set<MouseModel> mouseModels = phenoDao.getAllMouseModels();
-            for (MouseModel mouseModel : mouseModels) {
-
-                Node modelNode = mouseModelFactory.getOrCreate("modelId", mouseModel.getMgiModelId());
-                if (!modelNode.hasProperty("geneId")) {
-                    modelNode.setProperty("geneId", mouseModel.getMgiGeneId());
-                }
-
-                //make the phenotype term nodes -- SLOW
-                List<PhenotypeTerm> mousePhenotypes = phenoDao.getMouseModelPhenotypeTerms(mouseModel.getMgiModelId());
-                for (PhenotypeTerm term : mousePhenotypes) {
-                    Node termNode = ontologyTermFactory.getOrCreate("termId", term.getId());
-                    if (!termNode.hasProperty("termName")) {
-                        termNode.setProperty("termName", term.getTerm());
-                    }
-                    //link model to phenotype
-                    termNode.createRelationshipTo(modelNode, PhenoDigmRelationshipType.IS_PHENOTYPE_OF);
-//                    modelNode.createRelationshipTo(termNode, PhenoDigmRelationshipType.HAS_PHENOTYPE);
-                }
-            }
-            tx.success();
-
-        }
-
-        logger.info("Done loading mouse model phenotypes");
-    }
-
-    private void loadPredictedDiseaseAssociations() {
-        logger.info("Loading predicted gene disease associations...");
-        try (Transaction tx = graphDb.beginTx()) {
-            initUniqueNodeFactories();
-
-            for (Disease disease : phenoDao.getAllDiseses()) {
-                //add the new nodes to the graph database
-                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", disease.getDiseaseId());
-
-                Map<GeneIdentifier, Set<DiseaseModelAssociation>> predictedDiseaseAssociations = phenoDao.getPredictedDiseaseAssociationsForDiseaseId(disease.getDiseaseId());
-//                logger.info("Making Predicted disease associations for node " + diseaseNode.getProperty("diseaseTerm"));
-                for (GeneIdentifier mouseGeneIdentifier : predictedDiseaseAssociations.keySet()) {
-
-                    Node mouseGene = geneFactory.getOrCreate("geneId", mouseGeneIdentifier.getCompoundIdentifier());
-                    if (!mouseGene.hasProperty("geneSymbol")) {
-                        mouseGene.setProperty("geneSymbol", mouseGeneIdentifier.getGeneSymbol());
-                        logger.info("Made mouseGene node " + mouseGene.getProperty("geneSymbol"));
-                    }
-
-                    GeneIdentifier humanGeneIdentifier = phenoDao.getHumanOrthologIdentifierForMgiGeneId(mouseGeneIdentifier.getCompoundIdentifier());
-                    if (humanGeneIdentifier != null) {
-                        Node humanGene = geneFactory.getOrCreate("geneId", humanGeneIdentifier.getCompoundIdentifier());
-                        if (!humanGene.hasProperty("geneSymbol")) {
-                            humanGene.setProperty("geneSymbol", humanGeneIdentifier.getGeneSymbol());
-                            logger.info("Made humanGene node " + humanGene.getProperty("geneSymbol"));
-                        }
-
-                        if (!mouseGene.hasRelationship(PhenoDigmRelationshipType.IS_ORTHOLOG_OF)) {
-                            mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
-                            //                        humanGene.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.IS_HUMAN_ORTHOLOG_OF);
-                        }
-                    } else {
-                        logger.info("No human ortholog found for " + mouseGeneIdentifier);
-                    }
-
-                    //add the predicted disease associations
-                    for (DiseaseModelAssociation disAssoc : predictedDiseaseAssociations.get(mouseGeneIdentifier)) {
-
-                        Node predictedDisease = diseaseFactory.getOrCreate("diseaseId", disAssoc.getDiseaseIdentifier().getCompoundIdentifier());
-                        //connect the predicted disease with the gene
-//                        predictedDisease.createRelationshipTo(mouseGene, PhenoDigmRelationshipType.HAS_PREDICTED_GENE_ASSOCIATION);
-                        //only want one IS_ASSOCIATED_WITH_BY_PREDICTION otherwise there will be as many of these as there are models
-                        boolean hasPredictedRelationshipToDisease = false;
-                        for (Relationship predictedRelationship : mouseGene.getRelationships(PhenoDigmRelationshipType.IS_ASSOCIATED_WITH_BY_PREDICTION)) {
-                            if (predictedRelationship.getEndNode().equals(predictedDisease)) {
-                                hasPredictedRelationshipToDisease = true;
-                                break;
-                            }
-                        }
-
-                        if (!hasPredictedRelationshipToDisease) {
-                            mouseGene.createRelationshipTo(predictedDisease, PhenoDigmRelationshipType.IS_ASSOCIATED_WITH_BY_PREDICTION);
-                        }
-
-                        //connect the predicted disease with the underlying mouse models for that gene
-                        Node mouseModelNode = mouseModelFactory.getOrCreate("modelId", disAssoc.getMouseModel().getMgiModelId());
-                        mouseModelNode.setProperty("geneSymbol", mouseGeneIdentifier.getGeneSymbol());
-                        Relationship rel = mouseModelNode.createRelationshipTo(predictedDisease, PhenoDigmRelationshipType.IS_PREDICTED_MODEL_OF);
-                        rel.setProperty("modelToDiseaseScore", disAssoc.getModelToDiseaseScore());
-                        rel.setProperty("diseaseToModelScore", disAssoc.getDiseaseToModelScore());
-//                        predictedDisease.createRelationshipTo(mouseModelNode, PhenoDigmRelationshipType.HAS_PREDICTED_MODEL).setProperty("diseaseToModelScore", disAssoc.getDiseaseToModelScore());
-                    }
-                }
-            }
-            tx.success();
-        }
-
-        logger.info("Done loading predicted diseases");
-    }
-
-    private void loadHpMpMappings() {
-        logger.info("Loading HP - MP mappings...");
-
-        //make the HP-MP associations TODO: This is NOT the way to do it efficiently - this should be a single query off the HP-MP mappings table which I can't see yet.
-        for (Disease disease : phenoDao.getAllDiseses()) {
-
-            try (Transaction tx = graphDb.beginTx()) {
-
-                initUniqueNodeFactories();
-
-                //add the new nodes to the graph database
-                //make predicted HP-MP mappings
-                Map<GeneIdentifier, Set<DiseaseModelAssociation>> predictedDiseaseAssociations = phenoDao.getPredictedDiseaseAssociationsForDiseaseId(disease.getDiseaseId());
-                for (GeneIdentifier mouseGeneIdentifier : predictedDiseaseAssociations.keySet()) {
-                    //add the predicted disease associations
-                    for (DiseaseModelAssociation disAssoc : predictedDiseaseAssociations.get(mouseGeneIdentifier)) {
-//                        logger.info("Loading predicted disease HP-MP mappings " + disease.getDiseaseId() + " -> " + disAssoc.getMouseModel().getMgiModelId());
-
-                        List<PhenotypeMatch> phenotypeMatchList = phenoDao.getPhenotypeMatches(disease.getDiseaseId(), disAssoc.getMouseModel().getMgiModelId());
-                        for (PhenotypeMatch phenotypeMatch : phenotypeMatchList) {
-                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getId());
-                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getId());
-                            //matches between MP and HP nodes can be many to many so check that the match exists from the mp node
-                            boolean hasMatch = false;
-                            for (Relationship relationship : hp.getRelationships(PhenoDigmRelationshipType.PHENOTYPE_MATCH)) {
-                                if (relationship.getEndNode().equals(mp)) {
-                                    hasMatch = true;
-                                    break;
-                                }
-                            }
-                            if (!hasMatch) {
-                                Relationship rel = hp.createRelationshipTo(mp, PhenoDigmRelationshipType.PHENOTYPE_MATCH);
-                                rel.setProperty("IC", phenotypeMatch.getIc());
-                                rel.setProperty("SimJ", phenotypeMatch.getSimJ());
-                            }
-                        }
-                    }
-                }
-
-                logger.info("Loading known disease HP-MP mappings for " + disease.getDiseaseId());
-
-                //make known HP-MP mappings
-                Map<GeneIdentifier, Set<DiseaseModelAssociation>> knownDiseaseAssociations = phenoDao.getKnownDiseaseAssociationsForDiseaseId(disease.getDiseaseId());
-                for (GeneIdentifier mouseGeneIdentifier : knownDiseaseAssociations.keySet()) {
-                    //add the predicted disease associations
-                    for (DiseaseModelAssociation disAssoc : knownDiseaseAssociations.get(mouseGeneIdentifier)) {
-//                        logger.info("Loading known disease HP-MP mappings " + disease.getDiseaseId() + " -> " + disAssoc.getMouseModel().getMgiModelId());
-
-                        List<PhenotypeMatch> phenotypeMatchList = phenoDao.getPhenotypeMatches(disease.getDiseaseId(), disAssoc.getMouseModel().getMgiModelId());
-                        for (PhenotypeMatch phenotypeMatch : phenotypeMatchList) {
-                            Node hp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getHumanPhenotype().getId());
-                            Node mp = ontologyTermFactory.getOrCreate("termId", phenotypeMatch.getMousePhenotype().getId());
-                            //matches between MP and HP nodes can be many to many so check that the match exists from the hp node
-                            boolean hasMatch = false;
-                            for (Relationship relationship : hp.getRelationships(PhenoDigmRelationshipType.PHENOTYPE_MATCH)) {
-                                if (relationship.getEndNode().equals(mp)) {
-                                    hasMatch = true;
-                                    break;
-                                }
-                            }
-                            if (!hasMatch) {
-                                Relationship rel = hp.createRelationshipTo(mp, PhenoDigmRelationshipType.PHENOTYPE_MATCH);
-                                rel.setProperty("IC", phenotypeMatch.getIc());
-                                rel.setProperty("SimJ", phenotypeMatch.getSimJ());
-                            }
-                        }
-                    }
-                }
-                tx.success();
-            } 
-        }
-        logger.info("Done loading HP - MP mappings.");
-    }
-
     private void initUniqueNodeFactories() {
-        ontologyTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "ontology") {
+        hpTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "hp") {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
-                created.setProperty("termId", properties.get("termId"));
-                    created.addLabel(PhenoDigmLabel.Phenotype);
+                created.setProperty("hpId", properties.get("hpId"));
+                created.addLabel(PhenoDigmLabel.HP);
+            }
+        };
+        
+        mpTermFactory = new UniqueFactory.UniqueNodeFactory(graphDb, "mp") {
+            @Override
+            protected void initialize(Node created, Map<String, Object> properties) {
+                created.setProperty("mpId", properties.get("mpId"));
+                created.addLabel(PhenoDigmLabel.MP);
             }
         };
 
@@ -406,7 +180,7 @@ public class PhenoDigmGraphBuilder {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
                 created.setProperty("modelId", properties.get("modelId"));
-                    created.addLabel(PhenoDigmLabel.MouseModel);
+                created.addLabel(PhenoDigmLabel.MouseModel);
             }
         };
 
@@ -414,7 +188,7 @@ public class PhenoDigmGraphBuilder {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
                 created.setProperty("geneId", properties.get("geneId"));
-                    created.addLabel(PhenoDigmLabel.Gene);
+                created.addLabel(PhenoDigmLabel.Gene);
             }
         };
 
@@ -422,14 +196,14 @@ public class PhenoDigmGraphBuilder {
             @Override
             protected void initialize(Node created, Map<String, Object> properties) {
                 created.setProperty("diseaseId", properties.get("diseaseId"));
-                    created.addLabel(PhenoDigmLabel.Disease);
+                created.addLabel(PhenoDigmLabel.Disease);
             }
         };
     }
 
-    private void startDb(String dbPath) {
+    private void startDb(GraphDatabaseService graphDb) {
         System.out.println("Starting up database...");
-        graphDb = new EmbeddedNeo4j().getDatbase(dbPath, null);
+//        graphDb = new EmbeddedNeo4j().getDatbase(dbPath, null);
         registerShutdownHook(graphDb);
         System.out.println("Started database: " + graphDb.toString());
     }
@@ -452,5 +226,116 @@ public class PhenoDigmGraphBuilder {
                 graphDb.shutdown();
             }
         });
+    }
+
+    private static class DiseasRowCallbackHandler implements RowCallbackHandler {
+
+        public DiseasRowCallbackHandler() {
+        }
+
+        @Override
+        public void processRow(ResultSet rs) throws SQLException {
+            int nodes = 0;
+            while (rs.next()) {
+                //add the new nodes to the graph database
+                Node diseaseNode = diseaseFactory.getOrCreate("diseaseId", rs.getString("disease_id"));
+
+                diseaseNode.setProperty("diseaseTerm", rs.getString("disease_term"));
+                diseaseNode.setProperty("diseaseAlts", rs.getString("disease_alts"));
+                diseaseNode.setProperty("diseaseLocus", rs.getString("disease_locus"));
+                diseaseNode.setProperty("diseaseClasses", rs.getString("disease_classes"));
+
+                nodes++;
+                logger.debug("Made Disease node {} {}", diseaseNode.getProperty("diseaseId"), diseaseNode.getProperty("diseaseTerm"));
+
+            }
+            logger.info("Made {} disease nodes", nodes);
+
+        }
+    }
+
+    private static class MouseModelRowCallbackHandler implements RowCallbackHandler {
+
+        public MouseModelRowCallbackHandler() {
+        }
+
+        @Override
+        public void processRow(ResultSet rs) throws SQLException {
+            int nodes = 0;
+            logger.info("Creating mouse_model nodes");
+
+            while (rs.next()) {
+                Node modelNode = mouseModelFactory.getOrCreate("modelId", rs.getInt("model_id"));
+                modelNode.setProperty("source", rs.getString("source"));
+                modelNode.setProperty("allelicComposition", rs.getString("allelic_composition"));
+                modelNode.setProperty("geneticBackground", rs.getString("genetic_background"));
+                modelNode.setProperty("allelicCompositionLink", rs.getString("allelic_composition_link"));
+                modelNode.setProperty("homHet", rs.getString("hom_het"));
+                nodes++;
+            }
+            logger.info("Made {} mouse_model nodes", nodes);
+        }
+    }
+
+    private static class GeneOrthologRowCallbackHandler implements RowCallbackHandler {
+
+        public GeneOrthologRowCallbackHandler() {
+        }
+
+        @Override
+        public void processRow(ResultSet rs) throws SQLException {
+            int mouseNodes = 0;
+            int humanNodes = 0;
+            logger.info("Making gene orthologs");
+            while(rs.next()) {
+                
+                Node mouseGene = geneFactory.getOrCreate("geneId", rs.getString("model_gene_id"));
+                mouseGene.setProperty("geneSymbol", rs.getString("model_gene_symbol"));
+                mouseNodes++;
+                
+                String hgnc_id = rs.getString("hgnc_id");
+                if (hgnc_id != null) {
+                    Node humanGene = geneFactory.getOrCreate("geneId", hgnc_id);
+                    humanGene.setProperty("geneSymbol", rs.getString("hgnc_gene_symbol"));
+                    humanGene.setProperty("geneLocus", rs.getString("hgnc_gene_locus"));
+                    humanNodes++;
+                    mouseGene.createRelationshipTo(humanGene, PhenoDigmRelationshipType.IS_ORTHOLOG_OF);
+                }                
+            }
+            logger.info("Made {} mouse gene nodes mapped to {} human gene nodes", mouseNodes, humanNodes);
+
+        }
+    }
+    
+    private static class PhenotypeRowCallbackHandler implements RowCallbackHandler {
+        
+        UniqueFactory<Node> termFactory;
+        String uniqueId;
+        String columnName;
+        
+        public PhenotypeRowCallbackHandler(UniqueFactory<Node> termFactory, String uniqueId, String columnName) {
+            this.termFactory = termFactory;
+            this.uniqueId = uniqueId;
+            this.columnName = columnName;
+        }
+
+        @Override
+        public void processRow(ResultSet rs) throws SQLException {
+            int nodes = 0;
+            while (rs.next()) {
+                //add the new nodes to the graph database
+                logger.debug("{} {} {}",termFactory, uniqueId, rs.getString(columnName));
+                
+                Node phenotypeNode = termFactory.getOrCreate(uniqueId, rs.getString(columnName));
+
+                phenotypeNode.setProperty("term", rs.getString("term"));
+                
+                nodes++;
+                logger.debug("Made {} node {} {}", uniqueId, phenotypeNode.getProperty(uniqueId), phenotypeNode.getProperty("term"));
+
+            }
+            logger.info("Made {} {} nodes", nodes, uniqueId);
+
+        }
     }
 }
