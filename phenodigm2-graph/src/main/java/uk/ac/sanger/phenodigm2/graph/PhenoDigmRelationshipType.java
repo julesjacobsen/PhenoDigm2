@@ -21,29 +21,24 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public enum PhenoDigmRelationshipType implements RelationshipType {
     //gene-disease associations
-    IS_ASSOCIATED_WITH,
-//    HAS_GENE_ASSOCIATION,
-    IS_ASSOCIATED_WITH_BY_ORTHOLOGY,
-//    HAS_ORTHOLOGOUS_GENE_ASSOCIATION,
-    IS_ASSOCIATED_WITH_BY_PREDICTION,
-//    HAS_PREDICTED_GENE_ASSOCIATION,
-    //ortholog pairs
-//    IS_MOUSE_ORTHOLOG_OF,
-//    IS_HUMAN_ORTHOLOG_OF,
-    IS_ORTHOLOG_OF,
+    ASSOCIATED_WITH,
+    ASSOCIATED_WITH_BY_ORTHOLOGY,
+    ASSOCIATED_WITH_BY_PREDICTION,
+    
+//ortholog pairs
+    ORTHOLOG_OF,
     //gene-model associations
-    IS_MOUSE_MODEL_OF,
-//    HAS_MOUSE_MODEL,
-    //disease Association between mouse and disease
+    MOUSE_MODEL_OF,
+
+    //disease Association between mouse model and disease
     //PhenoDigm
-    IS_PREDICTED_MODEL_OF,
-//    HAS_PREDICTED_MODEL,
-    //MGI
-    IS_CURATED_MODEL_OF,
-//    HAS_CURATED_MODEL,
+    PREDICTED_MODEL_OF,
+    //MGI literature 
+    CURATED_LITERATURE_MODEL_OF,
+
     //HP / MP term associations
-    IS_PHENOTYPE_OF,
-//    HAS_PHENOTYPE,
+    PHENOTYPE_OF,
+
     //match between MP and HP term
     PHENOTYPE_MATCH
     ;
