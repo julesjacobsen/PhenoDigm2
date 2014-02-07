@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS `mouse_model` (
 DROP TABLE IF EXISTS `mp` ;
 
 CREATE TABLE IF NOT EXISTS `mp` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `mp_id` VARCHAR(12) NOT NULL,
   `term` VARCHAR(200) NULL,
-  PRIMARY KEY (`mp_id`));
+  PRIMARY KEY (`id`));
 
+CREATE INDEX `mp_id` ON `mp` (`mp_id` ASC);
 
 -- -----------------------------------------------------
 -- Table `mouse_model_mp`

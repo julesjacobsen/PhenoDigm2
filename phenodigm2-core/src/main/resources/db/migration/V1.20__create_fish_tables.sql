@@ -21,9 +21,12 @@ CREATE TABLE IF NOT EXISTS `fish_model` (
 DROP TABLE IF EXISTS `zp` ;
 
 CREATE TABLE IF NOT EXISTS `zp` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `zp_id` VARCHAR(12) NOT NULL,
   `term` VARCHAR(200) NULL,
-  PRIMARY KEY (`zp_id`));
+  PRIMARY KEY (`id`));
+
+CREATE INDEX `zp_id` ON `zp` (`zp_id` ASC);
 
 -- -----------------------------------------------------
 -- Table `fish_model_zp`
