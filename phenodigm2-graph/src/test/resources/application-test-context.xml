@@ -16,11 +16,11 @@
     
     <context:property-placeholder location="classpath:neo4j.properties"/>
 
-    <import resource="jdbc-test-services.xml"/>
+    <import resource="jdbc-test-context.xml"/>
 
-<!--    <bean class="org.springframework.context.annotation.ConfigurationClassPostProcessor"/>
-
-        <bean id="restGraphDatabaseService"
+    <bean class="org.springframework.context.annotation.ConfigurationClassPostProcessor"/>
+        
+<!--    <bean id="restGraphDatabaseService"
           class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
         <constructor-arg index="0" value="${neo4j.server.url}" />
         <constructor-arg index="1" value="${neo4j.server.login}" />
@@ -31,20 +31,27 @@
         <entry key="enable_remote_shell" value="true"/>
     </util:map>
  
-    <bean id="graphDbFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory"/>
- 
-    <bean id="graphDbBuilder" factory-bean="graphDbFactory" factory-method="newEmbeddedDatabaseBuilder">
+    <!--<bean id="graphDbFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory"/>-->
+<!--     <bean id="graphDbBuilder" factory-bean="graphDbFactory" factory-method="newEmbeddedDatabaseBuilder">
         <constructor-arg value="../target/phenodigm2.graphdb"/>
     </bean>
- 
+   
     <bean id="graphDbBuilderFinal" factory-bean="graphDbBuilder" factory-method="setConfig">
         <constructor-arg ref="config"/>
     </bean>
  
     <bean id="graphDatabaseService" factory-bean="graphDbBuilderFinal" factory-method="newGraphDatabase" destroy-method="shutdown" /> 
+ -->    
     
-<!--     cofigure the components of the application 
-    <bean id="phenodigmDaoNeo4jImpl" class="uk.ac.sanger.phenodigm2.graph.PhenoDigmDaoNeo4jImpl">
+ 
+    <bean id="batchDatabaseService" class="org.neo4j.unsafe.batchinsert.BatchInserters" factory-method="batchDatabase" destroy-method="shutdown" >
+        <constructor-arg value="../target/phenodigm2.graphdb"/>
+    </bean>
+ 
+     <!--<bean id="graphDatabaseService" factory-bean="batchDatabaseService" destroy-method="shutdown" />--> 
+
+<!--     configure the components of the application -->   
+<!--    <bean id="phenodigmDaoNeo4jImpl" class="uk.ac.sanger.phenodigm2.graph.PhenoDigmDaoNeo4jImpl">
         <constructor-arg ref="restGraphDatabaseService"/>
     </bean>-->
     
