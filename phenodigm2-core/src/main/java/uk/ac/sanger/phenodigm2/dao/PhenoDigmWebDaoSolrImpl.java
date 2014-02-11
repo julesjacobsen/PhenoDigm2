@@ -183,7 +183,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff) {
 
-        String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
+        String query = makeAssociationSummaryQuery(diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
         if (minRawScoreCutoff == 0) {
@@ -204,6 +204,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("max_mod_score");
         solrQuery.addField("max_htpc_score");
 
+        solrQuery.addSort("human_curated", SolrQuery.ORDER.desc);
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
         solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
 
@@ -242,7 +243,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff) {
 
-        String query = String.format("\"%s\" AND raw_mod_score:[%s TO *] ", geneId.getCompoundIdentifier(), minRawScoreCutoff);
+        String query = makeAssociationSummaryQuery(geneId.getCompoundIdentifier(), minRawScoreCutoff);
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
         if (minRawScoreCutoff == 0) {
@@ -260,6 +261,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("max_mod_score");
         solrQuery.addField("max_htpc_score");
 
+        solrQuery.addSort("human_curated", SolrQuery.ORDER.desc);
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
         solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
 
@@ -461,5 +463,9 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         }
 
         return phenotype;
+    }
+
+    private String makeAssociationSummaryQuery(String compoundIdentifier, double minRawScoreCutoff) {
+        return String.format("\"%s\" AND (human_curated:\"true\" OR mouse_curated:\"true\" OR raw_mod_score:[%s TO *]) ", compoundIdentifier, minRawScoreCutoff);
     }
 }
