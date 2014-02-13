@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
+import uk.ac.sanger.phenodigm2.model.ExternalIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -60,7 +61,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public Disease getDisease(DiseaseIdentifier diseaseId) {
 
-        String query = String.format("\"%s\"", diseaseId.getCompoundIdentifier());
+        String query = String.format("disease_id:\"%s\"", diseaseId.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease\"");
@@ -102,7 +103,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
     @Override
     public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
-        String query = String.format("\"%s\"", diseaseId.getCompoundIdentifier());
+        String query = String.format("disease_id:\"%s\"", diseaseId.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(query);
@@ -138,7 +139,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public Gene getGene(GeneIdentifier geneIdentifier) {
 
-        String query = String.format("\"%s\"", geneIdentifier.getCompoundIdentifier());
+        String query = String.format("marker_accession:\"%s\"", geneIdentifier.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"gene\"");
@@ -183,15 +184,16 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public List<GeneAssociationSummary> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minRawScoreCutoff) {
 
-        String query = makeAssociationSummaryQuery(diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
-        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
-        //rather than a few tens of ms   
-        if (minRawScoreCutoff == 0) {
-            query = String.format("\"%s\"", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
-        }
+        String query = String.format("disease_id:\"%s\"", diseaseId.getCompoundIdentifier(), minRawScoreCutoff);
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease_gene_summary\"");
+        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
+        //rather than a few tens of ms   
+        if (minRawScoreCutoff != 0) {
+            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *])", minRawScoreCutoff));
+        }
+        //add fields to return  
         solrQuery.addField("marker_accession");
         solrQuery.addField("marker_symbol");
         solrQuery.addField("hgnc_id");
@@ -210,7 +212,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
         //there will be more than 10 results for this - we want them all.
         solrQuery.setRows(ROWS);
-
+        
         SolrDocumentList resultsDocumentList;
 
         List<GeneAssociationSummary> geneAssociationSummaryList = new ArrayList<>();
@@ -243,15 +245,16 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public List<DiseaseAssociationSummary> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minRawScoreCutoff) {
 
-        String query = makeAssociationSummaryQuery(geneId.getCompoundIdentifier(), minRawScoreCutoff);
-        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
-        //rather than a few tens of ms   
-        if (minRawScoreCutoff == 0) {
-            query = String.format("\"%s\"", geneId.getCompoundIdentifier(), minRawScoreCutoff);
-        }
+        String query = String.format("marker_accession:\"%s\"", geneId.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"gene_disease_summary\"");
+        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
+        //rather than a few tens of ms   
+        if (minRawScoreCutoff != 0) {
+            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *])", minRawScoreCutoff));
+        }
+        //add fields to return
         solrQuery.addField("disease_id");
         solrQuery.addField("disease_term");
         //common fields
@@ -296,7 +299,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     @Override
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
 
-        String query = String.format("\"%s\" AND \"%s\"", diseaseId.getCompoundIdentifier(), geneId.getCompoundIdentifier());
+        String query = String.format("disease_id:\"%s\" AND marker_accession:\"%s\"", diseaseId.getCompoundIdentifier(), geneId.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"disease_model_association\"");
@@ -385,7 +388,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
      */
     private Map<Integer, MouseModel> getMouseModels(GeneIdentifier geneIdentifier) {
 
-        String query = String.format("\"%s\"", geneIdentifier.getCompoundIdentifier());
+        String query = String.format("marker_accession:\"%s\"", geneIdentifier.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
         solrQuery.addFilterQuery("type:\"mouse_model\"");
@@ -463,9 +466,5 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         }
 
         return phenotype;
-    }
-
-    private String makeAssociationSummaryQuery(String compoundIdentifier, double minRawScoreCutoff) {
-        return String.format("\"%s\" AND (human_curated:\"true\" OR mouse_curated:\"true\" OR raw_mod_score:[%s TO *]) ", compoundIdentifier, minRawScoreCutoff);
     }
 }
