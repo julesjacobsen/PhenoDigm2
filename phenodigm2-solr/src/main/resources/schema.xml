@@ -128,7 +128,7 @@
    <field name="source" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="allelic_composition" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
    <field name="genetic_background" type="text_en_splitting" indexed="true" stored="true" multiValued="false"/>
-   <field name="allelic_composition_link" type="string" indexed="true" stored="true" multiValued="false"/>
+   <field name="allele_ids" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hom_het" type="string" indexed="true" stored="true" multiValued="false"/>
   
    <!--project/curation status flags-->
