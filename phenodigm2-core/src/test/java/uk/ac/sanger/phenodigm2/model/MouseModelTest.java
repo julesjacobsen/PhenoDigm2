@@ -115,6 +115,29 @@ public class MouseModelTest {
         String result = instance.getSource();
         assertEquals(expResult, result);
     }
+    
+    /**
+     * Test of getAllelicCompositionLink method, of class MouseModel.
+     */
+    @Test
+    public void testGetAllelicCompositionLink() {
+        MouseModel instance = model1;
+        String expResult = "<a blah... todo />";
+        String result = instance.getAllelicCompositionLink();
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of getAllelicCompositionLink method, of class MouseModel.
+     */
+    @Test
+    public void testGetAllelicCompositionLinkMultipleAlleles() {
+        MouseModel instance = model2;
+        String expResult = "<a blah... todo />";
+        String result = instance.getAllelicCompositionLink();
+        assertEquals(expResult, result);
+    }
+    
     /**
      * Test of toString method, of class MouseModel.
      */
