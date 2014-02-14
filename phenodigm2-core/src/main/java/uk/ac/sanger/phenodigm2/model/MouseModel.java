@@ -20,6 +20,7 @@ public class MouseModel implements Comparable<MouseModel> {
     private String source;
     private String allelicComposition;    
     private String geneticBackground;
+    private String alleleIds;
     //link out to MGI - this is fiddly, so it's stored here for ease of reference
     private String allelicCompositionLink;
     
@@ -60,12 +61,16 @@ public class MouseModel implements Comparable<MouseModel> {
         this.geneticBackground = geneticBackground;
     }
 
-    public String getAllelicCompositionLink() {
-        return allelicCompositionLink;
+    public String getAlleleIds() {
+        return alleleIds;
     }
 
-    public void setAllelicCompositionLink(String allelicCompositionLink) {
-        this.allelicCompositionLink = allelicCompositionLink;
+    public void setAlleleIds(String alleleIds) {
+        this.alleleIds = alleleIds;
+    }
+
+    public String getAllelicCompositionLink() {
+        return allelicCompositionLink;
     }
 
     public String getSource() {
@@ -91,7 +96,7 @@ public class MouseModel implements Comparable<MouseModel> {
         hash = 29 * hash + (this.mgiModelId != null ? this.mgiModelId.hashCode() : 0);
         hash = 29 * hash + (this.allelicComposition != null ? this.allelicComposition.hashCode() : 0);
         hash = 29 * hash + (this.geneticBackground != null ? this.geneticBackground.hashCode() : 0);
-        hash = 29 * hash + (this.allelicCompositionLink != null ? this.allelicCompositionLink.hashCode() : 0);
+        hash = 29 * hash + (this.alleleIds != null ? this.alleleIds.hashCode() : 0);
         return hash;
     }
 
@@ -116,7 +121,7 @@ public class MouseModel implements Comparable<MouseModel> {
         if ((this.geneticBackground == null) ? (other.geneticBackground != null) : !this.geneticBackground.equals(other.geneticBackground)) {
             return false;
         }
-        if ((this.allelicCompositionLink == null) ? (other.allelicCompositionLink != null) : !this.allelicCompositionLink.equals(other.allelicCompositionLink)) {
+        if ((this.alleleIds == null) ? (other.alleleIds != null) : !this.alleleIds.equals(other.alleleIds)) {
             return false;
         }
         return true;
@@ -129,7 +134,7 @@ public class MouseModel implements Comparable<MouseModel> {
     
     @Override
     public String toString() {
-        return String.format("MouseModel{%s_%s (%s) %s %s}", mgiGeneId, mgiModelId, source, allelicComposition, geneticBackground);
+        return String.format("MouseModel{%s_%s (%s) %s %s %s}", mgiGeneId, mgiModelId, source, allelicComposition, geneticBackground, alleleIds);
     }
 
 }

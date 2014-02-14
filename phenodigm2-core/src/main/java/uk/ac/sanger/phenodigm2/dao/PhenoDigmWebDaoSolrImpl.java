@@ -399,7 +399,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("source");
         solrQuery.addField("genetic_background");
         solrQuery.addField("allelic_composition");
-        solrQuery.addField("allelic_composition_link");
+        solrQuery.addField("allele_ids");
         solrQuery.addField("hom_het");
         solrQuery.addField("phenotypes");
 
@@ -423,7 +423,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 String source = (String) solrDocument.getFieldValue("source");
                 String geneticBackground = (String) solrDocument.getFieldValue("genetic_background");
                 String allelicComposition = (String) solrDocument.getFieldValue("allelic_composition");
-                String allelicCompositionLink = (String) solrDocument.getFieldValue("allelic_composition_link");
+                String setAlleleIds = (String) solrDocument.getFieldValue("allele_ids");
                 String homHet = (String) solrDocument.getFieldValue("hom_het");
                 List<String> phenotypes = (List<String>) solrDocument.getFieldValue("phenotypes");
                 //make the phenotype terms
@@ -442,7 +442,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 model.setSource(source);
                 model.setGeneticBackground(geneticBackground);
                 model.setAllelicComposition(allelicComposition);
-                model.setAllelicCompositionLink(allelicCompositionLink);
+                model.setAlleleIds(setAlleleIds);
                 model.setPhenotypeTerms(phenotypeTerms);
 
                 logger.debug("Made {}", model);

@@ -79,7 +79,8 @@ public abstract class PhenoDigmWebDaoTest {
         }
         assertNotNull(expectedAssociationSummary);
         assertEquals(expectedHgncGeneIdentifier, expectedAssociationSummary.getHgncGeneIdentifier());
-        assertEquals(expectedSummary, expectedAssociationSummary.getAssociationSummary());    }
+        assertEquals(expectedSummary, expectedAssociationSummary.getAssociationSummary());    
+    }
     
     /**
      * Test of getDiseaseToGeneAssociationSummaries method, of class PhenoDigmWebDaoJdbcImpl.
@@ -254,7 +255,10 @@ public abstract class PhenoDigmWebDaoTest {
         assertNotNull(expectedModel);
         assertEquals("MGI:95523", expectedModel.getMgiGeneId());
         assertEquals(114, expectedModel.getMgiModelId(), 0);
-        
+        assertEquals("MGI:2153811", expectedModel.getAlleleIds());
+        //TODO...
+        assertEquals("html goes here...", expectedModel.getAllelicCompositionLink());
+
         //test the mouseModel phenotypes
         PhenotypeTerm expectedTerm = new PhenotypeTerm();
         expectedTerm.setId("MP:0000111");

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `fish_model` (
   `source` VARCHAR(45) NULL,
   `allelic_composition` VARCHAR(255) NULL,
   `genetic_background` VARCHAR(255) NULL,
-  `allelic_composition_link` TEXT NULL,
+  `allele_ids` VARCHAR(255) NULL,
   `hom_het` VARCHAR(3) NULL,
   PRIMARY KEY (`model_id`));
 

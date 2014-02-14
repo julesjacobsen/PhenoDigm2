@@ -22,9 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +145,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 //                + "join mp_term_infos mp on mp.term_id = mmm.mp_id \n"
 //                + "where disease_id = ? and mgi_gene_id = ?;";
 
-        String sql = "select disease_id, model_gene_id, dmma.model_id, source, lit_model, allelic_composition, allelic_composition_link, genetic_background, disease_to_model_perc_score, model_to_disease_perc_score, "
+        String sql = "select disease_id, model_gene_id, dmma.model_id, source, lit_model, allelic_composition, allele_ids, genetic_background, disease_to_model_perc_score, model_to_disease_perc_score, "
                 + "mp.mp_id, mp.term "
                 + "from mouse_disease_model_association dmma "
                 + "join mouse_model mm on mm.model_id = dmma.model_id "
@@ -368,7 +366,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     MouseModel model = new MouseModel();
                     model.setMgiModelId(mouseModelId);
                     model.setAllelicComposition(rs.getString("allelic_composition"));
-                    model.setAllelicCompositionLink(rs.getString("allelic_composition_link"));
+                    model.setAlleleIds(rs.getString("allele_ids"));
                     model.setGeneticBackground(rs.getString("genetic_background"));
                     model.setMgiGeneId(rs.getString("model_gene_id"));
                     model.setSource(rs.getString("source"));

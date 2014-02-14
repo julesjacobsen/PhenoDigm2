@@ -111,7 +111,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
             logger.info("Setting up mouse model cache...");
 
 //            String sql = "select mgm.mgi_gene_id, mm.mouse_model_id, mm.allelic_composition, mm.genetic_background, mm.allcomp_link, mm.source from mouse_models mm join mgi_gene_models mgm on mgm.mouse_model_id = mm.mouse_model_id order by mgm.mgi_gene_id;";
-            String sql = "select mmgo.model_gene_id, mm.model_id, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.source "
+            String sql = "select mmgo.model_gene_id, mm.model_id, mm.allelic_composition, mm.genetic_background, mm.allele_ids, mm.source "
                     + "from mouse_model mm "
                     + "join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id "
                     + "order by mmgo.model_gene_id;";
@@ -386,7 +386,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 mouseModel.setSource(rs.getString("source"));
                 mouseModel.setAllelicComposition(rs.getString("allelic_composition"));
                 mouseModel.setGeneticBackground(rs.getString("genetic_background"));
-                mouseModel.setAllelicCompositionLink(rs.getString("allelic_composition_link"));
+                mouseModel.setAlleleIds(rs.getString("allele_ids"));
                 mouseModel.setPhenotypeTerms(new ArrayList<PhenotypeTerm>());
 
                 mouseModelMap.put(mouseModel.getMgiModelId(), mouseModel);

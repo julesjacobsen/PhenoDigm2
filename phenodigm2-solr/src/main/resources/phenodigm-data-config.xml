@@ -56,7 +56,7 @@
         </entity>
         
         <!--mouse_model-->
-        <entity name="mouse_model" query="select mm.model_id as id, mm.model_id as model_id, 'mouse_model' as type, mgo.model_gene_id as model_gene_id, mgo.model_gene_symbol as model_gene_symbol, mm.source, mm.allelic_composition, mm.genetic_background, mm.allelic_composition_link, mm.hom_het from mouse_model mm join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id join mouse_gene_ortholog mgo on mgo.model_gene_id = mmgo.model_gene_id;">
+        <entity name="mouse_model" query="select mm.model_id as id, mm.model_id as model_id, 'mouse_model' as type, mgo.model_gene_id as model_gene_id, mgo.model_gene_symbol as model_gene_symbol, mm.source, mm.allelic_composition, mm.genetic_background, mm.allele_ids, mm.hom_het from mouse_model mm join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id join mouse_gene_ortholog mgo on mgo.model_gene_id = mmgo.model_gene_id;">
             <field column="id" name="id"/>
             <field column="type" name="type"/>
             <field column="model_id" name="model_id"/>
@@ -65,7 +65,7 @@
             <field column="model_gene_symbol" name="marker_symbol"/>
             <field column="allelic_composition" name="allelic_composition"/>
             <field column="genetic_background" name="genetic_background"/>
-            <field column="allelic_composition_link" name="allelic_composition_link"/>
+            <field column="allele_ids" name="allele_ids"/>
             <field column="hom_het" name="hom_het"/>
 
            <entity name="mouse_phenotypes" query="select concat(mp.mp_id, '_' , mp.term) as phenotype from mp join mouse_model_mp mmmp on mmmp.mp_id = mp.mp_id where mmmp.model_id = '${mouse_model.model_id}';">

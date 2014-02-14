@@ -37,7 +37,7 @@ public class MouseModelCacheTest {
         Fgfr2_8135.setMgiGeneId("MGI:95523");
         Fgfr2_8135.setMgiModelId(8135);
         Fgfr2_8135.setAllelicComposition("Fgfr2<m1Sgg>/Fgfr2<+>");
-        Fgfr2_8135.setAllelicCompositionLink(null);
+        Fgfr2_8135.setAlleleIds(null);
         Fgfr2_8135.setGeneticBackground("involves: C3H/HeJ * C57BL/6J");
         Fgfr2_8135.setPhenotypeTerms(new ArrayList<PhenotypeTerm>());
         mouseModelMap.put(Fgfr2_8135.getMgiModelId(), Fgfr2_8135);
@@ -47,7 +47,7 @@ public class MouseModelCacheTest {
         Fgfr2_8136.setMgiGeneId("MGI:95523");
         Fgfr2_8136.setMgiModelId(8136);
         Fgfr2_8136.setAllelicComposition("Fgfr2<m1Sgg>/Fgfr2<m1Sgg>");
-        Fgfr2_8136.setAllelicCompositionLink(null);
+        Fgfr2_8136.setAlleleIds(null);
         Fgfr2_8136.setGeneticBackground("involves: C3H/HeJ * C57BL/6J");
         Fgfr2_8136.setPhenotypeTerms(new ArrayList<PhenotypeTerm>());
         mouseModelMap.put(Fgfr2_8136.getMgiModelId(), Fgfr2_8136);

@@ -45,6 +45,7 @@ public class MouseModelTest {
         model1.setSource("MGI");
         model1.setAllelicComposition("hoopy");
         model1.setGeneticBackground("frood");
+        model1.setAlleleIds("MGI:7654321");
         
         model2 = new MouseModel();
         model2.setMgiGeneId("MGI:1233");
@@ -52,6 +53,7 @@ public class MouseModelTest {
         model2.setSource("MGP");
         model2.setAllelicComposition("sass");
         model2.setGeneticBackground("that");
+        model2.setAlleleIds("MGI:7654321|MGI:1234567");
     }
     
     @After
@@ -119,7 +121,7 @@ public class MouseModelTest {
     @Test
     public void testToString() {
         MouseModel instance = model1;
-        String expResult = "MouseModel{MGI:1234_4321 (MGI) hoopy frood}";
+        String expResult = "MouseModel{MGI:1234_4321 (MGI) hoopy frood MGI:7654321}";
         String result = instance.toString();
         assertEquals(expResult, result);
     }
