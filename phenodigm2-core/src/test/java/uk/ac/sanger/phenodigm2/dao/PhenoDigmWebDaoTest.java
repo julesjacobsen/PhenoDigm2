@@ -256,8 +256,7 @@ public abstract class PhenoDigmWebDaoTest {
         assertEquals("MGI:95523", expectedModel.getMgiGeneId());
         assertEquals(114, expectedModel.getMgiModelId(), 0);
         assertEquals("MGI:2153811", expectedModel.getAlleleIds());
-        //TODO...
-        assertEquals("html goes here...", expectedModel.getAllelicCompositionLink());
+        assertEquals("<a href=\"http://informatics.jax.org/accession/MGI:2153811\">Fgfr2<sup>tm1.1Dsn</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2153811\">Fgfr2<sup>tm1.1Dsn</sup></a>", expectedModel.getAllelicCompositionLink());
 
         //test the mouseModel phenotypes
         PhenotypeTerm expectedTerm = new PhenotypeTerm();

@@ -73,6 +73,10 @@ public class MouseModel implements Comparable<MouseModel> {
         return allelicCompositionLink;
     }
 
+    public void setAllelicCompositionLink(String alleleicCompositionLink) {
+        this.allelicCompositionLink = alleleicCompositionLink;
+    }
+    
     public String getSource() {
         return source;
     }

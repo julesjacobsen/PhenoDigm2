@@ -43,17 +43,19 @@ public class MouseModelTest {
         model1.setMgiGeneId("MGI:1234");
         model1.setMgiModelId(4321);
         model1.setSource("MGI");
-        model1.setAllelicComposition("hoopy");
-        model1.setGeneticBackground("frood");
-        model1.setAlleleIds("MGI:7654321");
+        model1.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
+        model1.setGeneticBackground("involves: 129S6/SvEvTac * C57BL/6");
+        model1.setAlleleIds("MGI:2135961");
+        model1.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>");
         
         model2 = new MouseModel();
         model2.setMgiGeneId("MGI:1233");
         model2.setMgiModelId(888);
         model2.setSource("MGP");
-        model2.setAllelicComposition("sass");
-        model2.setGeneticBackground("that");
-        model2.setAlleleIds("MGI:7654321|MGI:1234567");
+        model2.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
+        model2.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
+        model2.setAlleleIds("MGI:2136269|MGI:2136268");
+        model2.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
     }
     
     @After
@@ -122,7 +124,7 @@ public class MouseModelTest {
     @Test
     public void testGetAllelicCompositionLink() {
         MouseModel instance = model1;
-        String expResult = "<a blah... todo />";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>";
         String result = instance.getAllelicCompositionLink();
         assertEquals(expResult, result);
     }
@@ -133,7 +135,7 @@ public class MouseModelTest {
     @Test
     public void testGetAllelicCompositionLinkMultipleAlleles() {
         MouseModel instance = model2;
-        String expResult = "<a blah... todo />";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>";
         String result = instance.getAllelicCompositionLink();
         assertEquals(expResult, result);
     }
@@ -144,7 +146,7 @@ public class MouseModelTest {
     @Test
     public void testToString() {
         MouseModel instance = model1;
-        String expResult = "MouseModel{MGI:1234_4321 (MGI) hoopy frood MGI:7654321}";
+        String expResult = "MouseModel{MGI:1234_4321 (MGI) Fgf9<tm1Dor>/Fgf9<tm1Dor> involves: 129S6/SvEvTac * C57BL/6 MGI:2135961}";
         String result = instance.toString();
         assertEquals(expResult, result);
     }
