@@ -18,13 +18,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
- * @author jj8
+ * Tests for Class MouseModel.
+ * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class MouseModelTest {
     
-    private MouseModel model1;
-    private MouseModel model2;
+    private MouseModel mgiHomozygote;
+    private MouseModel mgiHeterozygote;
     
     public MouseModelTest() {
     }
@@ -39,23 +39,23 @@ public class MouseModelTest {
     
     @Before
     public void setUp() {
-        model1 = new MouseModel();
-        model1.setMgiGeneId("MGI:1234");
-        model1.setMgiModelId(4321);
-        model1.setSource("MGI");
-        model1.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
-        model1.setGeneticBackground("involves: 129S6/SvEvTac * C57BL/6");
-        model1.setAlleleIds("MGI:2135961");
-        model1.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>");
+        mgiHomozygote = new MouseModel();
+        mgiHomozygote.setMgiGeneId("MGI:1234");
+        mgiHomozygote.setMgiModelId(4321);
+        mgiHomozygote.setSource("MGI");
+        mgiHomozygote.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
+        mgiHomozygote.setGeneticBackground("involves: 129S6/SvEvTac * C57BL/6");
+        mgiHomozygote.setAlleleIds("MGI:2135961");
+        mgiHomozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>");
         
-        model2 = new MouseModel();
-        model2.setMgiGeneId("MGI:1233");
-        model2.setMgiModelId(888);
-        model2.setSource("MGP");
-        model2.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
-        model2.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
-        model2.setAlleleIds("MGI:2136269|MGI:2136268");
-        model2.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
+        mgiHeterozygote = new MouseModel();
+        mgiHeterozygote.setMgiGeneId("MGI:1233");
+        mgiHeterozygote.setMgiModelId(888);
+        mgiHeterozygote.setSource("MGP");
+        mgiHeterozygote.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
+        mgiHeterozygote.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
+        mgiHeterozygote.setAlleleIds("MGI:2136269|MGI:2136268");
+        mgiHeterozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
     }
     
     @After
@@ -68,8 +68,8 @@ public class MouseModelTest {
     @Test
     public void testHashCode() {
         Set<MouseModel> modelSet = new HashSet<MouseModel>();
-        modelSet.add(model1);
-        modelSet.add(model2);
+        modelSet.add(mgiHomozygote);
+        modelSet.add(mgiHeterozygote);
         
         assertEquals(2, modelSet.size());
         
@@ -80,8 +80,8 @@ public class MouseModelTest {
      */
     @Test
     public void testEquals() {
-        MouseModel other = model2;
-        MouseModel instance = model1;
+        MouseModel other = mgiHeterozygote;
+        MouseModel instance = mgiHomozygote;
         boolean expResult = false;
         boolean result = instance.equals(other);
         assertEquals(expResult, result);
@@ -92,8 +92,8 @@ public class MouseModelTest {
      */
     @Test
     public void testCompareTo() {
-        MouseModel other = model2;
-        MouseModel instance = model1;
+        MouseModel other = mgiHeterozygote;
+        MouseModel instance = mgiHomozygote;
         Set<MouseModel> modelSet = new TreeSet<MouseModel>();
         modelSet.add(other);
         modelSet.add(other);
@@ -104,7 +104,7 @@ public class MouseModelTest {
         List<MouseModel> sortedList = new ArrayList<MouseModel>();
         sortedList.addAll(modelSet);
         //models are sorted according to their modelId only
-        assertEquals(model2, sortedList.get(0));
+        assertEquals(mgiHeterozygote, sortedList.get(0));
     }
 
     /**
@@ -112,7 +112,7 @@ public class MouseModelTest {
      */
     @Test
     public void testGetSource() {
-        MouseModel instance = model1;
+        MouseModel instance = mgiHomozygote;
         String expResult = "MGI";
         String result = instance.getSource();
         assertEquals(expResult, result);
@@ -123,7 +123,7 @@ public class MouseModelTest {
      */
     @Test
     public void testGetAllelicCompositionLink() {
-        MouseModel instance = model1;
+        MouseModel instance = mgiHomozygote;
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>";
         String result = instance.getAllelicCompositionLink();
         assertEquals(expResult, result);
@@ -134,8 +134,8 @@ public class MouseModelTest {
      */
     @Test
     public void testGetAllelicCompositionLinkMultipleAlleles() {
-        MouseModel instance = model2;
-        String expResult = "<a href=\"http://informatics.jax.org/accession/2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>";
+        MouseModel instance = mgiHeterozygote;
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>";
         String result = instance.getAllelicCompositionLink();
         assertEquals(expResult, result);
     }
@@ -145,7 +145,7 @@ public class MouseModelTest {
      */
     @Test
     public void testToString() {
-        MouseModel instance = model1;
+        MouseModel instance = mgiHomozygote;
         String expResult = "MouseModel{MGI:1234_4321 (MGI) Fgf9<tm1Dor>/Fgf9<tm1Dor> involves: 129S6/SvEvTac * C57BL/6 MGI:2135961}";
         String result = instance.toString();
         assertEquals(expResult, result);

@@ -387,8 +387,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 mouseModel.setAllelicComposition(rs.getString("allelic_composition"));
                 mouseModel.setGeneticBackground(rs.getString("genetic_background"));
                 mouseModel.setAlleleIds(rs.getString("allele_ids"));
+                mouseModel.setAllelicCompositionLink(ExternalLinkFactory.buildLink(mouseModel));
                 mouseModel.setPhenotypeTerms(new ArrayList<PhenotypeTerm>());
-
+                
                 mouseModelMap.put(mouseModel.getMgiModelId(), mouseModel);
             }
             return mouseModelMap;

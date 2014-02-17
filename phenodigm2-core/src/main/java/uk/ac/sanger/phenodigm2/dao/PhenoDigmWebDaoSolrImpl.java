@@ -444,6 +444,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 model.setAllelicComposition(allelicComposition);
                 model.setAlleleIds(setAlleleIds);
                 model.setPhenotypeTerms(phenotypeTerms);
+                model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
 
                 logger.debug("Made {}", model);
                 modelMap.put(model.getMgiModelId(), model);

@@ -370,6 +370,8 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     model.setGeneticBackground(rs.getString("genetic_background"));
                     model.setMgiGeneId(rs.getString("model_gene_id"));
                     model.setSource(rs.getString("source"));
+                    model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
+
                     modelPhenotypes = new ArrayList();
                     model.setPhenotypeTerms(modelPhenotypes);
                     
