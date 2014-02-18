@@ -64,9 +64,10 @@ public class ExternalLinkFactory {
         String[] alleleIds;
 
         if (mouseModel.getAlleleIds() == null || mouseModel.getAlleleIds().isEmpty()) {
-            //this is not good
+            //this is not good - the model could be a hetero
             String alleleOne = String.format(urlPattern, mouseModel.getMgiGeneId(), formatAllelicCompositionHtml(alleles[0]));
-            return String.format("%s/%s", alleleOne, alleleOne);
+            String alleleTwo = String.format(urlPattern, mouseModel.getMgiGeneId(), formatAllelicCompositionHtml(alleles[1]));
+            return String.format("%s/%s", alleleOne, alleleTwo);
         } else {
             alleleIds = mouseModel.getAlleleIds().split("\\|");
         }

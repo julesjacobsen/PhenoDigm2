@@ -77,6 +77,15 @@ public class ExternalLinkFactoryTest {
         impcHomozygote.setAlleleIds(null);
         impcHomozygote.setAllelicCompositionLink("<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>");
         
+        impcHeterozygote = new MouseModel();
+        impcHeterozygote.setMgiGeneId("MGI:97874");
+        impcHeterozygote.setMgiModelId(3773);
+        impcHeterozygote.setSource("MGP");
+        impcHeterozygote.setAllelicComposition("Rb1<tm1Brd>/Rb1<+>");
+        impcHeterozygote.setGeneticBackground("involves: 129S7/SvEvBrd * C57BL/6");
+        impcHeterozygote.setAlleleIds(null);
+        impcHeterozygote.setAllelicCompositionLink("<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>+</sup></a>");
+        
     
     }
     
@@ -137,6 +146,29 @@ public class ExternalLinkFactoryTest {
         System.out.println("buildLinkIMpcHomozygote");
         String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>";
         String result = ExternalLinkFactory.buildLink(impcHomozygote);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkImpcHeterozygoteNoAlelleId() {
+        System.out.println("buildLinkMgiHeterozygote");
+        String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>+</sup></a>";
+        String result = ExternalLinkFactory.buildLink(impcHeterozygote);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkMgiHeterozygoteNoAlelleId() {
+        System.out.println("buildLinkMgiHeterozygote");
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:97874\">Rb1<sup>+</sup></a>";
+        impcHeterozygote.setSource("MGI");
+        String result = ExternalLinkFactory.buildLink(impcHeterozygote);
         assertEquals(expResult, result);
     }
 
