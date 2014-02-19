@@ -82,7 +82,7 @@ public class ExternalLinkFactory {
         List<String> alleleSymbols = makeAlleleSymbols(allelicComposition);
 
         //find out if the alleles are homozygous
-        boolean homozygous = checkZygosity(alleleSymbols);
+        boolean homozygous = isHomozygous(alleleSymbols);
 
         //make the alleleIds
         List<String> alleleIdentifiers = makeAlleleIdentifiers(geneId, homozygous, alleleIds, alleleSymbols);
@@ -143,13 +143,8 @@ public class ExternalLinkFactory {
         return alleleSymbols;
     }
 
-    private static boolean checkZygosity(List<String> alleleSymbols) {
-        if (alleleSymbols.size() == 2 && alleleSymbols.get(0).equals(alleleSymbols.get(1))) {
-//            logger.info("Genotype is homozygous");
-            return true;
-        }
-//        logger.info("Genotype is heterozygous");
-        return false;
+    private static boolean isHomozygous(List<String> alleleSymbols) {
+        return alleleSymbols.size() == 2 && alleleSymbols.get(0).equals(alleleSymbols.get(1));
     }
 
     private static List<String> makeAlleleIdentifiers(String geneId, boolean homozygous, String alleleIds, List<String> alleleSymbols) {
