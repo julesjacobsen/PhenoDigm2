@@ -51,7 +51,7 @@ public class ExternalLinkFactoryTest {
     @Before
     public void setUp() {
         mgiHomozygote = new MouseModel();
-        mgiHomozygote.setMgiGeneId("MGI:1234");
+        mgiHomozygote.setMgiGeneId("MGI:2135961");
         mgiHomozygote.setMgiModelId(4321);
         mgiHomozygote.setSource("MGI");
         mgiHomozygote.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
@@ -66,7 +66,7 @@ public class ExternalLinkFactoryTest {
         mgiHeterozygote.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
         mgiHeterozygote.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
         mgiHeterozygote.setAlleleIds("MGI:2136268|MGI:2136269");
-        mgiHeterozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
+        mgiHeterozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
     
         impcHomozygote = new MouseModel();
         impcHomozygote.setMgiGeneId("MGI:2148742");
@@ -109,7 +109,6 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testFormatAllelicCompositionHtmlTwoAllele() {
-        System.out.println("formatAllelicCompositionHtmlTwoAllele");
         String expResult = "Pitx2<sup>tm1Jfm</sup>/Pitx2<sup>tm2Jfm</sup>";
         String result = ExternalLinkFactory.formatAllelicCompositionHtml("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
         assertEquals(expResult, result);
@@ -120,7 +119,6 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testBuildLinkMgiHomozygote() {
-        System.out.println("buildLinkMgiHomozygote");
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>";
         String result = ExternalLinkFactory.buildLink(mgiHomozygote);
         assertEquals(expResult, result);
@@ -131,7 +129,6 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testBuildLinkMgiHeterozygote() {
-        System.out.println("buildLinkMgiHeterozygote");
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>";
         String result = ExternalLinkFactory.buildLink(mgiHeterozygote);
         assertEquals(expResult, result);
@@ -143,7 +140,6 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testBuildLinkImpcHomozygote() {
-        System.out.println("buildLinkIMpcHomozygote");
         String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>";
         String result = ExternalLinkFactory.buildLink(impcHomozygote);
         assertEquals(expResult, result);
@@ -154,7 +150,6 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testBuildLinkImpcHeterozygoteNoAlelleId() {
-        System.out.println("buildLinkMgiHeterozygote");
         String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>+</sup></a>";
         String result = ExternalLinkFactory.buildLink(impcHeterozygote);
         assertEquals(expResult, result);
@@ -165,11 +160,125 @@ public class ExternalLinkFactoryTest {
      */
     @Test
     public void testBuildLinkMgiHeterozygoteNoAlelleId() {
-        System.out.println("buildLinkMgiHeterozygote");
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:97874\">Rb1<sup>+</sup></a>";
         impcHeterozygote.setSource("MGI");
         String result = ExternalLinkFactory.buildLink(impcHeterozygote);
         assertEquals(expResult, result);
     }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkMgiHeterozygoteAlelleIdWithWildType() {
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:1857339\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:97874\">Rb1<sup>+</sup></a>";
+        impcHeterozygote.setSource("MGI");
+        impcHeterozygote.setAlleleIds("MGI:1857339");
+        String result = ExternalLinkFactory.buildLink(impcHeterozygote);
+        assertEquals(expResult, result);
+    }
 
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkStrings() {
+        String geneId = "MGI:101898";
+        String source = "MGI";
+        String allelicComposition = "Cd247/Pou2f1<tm1Tks>/Cd247/Pou2f1<tm1Tks>";
+        String alleleIds = "MGI:2447062";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:2447062\">Cd247/Pou2f1<sup>tm1Tks</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2447062\">Cd247/Pou2f1<sup>tm1Tks</sup></a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleIds);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkStringsMgpHetWildType() {
+        String geneId = "MGI:2148742";
+        String source = "MGP";
+        String allelicComposition = "Cldn16<tm1a(KOMP)Wtsi>/+";
+        String alleleIds = null;
+        String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">+</a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleIds);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkStringsMt() {
+        String geneId = "MGI:102492";
+        String source = "MGI";
+        String allelicComposition = "mt-Rnr2<m1Dwa>";
+        String alleleIds = "MGI:3783752";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:3783752\">mt-Rnr2<sup>m1Dwa</sup></a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleIds);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkStringsMtNoAlleleId() {
+        String geneId = "MGI:102492";
+        String source = "MGI";
+        String allelicComposition = "mt-Rnr2<m1Dwa>";
+        //bound to happen somewhere
+        String alleleIds = null;
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:102492\">mt-Rnr2<sup>m1Dwa</sup></a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleIds);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testAlleleBuildLinkStringNoAlleleId() {
+        String geneId = "MGI:102492";
+        String source = "MGI";
+        String allele = "mt-Rnr2<m1Dwa>";
+        //bound to happen somewhere
+        String alleleId = null;
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:102492\">mt-Rnr2<sup>m1Dwa</sup></a>";
+        String result = ExternalLinkFactory.buildAlleleLink(geneId, source, allele, alleleId);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testAlleleBuildLinkString() {
+        String geneId = "MGI:102492";
+        String source = "MGI";
+        String allele = "mt-Rnr2<m1Dwa>";
+        //bound to happen somewhere
+        String alleleId = "MGI:3783752";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:3783752\">mt-Rnr2<sup>m1Dwa</sup></a>";
+        String result = ExternalLinkFactory.buildAlleleLink(geneId, source, allele, alleleId);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testSpontaneousMutationBuildLinkString() {
+        String geneId = "MGI:97743";
+        String source = "MGI";
+        String allelicComposition = "Poo/Poo<+>";
+        //bound to happen somewhere
+        String alleleId = "MGI:3040786";
+        String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:3040786\">Poo</a>/<a href=\"http://informatics.jax.org/accession/MGI:97743\">Poo<sup>+</sup></a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleId);
+        assertEquals(expResult, result);
+    }
+     
+ 
 }
