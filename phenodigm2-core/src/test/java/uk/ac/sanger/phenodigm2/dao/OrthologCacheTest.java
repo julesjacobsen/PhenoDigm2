@@ -198,6 +198,18 @@ public class OrthologCacheTest {
      * Test of getGene method, of class OrthologCache.
      */
     @Test
+    public void testGetGene() {
+        GeneIdentifier mouseGeneIdentifier = Fgfr1;
+        OrthologCache instance = new OrthologCache(orthologMap);
+        Gene expResult = new Gene(Fgfr1, FGFR1);
+        Gene result = instance.getGene(mouseGeneIdentifier);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of getGene method, of class OrthologCache.
+     */
+    @Test
     public void testGetGeneNoHumanOrtholog() {
         GeneIdentifier mouseGeneIdentifier = Schip1;
         OrthologCache instance = new OrthologCache(orthologMap);
