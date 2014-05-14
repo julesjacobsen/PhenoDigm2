@@ -252,7 +252,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
         if (minRawScoreCutoff != 0) {
-            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *]) OR raw_htpc_score:[%s TO *])", minRawScoreCutoff, minRawScoreCutoff));
+            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *] OR raw_htpc_score:[%s TO *])", minRawScoreCutoff, minRawScoreCutoff));
         }
         //add fields to return
         solrQuery.addField("disease_id");
