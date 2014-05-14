@@ -4,7 +4,7 @@
 
     <groupId>uk.ac.sanger</groupId>
     <artifactId>phenodigm2-core</artifactId>
-    <version>1.3</version>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
 
     <name>phenodigm2-core</name>
