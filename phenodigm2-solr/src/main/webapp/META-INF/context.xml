@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" path="/phenodigm2/solr">
   <ResourceLink global="jdbc/phenodigmDataSource" name="jdbc/phenodigmDataSource" type="javax.sql.DataSource"/>
-  <Environment name="solr/home" type="java.lang.String" value="C:/Users/jj8/solr/build/solr/" override="true" />
+  <Environment name="solr/home" type="java.lang.String" value="C:/Users/jj8/Documents/GitHub/PhenoDigm2/phenodigm2-solr/target/solr/" override="true" />
 </Context>

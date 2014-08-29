@@ -17,18 +17,12 @@
 package uk.ac.sanger.phenodigm2.dao;
 
 import java.util.logging.Level;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
-import static uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoTest.logger;
 
 /**
  *

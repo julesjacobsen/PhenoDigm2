@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="${solr.core.name}" version="1.5">
+<schema name="phenodigm" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -105,8 +105,8 @@
       and back compatibility is not guaranteed.  Names with both leading and
       trailing underscores (e.g. _version_) are reserved.
    -->
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />      
-   <field name="type" type="string" indexed="true" stored="true"/>
+    <field name="id" type="uuid" indexed="true" stored="true" required="true"/>   
+    <field name="type" type="string" indexed="true" stored="true"/>
    
    <!--disease fields-->
    <field name="disease_id" type="string" indexed="true" stored="true" multiValued="false" /> 
@@ -143,9 +143,11 @@
    <field name="htpc_phenotype" type="boolean" indexed="true" stored="true"/>
    
    <!--disease-gene summary fields-->
-   <field name="max_mod_score" type="double" indexed="true" stored="true"/>
+   <field name="max_mgi_d2m_score" type="double" indexed="true" stored="true"/>
+   <field name="max_mgi_m2d_score" type="double" indexed="true" stored="true"/>
+   <field name="max_impc_d2m_score" type="double" indexed="true" stored="true"/>
+   <field name="max_impc_m2d_score" type="double" indexed="true" stored="true"/>
    <field name="raw_mod_score" type="double" indexed="true" stored="true"/>
-   <field name="max_htpc_score" type="double" indexed="true" stored="true"/>
    <field name="raw_htpc_score" type="double" indexed="true" stored="true"/>
    <field name="in_locus" type="boolean" indexed="true" stored="true"/>
    
@@ -158,12 +160,16 @@
    <field name="mp_matched_terms" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <!--phenotypes-->
-   <field name="mp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="mp_id" type="string" indexed="true" stored="true" multiValued="true" /> 
+   <field name="mp_term" type="string" indexed="true" stored="true" multiValued="true" /> 
+   <field name="score" type="float" indexed="true" stored="true" multiValued="true" /> 
+
    <field name="hp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="term" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="hp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="hp_synonym" type="string" indexed="true" stored="true" multiValued="true" /> 
 
    <field name="phenotypes" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
-   <field name="phenotype" type="text_en_splitting" indexed="true" stored="true"/>
+
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.
      Some fields are multiValued only because Tika currently may return"
@@ -172,26 +178,6 @@
        "content_type": From the HTTP headers of incoming stream
        "resourcename": From SolrCell request param resource.name
    -->
-<!--   <field name="title" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="subject" type="text_general" indexed="true" stored="true"/>
-   <field name="description" type="text_general" indexed="true" stored="true"/>
-   <field name="comments" type="text_general" indexed="true" stored="true"/>
-   <field name="author" type="text_general" indexed="true" stored="true"/>
-   <field name="keywords" type="text_general" indexed="true" stored="true"/>
-   <field name="category" type="text_general" indexed="true" stored="true"/>
-   <field name="resourcename" type="text_general" indexed="true" stored="true"/>
-   <field name="url" type="text_general" indexed="true" stored="true"/>
-   <field name="content_type" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="last_modified" type="date" indexed="true" stored="true"/>
-   <field name="links" type="string" indexed="true" stored="true" multiValued="true"/>-->
-
-   <!-- Main body of document extracted by SolrCell.
-        NOTE: This field is not indexed by default, since it is also copied to "text"
-        using copyField below. This is to save space. Use this field for returning and
-        highlighting document content. Use the "text" field to search the content. -->
-   <!--<field name="content" type="text_general" indexed="false" stored="true" multiValued="true"/>-->
-   
-
    <!-- catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
    <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
@@ -274,9 +260,9 @@
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>id</uniqueKey>
+<uniqueKey>id</uniqueKey>
  <!--<uniqueKey>marker_accession</uniqueKey>-->
-
+    
  <!-- DEPRECATED: The defaultSearchField is consulted by various query parsers when
   parsing a query string that isn't explicit about the field.  Machine (non-user)
   generated queries are best made explicit, or they can use the "df" request parameter
@@ -304,7 +290,8 @@
    <copyField source="marker_symbol" dest="text"/>
    <copyField source="marker_accession" dest="text"/>
    <copyField source="mp_id" dest="text"/>
-   <copyField source="term" dest="text"/>
+   <copyField source="mp_term" dest="text"/>
+   <copyField source="hp_term" dest="text"/>
    <copyField source="hp_id" dest="text"/>
 
    <!-- Copy the price into a currency enabled field (default USD) -->
@@ -321,7 +308,7 @@
    <copyField source="url" dest="text"/>-->
 
    <!-- Create a string version of disease for faceting -->
-   <copyField source="disease_term" dest="disease_term_s"/>
+   <!--<copyField source="disease_term" dest="disease_term_s"/>-->
 	
    <!-- Above, multiple source fields are copied to the [text] field. 
 	  Another way to map multiple source fields to the same 
@@ -341,7 +328,7 @@
          Class names starting with "solr" refer to java classes in a
        standard package such as org.apache.solr.analysis
     -->
-
+    <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
     <!-- The StrField type is not analyzed, but indexed/stored verbatim.
        It supports doc values but in that case the field needs to be
        single-valued and either required or have a default value.
@@ -653,140 +640,140 @@
              See the Java Regular Expression documentation for more
              information on pattern and replacement string syntax.
              
-             http://java.sun.com/j2se/1.6.0/docs/api/java/util/regex/package-summary.html
-          -->
-        <filter class="solr.PatternReplaceFilterFactory"
-                pattern="([^a-z])" replacement="" replace="all"
-        />
-      </analyzer>
-    </fieldType>
+                   http://java.sun.com/j2se/1.6.0/docs/api/java/util/regex/package-summary.html
+                -->
+                <filter class="solr.PatternReplaceFilterFactory"
+                        pattern="([^a-z])" replacement="" replace="all"
+                />
+            </analyzer>
+        </fieldType>
     
-    <fieldtype name="phonetic" stored="false" indexed="true" class="solr.TextField" >
-      <analyzer>
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.DoubleMetaphoneFilterFactory" inject="false"/>
-      </analyzer>
-    </fieldtype>
+        <fieldtype name="phonetic" stored="false" indexed="true" class="solr.TextField" >
+            <analyzer>
+                <tokenizer class="solr.StandardTokenizerFactory"/>
+                <filter class="solr.DoubleMetaphoneFilterFactory" inject="false"/>
+            </analyzer>
+        </fieldtype>
 
-    <fieldtype name="payloads" stored="false" indexed="true" class="solr.TextField" >
-      <analyzer>
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <!--
-        The DelimitedPayloadTokenFilter can put payloads on tokens... for example,
-        a token of "foo|1.4"  would be indexed as "foo" with a payload of 1.4f
-        Attributes of the DelimitedPayloadTokenFilterFactory : 
-         "delimiter" - a one character delimiter. Default is | (pipe)
-	 "encoder" - how to encode the following value into a playload
-	    float -> org.apache.lucene.analysis.payloads.FloatEncoder,
-	    integer -> o.a.l.a.p.IntegerEncoder
-	    identity -> o.a.l.a.p.IdentityEncoder
-            Fully Qualified class name implementing PayloadEncoder, Encoder must have a no arg constructor.
-         -->
-        <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float"/>
-      </analyzer>
-    </fieldtype>
+        <fieldtype name="payloads" stored="false" indexed="true" class="solr.TextField" >
+            <analyzer>
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+                <!--
+               The DelimitedPayloadTokenFilter can put payloads on tokens... for example,
+               a token of "foo|1.4"  would be indexed as "foo" with a payload of 1.4f
+               Attributes of the DelimitedPayloadTokenFilterFactory : 
+                "delimiter" - a one character delimiter. Default is | (pipe)
+                "encoder" - how to encode the following value into a playload
+                   float -> org.apache.lucene.analysis.payloads.FloatEncoder,
+                   integer -> o.a.l.a.p.IntegerEncoder
+                   identity -> o.a.l.a.p.IdentityEncoder
+                   Fully Qualified class name implementing PayloadEncoder, Encoder must have a no arg constructor.
+                -->
+                <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float"/>
+            </analyzer>
+        </fieldtype>
 
-    <!-- lowercases the entire field value, keeping it as a single token.  -->
-    <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer class="solr.KeywordTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory" />
-      </analyzer>
-    </fieldType>
+        <!-- lowercases the entire field value, keeping it as a single token.  -->
+        <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
+            <analyzer>
+                <tokenizer class="solr.KeywordTokenizerFactory"/>
+                <filter class="solr.LowerCaseFilterFactory" />
+            </analyzer>
+        </fieldType>
 
-    <!-- 
-      Example of using PathHierarchyTokenizerFactory at index time, so
-      queries for paths match documents at that path, or in descendent paths
-    -->
-    <fieldType name="descendent_path" class="solr.TextField">
-      <analyzer type="index">
-	<tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
-      </analyzer>
-      <analyzer type="query">
-	<tokenizer class="solr.KeywordTokenizerFactory" />
-      </analyzer>
-    </fieldType>
-    <!-- 
-      Example of using PathHierarchyTokenizerFactory at query time, so
-      queries for paths match documents at that path, or in ancestor paths
-    -->
-    <fieldType name="ancestor_path" class="solr.TextField">
-      <analyzer type="index">
-	<tokenizer class="solr.KeywordTokenizerFactory" />
-      </analyzer>
-      <analyzer type="query">
-	<tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
-      </analyzer>
-    </fieldType>
+        <!-- 
+          Example of using PathHierarchyTokenizerFactory at index time, so
+          queries for paths match documents at that path, or in descendent paths
+        -->
+        <fieldType name="descendent_path" class="solr.TextField">
+            <analyzer type="index">
+                <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.KeywordTokenizerFactory" />
+            </analyzer>
+        </fieldType>
+        <!-- 
+          Example of using PathHierarchyTokenizerFactory at query time, so
+          queries for paths match documents at that path, or in ancestor paths
+        -->
+        <fieldType name="ancestor_path" class="solr.TextField">
+            <analyzer type="index">
+                <tokenizer class="solr.KeywordTokenizerFactory" />
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
+            </analyzer>
+        </fieldType>
 
-    <!-- since fields of this type are by default not stored or indexed,
-         any data added to them will be ignored outright.  --> 
-    <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
+        <!-- since fields of this type are by default not stored or indexed,
+        any data added to them will be ignored outright.  --> 
+        <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
 
-    <!-- This point type indexes the coordinates as separate fields (subFields)
-      If subFieldType is defined, it references a type, and a dynamic field
-      definition is created matching *___<typename>.  Alternately, if 
-      subFieldSuffix is defined, that is used to create the subFields.
-      Example: if subFieldType="double", then the coordinates would be
-        indexed in fields myloc_0___double,myloc_1___double.
-      Example: if subFieldSuffix="_d" then the coordinates would be indexed
-        in fields myloc_0_d,myloc_1_d
-      The subFields are an implementation detail of the fieldType, and end
-      users normally should not need to know about them.
-     -->
-    <fieldType name="point" class="solr.PointType" dimension="2" subFieldSuffix="_d"/>
+        <!-- This point type indexes the coordinates as separate fields (subFields)
+         If subFieldType is defined, it references a type, and a dynamic field
+         definition is created matching *___<typename>.  Alternately, if 
+         subFieldSuffix is defined, that is used to create the subFields.
+         Example: if subFieldType="double", then the coordinates would be
+           indexed in fields myloc_0___double,myloc_1___double.
+         Example: if subFieldSuffix="_d" then the coordinates would be indexed
+           in fields myloc_0_d,myloc_1_d
+         The subFields are an implementation detail of the fieldType, and end
+         users normally should not need to know about them.
+        -->
+        <fieldType name="point" class="solr.PointType" dimension="2" subFieldSuffix="_d"/>
 
-    <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
-    <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+        <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
+        <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
 
-    <!-- An alternative geospatial field type new to Solr 4.  It supports multiValued and polygon shapes.
-      For more information about this and other Spatial fields new to Solr 4, see:
-      http://wiki.apache.org/solr/SolrAdaptersForLuceneSpatial4
-    -->
-    <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
-        geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
+        <!-- An alternative geospatial field type new to Solr 4.  It supports multiValued and polygon shapes.
+          For more information about this and other Spatial fields new to Solr 4, see:
+          http://wiki.apache.org/solr/SolrAdaptersForLuceneSpatial4
+        -->
+        <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
+                   geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
 
-   <!-- Money/currency field type. See http://wiki.apache.org/solr/MoneyFieldType
-        Parameters:
-          defaultCurrency: Specifies the default currency if none specified. Defaults to "USD"
-          precisionStep:   Specifies the precisionStep for the TrieLong field used for the amount
-          providerClass:   Lets you plug in other exchange provider backend:
-                           solr.FileExchangeRateProvider is the default and takes one parameter:
-                             currencyConfig: name of an xml file holding exchange rates
-                           solr.OpenExchangeRatesOrgProvider uses rates from openexchangerates.org:
-                             ratesFileLocation: URL or path to rates JSON file (default latest.json on the web)
-                             refreshInterval: Number of minutes between each rates fetch (default: 1440, min: 60)
-   -->
-<!--    <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />-->
+        <!-- Money/currency field type. See http://wiki.apache.org/solr/MoneyFieldType
+             Parameters:
+               defaultCurrency: Specifies the default currency if none specified. Defaults to "USD"
+               precisionStep:   Specifies the precisionStep for the TrieLong field used for the amount
+               providerClass:   Lets you plug in other exchange provider backend:
+                                solr.FileExchangeRateProvider is the default and takes one parameter:
+                                  currencyConfig: name of an xml file holding exchange rates
+                                solr.OpenExchangeRatesOrgProvider uses rates from openexchangerates.org:
+                                  ratesFileLocation: URL or path to rates JSON file (default latest.json on the web)
+                                  refreshInterval: Number of minutes between each rates fetch (default: 1440, min: 60)
+        -->
+        <!--    <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />-->
              
 
 
-   <!-- some examples for different languages (generally ordered by ISO code) -->
+        <!-- some examples for different languages (generally ordered by ISO code) -->
 
-<!--     Arabic 
-    <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
-      <analyzer> 
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-         for any non-arabic 
-        <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_ar.txt" />
-         normalizes ﻯ to ﻱ, etc 
-        <filter class="solr.ArabicNormalizationFilterFactory"/>
-        <filter class="solr.ArabicStemFilterFactory"/>
-      </analyzer>
-    </fieldType>-->
+        <!--     Arabic 
+        <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
+          <analyzer> 
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+             for any non-arabic 
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_ar.txt" />
+             normalizes ﻯ to ﻱ, etc 
+            <filter class="solr.ArabicNormalizationFilterFactory"/>
+            <filter class="solr.ArabicStemFilterFactory"/>
+          </analyzer>
+        </fieldType>-->
 
- </types>
+    </types>
   
-  <!-- Similarity is the scoring routine for each document vs. a query.
+    <!-- Similarity is the scoring routine for each document vs. a query.
        A custom Similarity or SimilarityFactory may be specified here, but 
        the default is fine for most applications.  
        For more info: http://wiki.apache.org/solr/SchemaXml#Similarity
     -->
-  <!--
+    <!--
      <similarity class="com.example.solr.CustomSimilarityFactory">
        <str name="paramkey">param value</str>
      </similarity>
     -->
-
+    
 </schema>

@@ -123,29 +123,6 @@ public abstract class PhenoDigmWebDaoTest {
     }
         
     /**
-     * Test of getDiseaseToGeneAssociationSummariesNoKnownAssociations method, of class PhenoDigmWebDaoJdbcImpl.
-     */
-    @Test
-    public void testGetDiseaseToGeneAssociationSummariesNoKnownAssociations() {
-//        logger.info("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
-        
-        DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
-        double cutoff = 0.0;
-        
-        Disease expDisease = new Disease(diseaseId);
-        expDisease.setTerm("1P36 MICRODELETION SYNDROME");
-        
-        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, cutoff);
-        logger.info("{} has {} GeneAssociationSummary using cutoff of {}", diseaseId, result.size(), cutoff);
-
-        assertFalse(result.isEmpty());
-        for (GeneAssociationSummary geneAssociationSummary : result) {
-            assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
-        }
-
-    }
-
-    /**
      * Test of getDisease method, of class PhenoDigmWebDaoJdbcImpl.
      */
     @Test

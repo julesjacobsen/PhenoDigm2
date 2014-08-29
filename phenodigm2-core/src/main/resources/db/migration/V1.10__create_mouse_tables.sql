@@ -191,6 +191,28 @@ CREATE INDEX `mdgs_disease_id` ON `mouse_disease_gene_summary` (`disease_id` ASC
 
 CREATE INDEX `mdgs_model_gene_id` ON `mouse_disease_gene_summary` (`model_gene_id` ASC);
 
+-- -----------------------------------------------------
+-- Table mouse_disease_gene_summary_high_quality
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mouse_disease_gene_summary_high_quality` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `disease_id` VARCHAR(20) NOT NULL,
+  `model_gene_id` VARCHAR(45) NOT NULL,
+  `human_curated` TINYINT(1) NULL DEFAULT FALSE,
+  `mod_curated` TINYINT(1) NULL DEFAULT FALSE,
+  `in_locus` TINYINT(1) NULL DEFAULT FALSE,
+  `max_mod_disease_to_model_perc_score` DOUBLE NULL DEFAULT NULL,
+  `max_mod_model_to_disease_perc_score` DOUBLE NULL DEFAULT NULL,
+  `max_htpc_disease_to_model_perc_score` DOUBLE NULL DEFAULT NULL,
+  `max_htpc_model_to_disease_perc_score` DOUBLE NULL DEFAULT NULL,
+  `mod_raw_score` DOUBLE NULL DEFAULT NULL,
+  `htpc_raw_score` DOUBLE NULL DEFAULT NULL, 
+  PRIMARY KEY (`id`))
+COMMENT = 'High-quality data used for the Disease/Gene pages in their initial, collapsed form (i.e. without the details panes visible)';
+
+CREATE INDEX `mdgshq_disease_id` ON `mouse_disease_gene_summary_high_quality` (`disease_id` ASC);
+
+CREATE INDEX `mdgshq_model_gene_id` ON `mouse_disease_gene_summary_high_quality` (`model_gene_id` ASC);
 
 -- -----------------------------------------------------
 -- Table `mouse_disease_summary`

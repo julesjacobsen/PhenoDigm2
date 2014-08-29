@@ -4,7 +4,7 @@
 
     <groupId>uk.ac.sanger</groupId>
     <artifactId>phenodigm2</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <packaging>pom</packaging>
 
     <name>PhenoDigm2</name>

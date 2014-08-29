@@ -1097,11 +1097,9 @@
          updateRequestProcessorChains that can be used by name 
          on each Update Request
       -->
-    <!--
-       <lst name="defaults">
-         <str name="update.chain">dedupe</str>
+        <lst name="defaults">
+         <str name="update.chain">uuid</str>
        </lst>
-       -->
   </requestHandler>
 
   <!-- for back compat with clients using /update/json and /update/csv -->  
@@ -1281,12 +1279,20 @@
     -->
   </requestHandler>
 
-
+<updateRequestProcessorChain name="uuid">
+      <processor class="solr.UUIDUpdateProcessorFactory">
+          <str name="fieldName">id</str>
+      </processor>
+      <processor class="solr.RunUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
+  
   <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
     <lst name="defaults">
       <str name="config">${solr.core.data.config}</str>
+      <str name="update.chain">uuid</str>
     </lst>
   </requestHandler>
+  
   
   <!-- Search Components
 
@@ -1616,11 +1622,11 @@
        results for a given query regardless of the normal lucene
        scoring.
     -->
-  <searchComponent name="elevator" class="solr.QueryElevationComponent" >
-    <!-- pick a fieldType to analyze queries -->
+<!--  <searchComponent name="elevator" class="solr.QueryElevationComponent" >
+     pick a fieldType to analyze queries 
     <str name="queryFieldType">string</str>
     <str name="config-file">elevate.xml</str>
-  </searchComponent>
+  </searchComponent>-->
 
   <!-- A request handler for demonstrating the elevator component -->
   <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">

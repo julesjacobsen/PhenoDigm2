@@ -43,3 +43,17 @@ CREATE TABLE IF NOT EXISTS `hp` (
   PRIMARY KEY (`id`));
 
 CREATE INDEX `hp_id` ON `hp` (`hp_id` ASC);
+
+-- -----------------------------------------------------
+-- Table `hp_synonym`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `hp_synonym` ;
+
+CREATE TABLE IF NOT EXISTS `hp_synonym` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hp_id` VARCHAR(12) NOT NULL,
+  `synonym` VARCHAR(200) NULL,
+  PRIMARY KEY (`id`));
+
+CREATE INDEX `hpsyn_hp_id` ON `hp_synonym` (`hp_id` ASC);

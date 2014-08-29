@@ -191,8 +191,14 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
         //rather than a few tens of ms   
         if (minRawScoreCutoff != 0) {
-            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *] OR raw_htpc_score:[%s TO *])", minRawScoreCutoff, minRawScoreCutoff));
+            //we're not doing this anymore as we've pre-processed the data from the database in order to show only the high quality data
+            //this makes the query *lot* quicker and also makes for a *much* smaller core so big wins all round.
+//            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *] OR raw_htpc_score:[%s TO *])", minRawScoreCutoff, minRawScoreCutoff));
         }
+        
+        String maxMgiField = "max_mgi_d2m_score";
+        String maxImpcField = "max_impc_d2m_score";
+        
         //add fields to return  
         solrQuery.addField("marker_accession");
         solrQuery.addField("marker_symbol");
@@ -203,12 +209,12 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         //common fields
         solrQuery.addField("human_curated");
         solrQuery.addField("mouse_curated");
-        solrQuery.addField("max_mod_score");
-        solrQuery.addField("max_htpc_score");
+        solrQuery.addField(maxMgiField);
+        solrQuery.addField(maxImpcField);
 
         solrQuery.addSort("human_curated", SolrQuery.ORDER.desc);
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
-        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
+        solrQuery.addSort(maxMgiField, SolrQuery.ORDER.desc);
 
         //there will be more than 10 results for this - we want them all.
         solrQuery.setRows(ROWS);
@@ -229,7 +235,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 GeneIdentifier modelGeneId = new GeneIdentifier(modGenSymbol, modGenId);
                 GeneIdentifier hgncGeneId = new GeneIdentifier(humanGenSymbol, humanGenId);
 
-                AssociationSummary associationSummary = makeAssociationSummary(solrDocument);
+                AssociationSummary associationSummary = makeAssociationSummary(solrDocument, maxMgiField, maxImpcField);
 
                 GeneAssociationSummary geneAssociationSummary = new GeneAssociationSummary(hgncGeneId, modelGeneId, associationSummary);
 //                logger.info("Made {}", geneAssociationSummary );
@@ -248,12 +254,11 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         String query = String.format("marker_accession:\"%s\"", geneId.getCompoundIdentifier());
 
         SolrQuery solrQuery = new SolrQuery(query);
-        solrQuery.addFilterQuery("type:\"gene_disease_summary\"");
-        //if there is no cutoff then don't put it in the query as it will take a long time (a few seconds) to collect the results
-        //rather than a few tens of ms   
-        if (minRawScoreCutoff != 0) {
-            solrQuery.addFilterQuery(String.format("(human_curated:true OR mouse_curated:true OR raw_mod_score:[%s TO *] OR raw_htpc_score:[%s TO *])", minRawScoreCutoff, minRawScoreCutoff));
-        }
+        solrQuery.addFilterQuery("type:\"disease_gene_summary\"");
+
+        String maxMgiField = "max_mgi_m2d_score";
+        String maxImpcField = "max_impc_m2d_score";
+        
         //add fields to return
         solrQuery.addField("disease_id");
         solrQuery.addField("disease_term");
@@ -261,12 +266,12 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         solrQuery.addField("in_locus");
         solrQuery.addField("human_curated");
         solrQuery.addField("mouse_curated");
-        solrQuery.addField("max_mod_score");
-        solrQuery.addField("max_htpc_score");
+        solrQuery.addField(maxMgiField);
+        solrQuery.addField(maxImpcField);
 
         solrQuery.addSort("human_curated", SolrQuery.ORDER.desc);
         solrQuery.addSort("in_locus", SolrQuery.ORDER.desc);
-        solrQuery.addSort("max_mod_score", SolrQuery.ORDER.desc);
+        solrQuery.addSort(maxMgiField, SolrQuery.ORDER.desc);
 
         //there will be more than 10 results for this - we want them all.
         solrQuery.setRows(ROWS);
@@ -283,7 +288,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                 String diseaseTerm = (String) solrDocument.getFieldValue("disease_term");
 
                 //make the association summary details
-                AssociationSummary associationSummary = makeAssociationSummary(solrDocument);
+                AssociationSummary associationSummary = makeAssociationSummary(solrDocument, maxMgiField, maxImpcField);
 
                 DiseaseAssociationSummary diseaseAssociationSummary = new DiseaseAssociationSummary(new DiseaseIdentifier(diseaseId), diseaseTerm, associationSummary);
 //                logger.info("Made {}", diseaseAssociationSummary );
@@ -359,20 +364,20 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
      * @param solrDocument
      * @return
      */
-    private AssociationSummary makeAssociationSummary(SolrDocument solrDocument) {
+    private AssociationSummary makeAssociationSummary(SolrDocument solrDocument, String maxModField, String maxHtpcField) {
         //make the association summary details
         boolean associatedInHuman = (boolean) solrDocument.getFieldValue("human_curated");
         boolean hasLiteratureEvidence = (boolean) solrDocument.getFieldValue("mouse_curated");
         boolean inLocus = (boolean) solrDocument.getFieldValue("in_locus");
 
         double bestModScore = 0.0;
-        if (solrDocument.getFieldValue("max_mod_score") != null) {
-            bestModScore = (double) solrDocument.getFieldValue("max_mod_score");
+        if (solrDocument.getFieldValue(maxModField) != null) {
+            bestModScore = (double) solrDocument.getFieldValue(maxModField);
         }
 
         double bestHtpcScore = 0.0;
-        if (solrDocument.getFieldValue("max_htpc_score") != null) {
-            bestHtpcScore = (double) solrDocument.getFieldValue("max_htpc_score");
+        if (solrDocument.getFieldValue(maxHtpcField) != null) {
+            bestHtpcScore = (double) solrDocument.getFieldValue(maxHtpcField);
         }
 
         AssociationSummary associationSummary = new AssociationSummary(associatedInHuman, hasLiteratureEvidence, inLocus, bestModScore, bestHtpcScore);

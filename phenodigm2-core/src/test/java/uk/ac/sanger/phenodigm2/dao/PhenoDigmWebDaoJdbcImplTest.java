@@ -16,10 +16,18 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoTest.logger;
+import uk.ac.sanger.phenodigm2.model.Disease;
+import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
+import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  *
@@ -33,4 +41,27 @@ public class PhenoDigmWebDaoJdbcImplTest extends PhenoDigmWebDaoTest {
         logger = LoggerFactory.getLogger(PhenoDigmWebDaoJdbcImplTest.class);
     }
 
+    
+    /**
+     * Test of getDiseaseToGeneAssociationSummariesNoKnownAssociations method, of class PhenoDigmWebDaoJdbcImpl.
+     */
+    @Test
+    public void testGetDiseaseToGeneAssociationSummariesNoKnownAssociations() {
+//        logger.info("testGetDiseaseToGeneAssociationSummariesNoKnownAssociations");
+        
+        DiseaseIdentifier diseaseId = new DiseaseIdentifier("DECIPHER:18");
+        double cutoff = 0.0;
+        
+        Disease expDisease = new Disease(diseaseId);
+        expDisease.setTerm("1P36 MICRODELETION SYNDROME");
+        
+        List<GeneAssociationSummary> result = instance.getDiseaseToGeneAssociationSummaries(diseaseId, cutoff);
+        logger.info("{} has {} GeneAssociationSummary using cutoff of {}", diseaseId, result.size(), cutoff);
+
+        assertFalse(result.isEmpty());
+        for (GeneAssociationSummary geneAssociationSummary : result) {
+            assertFalse(geneAssociationSummary.getAssociationSummary().isHasLiteratureEvidence());
+        }
+        
+    }
 }
