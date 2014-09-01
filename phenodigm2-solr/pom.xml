@@ -4,7 +4,7 @@
 
     <groupId>uk.ac.sanger</groupId>
     <artifactId>phenodigm2-solr</artifactId>
-    <version>1.4</version>
+    <version>1.4.0</version>
     <packaging>war</packaging>
     
     <name>phenodigm2-solr</name>

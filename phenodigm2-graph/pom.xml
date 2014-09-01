@@ -11,7 +11,7 @@
     <parent>
         <groupId>uk.ac.sanger</groupId>
         <artifactId>phenodigm2</artifactId>
-        <version>1.4</version>
+        <version>1.4.0</version>
     </parent>
     
     
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>uk.ac.sanger</groupId>
             <artifactId>phenodigm2-core</artifactId>
-            <version>1.3</version>
+            <version>1.4.0</version>
         </dependency>
         <!--Neo4J is a graph database - hopefully will make it all nice for handling these complex relationships-->
         <dependency>
