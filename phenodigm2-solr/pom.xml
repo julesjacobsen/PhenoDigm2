@@ -4,14 +4,17 @@
 
     <groupId>uk.ac.sanger</groupId>
     <artifactId>phenodigm2-solr</artifactId>
-    <version>1.4.0</version>
     <packaging>war</packaging>
     
     <name>phenodigm2-solr</name>
     
+    <parent>
+        <groupId>uk.ac.sanger</groupId>
+        <artifactId>phenodigm2</artifactId>
+        <version>1.4.0</version>
+    </parent>
+    
     <properties>
-        <solr.version>4.4.0</solr.version>
-        <slf4j.version>1.7.5</slf4j.version>
         <jetty.version>9.0</jetty.version>
         <!--SOLR PROPERTIES-->
         <!--Configures the directory used to store the data and configuration of the Solr core-->
