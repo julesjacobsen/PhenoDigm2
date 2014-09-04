@@ -34,13 +34,11 @@
         <constructor-arg index="0" ref="coreContainer"/>
         <constructor-arg index="1" value="phenodigm"/>
     </bean>
-    <!-- For the CoreContainer we're using a solr core pre-built from the H2 database using the phenodigm2-solr project.
-        This isn't ideal as there is a bit of a chicken-and-egg problem with integration testing the solr DAO
-    -->
+    <!-- For the CoreContainer we're using a solr core built from the H2 database using the parent project. -->
     <bean id="coreContainer" class="org.apache.solr.core.CoreContainer" init-method="load"> 
-        <constructor-arg index="0" value="../phenodigm2-solr/target/solr/"/>
+        <constructor-arg index="0" value="target/solr/"/>
     </bean>
-    
+
     <!-- Using an external solr server via HTTP -->    
     <!--<bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">--> 
         <!--<constructor-arg index="0" value="http://localhost:8084/phenodigm2/solr/phenodigm"/>-->

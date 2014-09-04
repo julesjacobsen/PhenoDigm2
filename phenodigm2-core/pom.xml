@@ -13,7 +13,18 @@
         <artifactId>phenodigm2</artifactId>
         <version>1.4.0</version>
     </parent>
-
+    
+    <properties>
+        <!--override for parent resource dir-->
+        <!--common files for solr configration from the parent project-->
+        <solr.resource.directory>../src/main/resources/solr</solr.resource.directory>
+        <solr.datasource>type="JdbcDataSource" 
+                    driver="org.h2.Driver" 
+                    url="jdbc:h2:file:../target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2;DB_CLOSE_ON_EXIT=FALSE" 
+                    user="sa" 
+                    password=""</solr.datasource>
+    </properties>
+     
     <dependencies>
         <!-- SolrJ -->
         <dependency>
@@ -31,6 +42,6 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+    </dependencies>  
 </project>
     
