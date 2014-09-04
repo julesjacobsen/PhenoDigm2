@@ -136,11 +136,16 @@
    <field name="mouse_curated" type="boolean" indexed="true" stored="true"/>
    <field name="mgi_predicted" type="boolean" indexed="true" stored="true"/>
    <field name="impc_predicted" type="boolean" indexed="true" stored="true"/>
-   <field name="mgi_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
-   <field name="impc_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
+   <field name="mgi_predicted_known_gene" type="boolean" indexed="true" stored="true"/>
+   <field name="impc_predicted_known_gene" type="boolean" indexed="true" stored="true"/>
+   <field name="mgi_novel_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
+   <field name="impc_novel_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
    <field name="mod_model" type="boolean" indexed="true" stored="true"/>
    <field name="htpc_model" type="boolean" indexed="true" stored="true"/>
    <field name="htpc_phenotype" type="boolean" indexed="true" stored="true"/>
+   <!--deprecated - will be removed once external dependencies are fixed-->
+   <field name="mgi_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
+   <field name="impc_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
    
    <!--disease-gene summary fields-->
    <field name="max_mgi_d2m_score" type="double" indexed="true" stored="true"/>
@@ -160,9 +165,8 @@
    <field name="mp_matched_terms" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <!--phenotypes-->
-   <field name="mp_id" type="string" indexed="true" stored="true" multiValued="true" /> 
-   <field name="mp_term" type="string" indexed="true" stored="true" multiValued="true" /> 
-   <field name="score" type="float" indexed="true" stored="true" multiValued="true" /> 
+   <field name="mp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="mp_term" type="string" indexed="true" stored="true" multiValued="false" /> 
 
    <field name="hp_id" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="hp_term" type="string" indexed="true" stored="true" multiValued="false" /> 

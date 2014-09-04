@@ -17,38 +17,32 @@
     <properties>
         <jetty.version>9.0</jetty.version>
         <!--SOLR PROPERTIES-->
+        <!--common files for solr configration from the parent project-->
+        <project.solr.resource.directory>../src/main/resources/solr</project.solr.resource.directory>
         <!--Configures the directory used to store the data and configuration of the Solr core-->
         <solr.core.directory>solr</solr.core.directory>
         <!--Configures the name of the Solr core.-->
         <solr.core.name>phenodigm</solr.core.name>
         <!--Filename of your data-config file-->
         <solr.core.data.config>phenodigm-data-config.xml</solr.core.data.config>
+        <solr.datasource>name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource" batchSize="-1"</solr.datasource>
         <!--SYSTEM PROPERTIES-->
-        <!--Configures the home directory of Solr. Set the preferred directory path here.  C:/Users/jj8/solr/build ${project.build.directory}-->
+        <!--Configures the home directory of Solr. Set the preferred directory path here. -->
         <solr.home>${project.build.directory}</solr.home>
     </properties>
     
-    <!--    <profiles>
+    <profiles>
         <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>test</id>
             <properties>
-                <build.profile.id>dev</build.profile.id>
-                SOLR PROPERTIES
-                Configures the directory used to store the data and configuration of the Solr core
-                <solr.core.directory>solr</solr.core.directory>
-                Configures the name of the Solr core.
-                <solr.core.name>phenodigm</solr.core.name>
-                Filename of your data-config file
-                <solr.core.data.config>phenodigm-data-config.xml</solr.core.data.config>
-                SYSTEM PROPERTIES
-                Configures the home directory of Solr. Set the preferred directory path here.  C:/Users/jj8/solr/build ${project.build.directory}
-                <solr.home>${project.build.directory}</solr.home>
+                <solr.datasource>type="JdbcDataSource" 
+                    driver="org.h2.Driver" 
+                    url="jdbc:h2:file:../target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2;DB_CLOSE_ON_EXIT=FALSE" 
+                    user="sa" 
+                    password=""</solr.datasource>
             </properties>
         </profile>
-    </profiles>-->
+    </profiles>
     
     <dependencies>
         <!-- SLF4J -->
@@ -160,7 +154,7 @@
                                 filtering to it.
                                 -->
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>${project.solr.resource.directory}</directory>
                                     <filtering>true</filtering>
                                     <targetPath>${solr.home}/${solr.core.directory}</targetPath>
                                     <includes>
@@ -168,7 +162,7 @@
                                     </includes>
                                 </resource>
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>${project.solr.resource.directory}</directory>
                                     <filtering>true</filtering>
                                     <targetPath>${solr.home}/${solr.core.directory}/${solr.core.name}</targetPath>
                                     <includes>
@@ -177,7 +171,7 @@
                                 </resource>
                                 <!-- Copy configuration files -->
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>../src/main/resources/solr</directory>
                                     <filtering>true</filtering>
                                     <targetPath>${solr.home}/${solr.core.directory}/${solr.core.name}/conf</targetPath>
                                     <includes>
@@ -241,6 +235,15 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.1.1</version>
                 <configuration>
+                    <containerConfigXML>src/main/webapp/META-INF/context.xml</containerConfigXML>
+                    <webResources>
+                        <resource>
+                            <!--filter the context.xml to add in the desired solr home path-->
+                            <directory>src/main/webapp/META-INF</directory>
+                            <filtering>true</filtering>
+                            <targetPath>META-INF</targetPath>
+                        </resource>
+                    </webResources>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>

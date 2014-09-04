@@ -1,10 +1,5 @@
 <dataConfig>
-    <!--<dataSource name="phenodb" jndiName="java:comp/env/jdbc/phenodigmDataSource" batchSize="-1"/>--> 
-    <dataSource type="JdbcDataSource" 
-    driver="org.h2.Driver" 
-    url="jdbc:h2:file:../target/phenodigm2;MODE=MySQL;IFEXISTS=TRUE;DATABASE_TO_UPPER=FALSE;SCHEMA=PHENODIGM2;DB_CLOSE_ON_EXIT=FALSE" 
-    user="sa" 
-    password=""/> 
+    <dataSource ${solr.datasource}/>
 
     <document>
         <!--unique document id-->
@@ -105,21 +100,15 @@
         <!--human phenotypes-->
         <entity name="human_phenotype" 
                 query="select distinct 'hp' as type
-                        , disease_hp.hp_id
-                        , hp.term 
-                        from disease_hp 
-                        join hp on hp.hp_id = disease_hp.hp_id;">
+                        , hp_id
+                        , term                    
+                        from hp;">
             <field column="type" name="type"/>         
             <field column="hp_id" name="hp_id"/>
             <field column="term" name="hp_term"/>
             <entity name="hp_synonyms" query="select synonym from hp_synonym where hp_id = '${human_phenotype.hp_id}';">
                 <field column="synonym" name="hp_synonym"/>
             </entity>
-            <!--            <entity name="mp_mappings" query="select mp.mp_id, term, sqrt(simj * ic) as score from hp_mp_mapping hp_mp join mp on mp.mp_id = hp_mp.mp_id where hp_id = '${human_phenotype.hp_id}' order by score desc limit 10;">
-                <field column="mp_id" name="mp_id"/>
-                <field column="term" name="mp_term"/>
-                <field column="score" name="score"/>
-            </entity>-->
         </entity>
                
         <!--mouse phenotypes-->
@@ -148,9 +137,11 @@
                         , mod_raw_score as raw_mod_score
                         , htpc_raw_score as raw_htpc_score
                         , (case when mod_raw_score is null then false else true end) as mod_predicted
-                        , (case when (in_locus and mod_raw_score is not null) then true else false end) as mod_predicted_in_locus
+                        , (case when (mod_raw_score is not null and human_curated) then true else false end) as mod_predicted_known_gene
+                        , (case when (not human_curated and in_locus and mod_raw_score is not null) then true else false end) as novel_mod_predicted_in_locus
                         , (case when htpc_raw_score is null then false else true end) as htpc_predicted 
-                        , (case when (in_locus and htpc_raw_score is not null) then true else false end) as htpc_predicted_in_locus 
+                        , (case when (htpc_raw_score is not null and human_curated) then true else false end) as htpc_predicted_known_gene
+                        , (case when (not human_curated and in_locus and htpc_raw_score is not null) then true else false end) as novel_htpc_predicted_in_locus 
                         from 
                         mouse_disease_gene_summary_high_quality mdgshq 
                         left join disease d on d.disease_id = mdgshq.disease_id 
@@ -190,8 +181,10 @@
             <!--summary fields for faceting-->
             <field column="mod_predicted" name="mgi_predicted"/>
             <field column="htpc_predicted" name="impc_predicted"/>
-            <field column="mod_predicted_in_locus" name="mgi_predicted_in_locus"/>
-            <field column="htpc_predicted_in_locus" name="impc_predicted_in_locus"/>
+            <field column="mod_predicted_known_gene" name="mgi_predicted_known_gene"/>
+            <field column="htpc_predicted_known_gene" name="impc_predicted_known_gene"/>
+            <field column="novel_mod_predicted_in_locus" name="mgi_novel_predicted_in_locus"/>
+            <field column="novel_htpc_predicted_in_locus" name="impc_novel_predicted_in_locus"/>
             
         </entity>
        
@@ -222,6 +215,24 @@
             <field column="hp_matched_terms" splitBy="," name="hp_matched_terms"/>
             <field column="mp_matched_terms" splitBy="," name="mp_matched_terms"/>
         </entity>
-        <!-- HP-MP mappings too? -->
+        
+        <!-- best HP-MP mappings - these are only for those MP terms used by the IMPC in their assays -->
+        <entity name="best_hp_mp" 
+                query="select 'hp_mp' as type
+                        , hp_id
+                        , hp_term
+                        , mp_id
+                        , mp_term                         
+                        from best_impc_hp_mp_mapping;">
+            <field column="type" name="type"/>         
+            <field column="hp_id" name="hp_id"/>
+            <field column="hp_term" name="hp_term"/>
+            <field column="mp_id" name="mp_id"/>
+            <field column="mp_term" name="mp_term"/>
+            <entity name="hp_synonyms" query="select synonym from hp_synonym where hp_id = '${best_hp_mp.hp_id}';">
+                <field column="synonym" name="hp_synonym"/>
+            </entity>
+        </entity>
+        
     </document>
 </dataConfig>

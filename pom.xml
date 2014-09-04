@@ -225,19 +225,58 @@
                 </configuration>
                 -->
             </plugin>
+            <!--jacoco code-coverage--> 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.1.201405082137</version>
+                <configuration>
+                    <excludes>
+                        <!--		 Application starter 
+                        <exclude>ac/simons/biking2/Application.class</exclude>
+                         Configuration 
+                        <exclude>ac/simons/biking2/config/*</exclude>			-->
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
-                        <phase>process-classes</phase>
+                        <id>pre-unit-test</id>
                         <goals>
-                            <goal>cobertura</goal>
+                            <goal>prepare-agent</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>		
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule> 
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <!--yep, pretty low expectations here-->
+                                            <minimum>0.01</minimum>			
+                                        </limit>
+                                        <limit> 
+                                            <counter>COMPLEXITY</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <!--yep, pretty low expectations here-->
+                                            <minimum>0.01</minimum> 
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+        
     </build>
 </project>
