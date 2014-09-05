@@ -8,9 +8,9 @@ DROP TABLE IF EXISTS `fish_model` ;
 CREATE TABLE IF NOT EXISTS `fish_model` (
   `model_id` INT(8) UNSIGNED NOT NULL,
   `source` VARCHAR(45) NULL,
-  `allelic_composition` VARCHAR(255) NULL,
+  `allelic_composition` LONGTEXT NULL,
   `genetic_background` VARCHAR(255) NULL,
-  `allele_ids` VARCHAR(255) NULL,
+  `allele_ids` VARCHAR(200) NULL,
   `hom_het` VARCHAR(3) NULL,
   PRIMARY KEY (`model_id`));
 
@@ -48,14 +48,14 @@ CREATE INDEX `model_id_zp_id` ON `fish_model_zp` (`model_id` ASC, `zp_id` ASC);
 DROP TABLE IF EXISTS `hp_zp_mapping` ;
 
 CREATE TABLE IF NOT EXISTS `hp_zp_mapping` (
-  `id` INT(11) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `hp_id` VARCHAR(12) NOT NULL,
   `hp_term` VARCHAR(200) NULL,
   `zp_id` VARCHAR(12) NOT NULL,
   `zp_term` VARCHAR(200) NULL,
   `simJ` DOUBLE NULL,
   `ic` DOUBLE NULL,
-  `lcs` LONGTEXT NULL,
+  `lcs` VARCHAR(200) NULL,
   `ic_ratio` DOUBLE NULL,
   PRIMARY KEY (`id`));
 
@@ -77,11 +77,10 @@ CREATE TABLE IF NOT EXISTS `fish_disease_model_association_detail` (
   `zp_id` VARCHAR(12) NOT NULL,
   `simJ` DOUBLE NULL,
   `ic` DOUBLE NULL,
-  `lcs` TEXT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fdmad_disease_model` (`disease_id` ASC, `model_id` ASC));
+  `lcs` VARCHAR(200) NULL,
+  PRIMARY KEY (`id`));
 
-
+CREATE INDEX `fdmad_disease_model` ON `fish_disease_model_association_detail` (`disease_id` ASC, `model_id` ASC);
 -- -----------------------------------------------------
 -- Table `fish_disease_model_association`
 -- -----------------------------------------------------
@@ -97,8 +96,7 @@ CREATE TABLE IF NOT EXISTS `fish_disease_model_association` (
   `raw_score` DOUBLE NOT NULL DEFAULT 0.0,
   `hp_matched_terms` text,
   `zp_matched_terms` text,
-  PRIMARY KEY (`id`))
-COMMENT = 'Used to show the AJAX details view in IMPC portal.';
+  PRIMARY KEY (`id`));
 
 CREATE INDEX `f_disease_id` ON `fish_disease_model_association` (`disease_id` ASC);
 
@@ -113,19 +111,21 @@ CREATE INDEX `f_disease_model` ON `fish_disease_model_association` (`disease_id`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `fish_gene_ortholog` ;
 
-CREATE TABLE IF NOT EXISTS `fish_gene_orthologs` (
+CREATE TABLE IF NOT EXISTS `fish_gene_ortholog` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `model_gene_id` VARCHAR(45) NULL,
   `model_gene_symbol` VARCHAR(255) NULL,
   `hgnc_id` VARCHAR(45) NULL,
   `hgnc_gene_symbol` VARCHAR(255) NULL,
   `hgnc_gene_locus` VARCHAR(255) NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fg_model_gene_id_symbol` (`model_gene_id` ASC, `model_gene_symbol` ASC),
-  INDEX `fg_hgnc_gene_id_symbol` (`hgnc_id` ASC, `hgnc_gene_symbol` ASC),
-  INDEX `fg_model_hgnc_id` (`model_gene_id` ASC, `hgnc_id` ASC),
-  INDEX `fg_model_hgnc_symbol` (`model_gene_symbol` ASC, `hgnc_gene_symbol` ASC));
+  `entrezgene` INT(8) DEFAULT NULL,	 
+  PRIMARY KEY (`id`));
 
+
+CREATE INDEX `fgo_model_gene_id_symbol` ON `fish_gene_ortholog` (`model_gene_id` ASC, `model_gene_symbol` ASC);
+CREATE INDEX `fgo_hgnc_gene_id_symbol` ON `fish_gene_ortholog` (`hgnc_id` ASC, `hgnc_gene_symbol` ASC);
+CREATE INDEX `fgo_model_hgnc_id` ON `fish_gene_ortholog` (`model_gene_id` ASC, `hgnc_id` ASC);
+CREATE INDEX `fgo_model_hgnc_symbol` ON `fish_gene_ortholog` (`model_gene_symbol` ASC, `hgnc_gene_symbol` ASC);
 -- -----------------------------------------------------
 -- Table `fish_model_gene_ortholog`
 -- -----------------------------------------------------
@@ -161,8 +161,7 @@ CREATE TABLE IF NOT EXISTS `fish_gene_summary` (
   `mod_model` TINYINT(1) NULL DEFAULT FALSE,
   `htpc_model` TINYINT(1) NULL DEFAULT FALSE,
   `htpc_phenotype` TINYINT(1) NULL DEFAULT FALSE,
-  PRIMARY KEY (`model_gene_id`))
-COMMENT = 'Used for solr faceting';
+  PRIMARY KEY (`model_gene_id`));
 
 
 -- -----------------------------------------------------
@@ -183,8 +182,7 @@ CREATE TABLE IF NOT EXISTS `fish_disease_gene_summary` (
   `max_htpc_model_to_disease_perc_score` DOUBLE NULL DEFAULT NULL,
   `mod_raw_score` DOUBLE NULL DEFAULT NULL,
   `htpc_raw_score` DOUBLE NULL DEFAULT NULL, 
-  PRIMARY KEY (`id`))
-COMMENT = 'Used for the Disease/Gene pages in their initial, collapsed form (i.e. without the details panes visible)';
+  PRIMARY KEY (`id`));
 
 CREATE INDEX `fdgs_disease_id` ON `fish_disease_gene_summary` (`disease_id` ASC);
 
@@ -204,5 +202,4 @@ CREATE TABLE IF NOT EXISTS `fish_disease_summary` (
   `htpc_predicted` TINYINT(1) NULL DEFAULT FALSE,
   `mod_predicted_in_locus` TINYINT(1) NULL DEFAULT FALSE,
   `htpc_predicted_in_locus` TINYINT(1) NULL DEFAULT FALSE,
-  PRIMARY KEY (`disease_id`))
-COMMENT = 'Used for solr faceting';
+  PRIMARY KEY (`disease_id`));

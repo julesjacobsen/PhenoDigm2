@@ -220,7 +220,8 @@ public abstract class PhenoDigmDaoTest {
         PhenotypeMatch expectedMatch = new PhenotypeMatch();
         expectedMatch.setSimJ(0.853968);
         expectedMatch.setIc(8.901661);
-        expectedMatch.setLcs("HP_0009702 Carpal synostosis ^ MP_0008915 fused carpal bones");
+        //fused carpal bones (MP:0008915)
+        expectedMatch.setLcs("");
         
         PhenotypeTerm humanTerm = new PhenotypeTerm();
         humanTerm.setId("HP:0005048");

@@ -56,4 +56,78 @@ CREATE TABLE IF NOT EXISTS `hp_synonym` (
   `synonym` VARCHAR(200) NULL,
   PRIMARY KEY (`id`));
 
-CREATE INDEX `hpsyn_hp_id` ON `hp_synonym` (`hp_id` ASC);
+CREATE INDEX `hps_hp_id` ON `hp_synonym` (`hp_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `disease_disease_association`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `disease_disease_association` ;
+
+CREATE TABLE `disease_disease_association` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `disease_id` varchar(20) NOT NULL,
+  `disease_match` varchar(20) NOT NULL,
+  `disease_to_disease_perc_score` double NOT NULL DEFAULT '0',
+  `raw_score` double NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`));
+  
+CREATE INDEX `dda_disease_id` ON `disease_disease_association` (`disease_id` ASC);
+CREATE INDEX `dda_disease_match` ON `disease_disease_association` (`disease_match` ASC);
+CREATE INDEX `dda_disease_disease` ON `disease_disease_association` (`disease_id` ASC,`disease_match` ASC);
+
+-- -----------------------------------------------------
+-- Table `disease_disease_association_detail`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `disease_disease_association_detail` ;
+
+CREATE TABLE `disease_disease_association_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `disease_id` varchar(20) NOT NULL,
+  `disease_match` varchar(20) NOT NULL,
+  `hp_id` varchar(12) NOT NULL,
+  `hp_match` varchar(12) NOT NULL,
+  `simJ` double DEFAULT NULL,
+  `ic` double DEFAULT NULL,
+  `lcs` varchar(200),
+  PRIMARY KEY (`id`));
+
+CREATE INDEX `ddad_disease_disease` ON `disease_disease_association_detail` (`disease_id` ASC,`disease_match` ASC);
+
+-- -----------------------------------------------------
+-- Table `hp_hp_mapping`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `hp_hp_mapping` ;
+
+CREATE TABLE `hp_hp_mapping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hp_id` varchar(12) NOT NULL,
+  `hp_term` varchar(200) DEFAULT NULL,
+  `hp_id_hit` varchar(12) NOT NULL,
+  `hp_term_hit` varchar(200) DEFAULT NULL,
+  `simJ` float DEFAULT NULL,
+  `ic` float DEFAULT NULL,
+  `lcs` varchar(200),
+  `ic_ratio` float DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+CREATE INDEX `hphpm_hp_hp` ON `hp_hp_mapping` (`hp_id` ASC,`hp_id_hit` ASC);
+
+-- -----------------------------------------------------
+-- Table `best_impc_hp_mp_mapping`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `best_impc_hp_mp_mapping` ;
+
+CREATE TABLE `best_impc_hp_mp_mapping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hp_id` varchar(12) NOT NULL,
+  `hp_term` varchar(200) DEFAULT NULL,
+  `mp_id` varchar(12) NOT NULL,
+  `mp_term` varchar(200) DEFAULT NULL,
+  `ic` double DEFAULT NULL,
+  `lcs` varchar(200),
+  PRIMARY KEY (`id`));
+
+CREATE INDEX `best_hp_mp` ON `best_impc_hp_mp_mapping` (`hp_id` ASC, `mp_id` ASC);
