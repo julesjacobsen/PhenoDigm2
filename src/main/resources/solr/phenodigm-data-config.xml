@@ -6,7 +6,24 @@
         <field name="id"/>       
         <!--disease_summary-->
         <entity name="disease" transformer="RegexTransformer" 
-                query="select 'disease' as type, d.disease_id as disease_id , disease_term, disease_alts, disease_locus, disease_classes as disease_classes, human_curated, mod_curated as mod_curated, mod_predicted as mod_predicted, htpc_predicted, mod_predicted_in_locus, htpc_predicted_in_locus from disease d join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
+                query="select 'disease' as type
+                        , d.disease_id as disease_id 
+                        , disease_term
+                        , disease_alts
+                        , disease_locus
+                        , disease_classes as disease_classes
+                        , human_curated
+                        , mod_curated as mod_curated
+                        , mod_predicted as mod_predicted
+                        , htpc_predicted
+                        , mod_predicted_in_locus
+                        , htpc_predicted_in_locus
+                        , mod_predicted_known_gene as mod_predicted_known_gene
+                        , novel_mod_predicted_in_locus as novel_mod_predicted_in_locus
+                        , htpc_predicted_known_gene as htpc_predicted_known_gene
+                        , novel_htpc_predicted_in_locus as novel_htpc_predicted_in_locus 
+                        from disease d 
+                        join mouse_disease_summary mds on mds.disease_id = d.disease_id;">
             <field column="type" name="type"/>
             <field column="disease_id" name="disease_id"/>
             <field column="disease_source" regex="([A-Z]+):[0-9]+" sourceColName="disease_id"/>
@@ -21,6 +38,11 @@
             <field column="htpc_predicted" name="impc_predicted"/>
             <field column="mod_predicted_in_locus" name="mgi_predicted_in_locus"/>
             <field column="htpc_predicted_in_locus" name="impc_predicted_in_locus"/>
+            
+            <field column="mod_predicted_known_gene" name="mgi_predicted_known_gene"/>
+            <field column="htpc_predicted_known_gene" name="impc_predicted_known_gene"/>
+            <field column="novel_mod_predicted_in_locus" name="mgi_novel_predicted_in_locus"/>
+            <field column="novel_htpc_predicted_in_locus" name="impc_novel_predicted_in_locus"/>
             
             <entity name="disease_phenotypes" 
                     query="select concat(hp.hp_id, '_', hp.term) as phenotype 
@@ -136,12 +158,12 @@
                         , max_htpc_model_to_disease_perc_score as max_htpc_model_to_disease_perc_score
                         , mod_raw_score as raw_mod_score
                         , htpc_raw_score as raw_htpc_score
-                        , (case when mod_raw_score is null then false else true end) as mod_predicted
-                        , (case when (mod_raw_score is not null and human_curated) then true else false end) as mod_predicted_known_gene
-                        , (case when (not human_curated and in_locus and mod_raw_score is not null) then true else false end) as novel_mod_predicted_in_locus
-                        , (case when htpc_raw_score is null then false else true end) as htpc_predicted 
-                        , (case when (htpc_raw_score is not null and human_curated) then true else false end) as htpc_predicted_known_gene
-                        , (case when (not human_curated and in_locus and htpc_raw_score is not null) then true else false end) as novel_htpc_predicted_in_locus 
+                        , mod_predicted as mod_predicted
+                        , mod_predicted_known_gene as mod_predicted_known_gene
+                        , novel_mod_predicted_in_locus as novel_mod_predicted_in_locus
+                        , htpc_predicted as htpc_predicted 
+                        , htpc_predicted_known_gene as htpc_predicted_known_gene
+                        , novel_htpc_predicted_in_locus as novel_htpc_predicted_in_locus 
                         from 
                         mouse_disease_gene_summary_high_quality mdgshq 
                         left join disease d on d.disease_id = mdgshq.disease_id 
@@ -232,6 +254,21 @@
             <entity name="hp_synonyms" query="select synonym from hp_synonym where hp_id = '${best_hp_mp.hp_id}';">
                 <field column="synonym" name="hp_synonym"/>
             </entity>
+        </entity>
+        
+        <!--best MP-HP mappings, for when you want to look at things from a more mousey perspective. You could do this using the scores, but these have been pre-computed--> 
+        <entity name="best_mp_hp" 
+                query="select 'mp_hp' as type
+                        , hp_id
+                        , hp_term
+                        , mp_id
+                        , mp_term                         
+                        from best_impc_mp_hp_mapping">
+            <field column="type" name="type"/>         
+            <field column="hp_id" name="hp_id"/>
+            <field column="hp_term" name="hp_term"/>
+            <field column="mp_id" name="mp_id"/>
+            <field column="mp_term" name="mp_term"/>
         </entity>
         
     </document>
