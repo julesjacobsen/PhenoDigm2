@@ -143,9 +143,6 @@
    <field name="mod_model" type="boolean" indexed="true" stored="true"/>
    <field name="htpc_model" type="boolean" indexed="true" stored="true"/>
    <field name="htpc_phenotype" type="boolean" indexed="true" stored="true"/>
-   <!--deprecated - will be removed once external dependencies are fixed-->
-   <field name="mgi_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
-   <field name="impc_predicted_in_locus" type="boolean" indexed="true" stored="true"/>
    
    <!--disease-gene summary fields-->
    <field name="max_mgi_d2m_score" type="double" indexed="true" stored="true"/>
