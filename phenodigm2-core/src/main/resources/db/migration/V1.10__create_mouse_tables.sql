@@ -284,7 +284,13 @@ CREATE TABLE IF NOT EXISTS `mouse_disease_gene_summary_high_quality` (
   `max_htpc_disease_to_model_perc_score` DOUBLE NULL DEFAULT NULL,
   `max_htpc_model_to_disease_perc_score` DOUBLE NULL DEFAULT NULL,
   `mod_raw_score` DOUBLE NULL DEFAULT NULL,
-  `htpc_raw_score` DOUBLE NULL DEFAULT NULL, 
+  `htpc_raw_score` DOUBLE NULL DEFAULT NULL,
+  `mod_predicted` BOOLEAN DEFAULT FALSE,
+  `mod_predicted_known_gene` BOOLEAN DEFAULT FALSE,
+  `novel_mod_predicted_in_locus` BOOLEAN DEFAULT FALSE,
+  `htpc_predicted` BOOLEAN DEFAULT FALSE,
+  `htpc_predicted_known_gene` BOOLEAN DEFAULT FALSE,
+  `novel_htpc_predicted_in_locus` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id`));
                         
 CREATE INDEX `mdgshq_disease_id` ON `mouse_disease_gene_summary_high_quality` (`disease_id` ASC);
