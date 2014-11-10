@@ -99,10 +99,7 @@ public class Allele {
         if (!Objects.equals(this.alleleSymbol, other.alleleSymbol)) {
             return false;
         }
-        if (!Objects.equals(this.alleleId, other.alleleId)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.alleleId, other.alleleId);
     }
 
     @Override

@@ -34,7 +34,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
-import uk.ac.sanger.phenodigm2.model.CurationStatus;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
@@ -42,7 +41,6 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
 import uk.ac.sanger.phenodigm2.model.PhenotypeMatch;
 import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
-import uk.ac.sanger.phenodigm2.model.ProjectStatus;
 import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
@@ -284,42 +282,6 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    private static CurationStatus makeCurationStatus(int human_curated, int mouse_curated, int mgi_phenotype, int impc_phenotype) {
-        
-        CurationStatus curationStatus = new CurationStatus();
-        
-        if (human_curated == 1) {
-            curationStatus.setIsAssociatedInHuman(true);
-        }
-        if (mouse_curated == 1) {
-            curationStatus.setHasMgiLiteratureEvidence(true);
-        }
-        if (mgi_phenotype == 1) {
-            curationStatus.setHasMgiPhenotypeEvidence(true);
-        }
-        if (impc_phenotype == 1) {
-            curationStatus.setHasImpcPhenotypeEvidence(true);
-        }
-        
-        return curationStatus;
-    }
-
-    private static ProjectStatus makeProjectStatus(int mgi_mouse, int impc_mouse, int impc_pheno){
-        ProjectStatus projectStatus = new ProjectStatus();
-        
-        if (mgi_mouse == 1) {
-            projectStatus.setHasMgiMouse(true);
-        }
-        if (impc_mouse == 1) {
-            projectStatus.setHasImpcMouse(true);        
-        }
-        if (impc_pheno == 1) {
-            projectStatus.setHasImpcPhenotypeData(true);
-        }
-        
-        return projectStatus;
-    }
-    
     private static List<String> makeStringListFromDelimitedString(String otherTerms, String delimiter) {
         List<String> alternativeTerms = new ArrayList<String>();
         String[] altTerms = otherTerms.split(delimiter);
