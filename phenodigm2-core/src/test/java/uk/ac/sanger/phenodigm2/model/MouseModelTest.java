@@ -51,7 +51,7 @@ public class MouseModelTest {
         mgiHeterozygote = new MouseModel();
         mgiHeterozygote.setMgiGeneId("MGI:1233");
         mgiHeterozygote.setMgiModelId(888);
-        mgiHeterozygote.setSource("MGP");
+        mgiHeterozygote.setSource("IMPC");
         mgiHeterozygote.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
         mgiHeterozygote.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
         mgiHeterozygote.setAlleleIds("MGI:2136269|MGI:2136268");

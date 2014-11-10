@@ -33,6 +33,9 @@ public class ExternalLinkFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ExternalLinkFactory.class);
 
+    private static final String MGI = "MGI";
+    private static final String IMPC = "IMPC";
+    
     private enum URL_PATTERNS {
 
         MGI_URL("<a href=\"http://informatics.jax.org/accession/%s\">%s</a>"),
@@ -187,10 +190,10 @@ public class ExternalLinkFactory {
 
         //find out what source of the model is for building the URL.
         switch (source) {
-            case "MGI":
+            case MGI:
                 urlPattern = URL_PATTERNS.MGI_URL.toString();
                 break;
-            case "MGP":
+            case IMPC:
                 urlPattern = URL_PATTERNS.IMPC_URL.toString();
                 break;
         }

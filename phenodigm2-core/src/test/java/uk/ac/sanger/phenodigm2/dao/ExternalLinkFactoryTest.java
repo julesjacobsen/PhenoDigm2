@@ -71,7 +71,7 @@ public class ExternalLinkFactoryTest {
         impcHomozygote = new MouseModel();
         impcHomozygote.setMgiGeneId("MGI:2148742");
         impcHomozygote.setMgiModelId(27887);
-        impcHomozygote.setSource("MGP");
+        impcHomozygote.setSource("IMPC");
         impcHomozygote.setAllelicComposition("Cldn16<tm1a(KOMP)Wtsi>/Cldn16<tm1a(KOMP)Wtsi>");
         impcHomozygote.setGeneticBackground("MAPG");
         impcHomozygote.setAlleleIds(null);
@@ -80,7 +80,7 @@ public class ExternalLinkFactoryTest {
         impcHeterozygote = new MouseModel();
         impcHeterozygote.setMgiGeneId("MGI:97874");
         impcHeterozygote.setMgiModelId(3773);
-        impcHeterozygote.setSource("MGP");
+        impcHeterozygote.setSource("IMPC");
         impcHeterozygote.setAllelicComposition("Rb1<tm1Brd>/Rb1<+>");
         impcHeterozygote.setGeneticBackground("involves: 129S7/SvEvBrd * C57BL/6");
         impcHeterozygote.setAlleleIds(null);
@@ -198,7 +198,7 @@ public class ExternalLinkFactoryTest {
     @Test
     public void testBuildLinkStringsMgpHetWildType() {
         String geneId = "MGI:2148742";
-        String source = "MGP";
+        String source = "IMPC";
         String allelicComposition = "Cldn16<tm1a(KOMP)Wtsi>/+";
         String alleleIds = null;
         String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">+</a>";
