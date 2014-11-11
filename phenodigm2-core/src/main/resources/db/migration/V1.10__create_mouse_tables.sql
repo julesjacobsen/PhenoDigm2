@@ -329,26 +329,26 @@ CREATE TABLE `best_impc_hp_mp_mapping` (
   `hp_term` varchar(200) DEFAULT NULL,
   `mp_id` varchar(12) NOT NULL,
   `mp_term` varchar(200) DEFAULT NULL,
-  `ic` double DEFAULT NULL,
+  `score` double DEFAULT NULL,
   `lcs` varchar(200),
   PRIMARY KEY (`id`));
 
 CREATE INDEX `best_hp_mp` ON `best_impc_hp_mp_mapping` (`hp_id` ASC, `mp_id` ASC);
 
 -- -----------------------------------------------------
--- Table `best_impc_hp_mp_mapping`
+-- Table `best_impc_mp_hp_mapping`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `best_impc_hp_mp_mapping` ;
+DROP TABLE IF EXISTS `best_impc_mp_hp_mapping` ;
 
-CREATE TABLE `best_impc_hp_mp_mapping` (
+CREATE TABLE `best_impc_mp_hp_mapping` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `hp_id` varchar(12) NOT NULL,
-  `hp_term` varchar(200) DEFAULT NULL,
   `mp_id` varchar(12) NOT NULL,
   `mp_term` varchar(200) DEFAULT NULL,
-  `ic` double DEFAULT NULL,
+  `hp_id` varchar(12) NOT NULL,
+  `hp_term` varchar(200) DEFAULT NULL,
+  `score` double DEFAULT NULL,
   `lcs` varchar(200),
   PRIMARY KEY (`id`));
 
-CREATE INDEX `best_hp_mp` ON `best_impc_hp_mp_mapping` (`hp_id` ASC, `mp_id` ASC);
+CREATE INDEX `best_mp_hp` ON `best_impc_mp_hp_mapping` (`mp_id` ASC, `hp_id` ASC);
 
