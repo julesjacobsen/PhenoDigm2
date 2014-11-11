@@ -193,7 +193,8 @@ public class ExternalLinkFactory {
             case MGI:
                 urlPattern = URL_PATTERNS.MGI_URL.toString();
                 break;
-            case IMPC:
+            case "MGP": //MGP is the legacy source name
+            case IMPC: //IMPC is the new shiny one
                 urlPattern = URL_PATTERNS.IMPC_URL.toString();
                 break;
         }

@@ -196,9 +196,23 @@ public class ExternalLinkFactoryTest {
      * Test of buildLink method, of class ExternalLinkFactory.
      */
     @Test
-    public void testBuildLinkStringsMgpHetWildType() {
+    public void testBuildLinkStringsIMPCHetWildType() {
         String geneId = "MGI:2148742";
         String source = "IMPC";
+        String allelicComposition = "Cldn16<tm1a(KOMP)Wtsi>/+";
+        String alleleIds = null;
+        String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">+</a>";
+        String result = ExternalLinkFactory.buildLink(geneId, source, allelicComposition, alleleIds);
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of buildLink method, of class ExternalLinkFactory.
+     */
+    @Test
+    public void testBuildLinkStringsMgpSourceAlsoProducesImpcLink() {
+        String geneId = "MGI:2148742";
+        String source = "MGP";
         String allelicComposition = "Cldn16<tm1a(KOMP)Wtsi>/+";
         String alleleIds = null;
         String expResult = "<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">Cldn16<sup>tm1a(KOMP)Wtsi</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:2148742\">+</a>";
