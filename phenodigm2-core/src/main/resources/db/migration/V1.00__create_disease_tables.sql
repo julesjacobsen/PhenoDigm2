@@ -115,19 +115,3 @@ CREATE TABLE `hp_hp_mapping` (
 
 CREATE INDEX `hphpm_hp_hp` ON `hp_hp_mapping` (`hp_id` ASC,`hp_id_hit` ASC);
 
--- -----------------------------------------------------
--- Table `best_impc_hp_mp_mapping`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `best_impc_hp_mp_mapping` ;
-
-CREATE TABLE `best_impc_hp_mp_mapping` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `hp_id` varchar(12) NOT NULL,
-  `hp_term` varchar(200) DEFAULT NULL,
-  `mp_id` varchar(12) NOT NULL,
-  `mp_term` varchar(200) DEFAULT NULL,
-  `ic` double DEFAULT NULL,
-  `lcs` varchar(200),
-  PRIMARY KEY (`id`));
-
-CREATE INDEX `best_hp_mp` ON `best_impc_hp_mp_mapping` (`hp_id` ASC, `mp_id` ASC);
