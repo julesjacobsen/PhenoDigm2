@@ -16,17 +16,12 @@
  */
 package uk.ac.sanger.phenodigm2.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -34,23 +29,11 @@ import static org.junit.Assert.*;
  */
 public class DiseaseIdentifierTest {
     
-    public DiseaseIdentifierTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
+    @Test
+    public void testConstructor_super() {
+        DiseaseIdentifier instance = new DiseaseIdentifier("OMIM", "101600");
+        assertEquals("OMIM", instance.getDatabaseCode());
+        assertEquals("101600", instance.getDatabaseAcc());
     }
 
     @Test
@@ -61,14 +44,14 @@ public class DiseaseIdentifierTest {
         DiseaseIdentifier omimDisease2 = new DiseaseIdentifier("OMIM:1235");
         DiseaseIdentifier orphanetDisease1 = new DiseaseIdentifier("ORPHANET:1234");
         
-        List<DiseaseIdentifier> diseaseList  = new ArrayList<DiseaseIdentifier>();
+        List<DiseaseIdentifier> diseaseList  = new ArrayList<>();
         
         diseaseList.add(orphanetDisease1);
         diseaseList.add(omimDisease1);
         diseaseList.add(decypherDisease1);
         diseaseList.add(omimDisease2);
         
-        List<DiseaseIdentifier> expectedDiseaseList  = new ArrayList<DiseaseIdentifier>();
+        List<DiseaseIdentifier> expectedDiseaseList  = new ArrayList<>();
         
         expectedDiseaseList.add(decypherDisease1);        
         expectedDiseaseList.add(omimDisease1);
@@ -92,7 +75,7 @@ public class DiseaseIdentifierTest {
         
         assertTrue(decypherDisease1.equals(decypherDisease2));
         
-        Set<DiseaseIdentifier> diseaseSet = new HashSet<DiseaseIdentifier>();
+        Set<DiseaseIdentifier> diseaseSet = new HashSet<>();
         diseaseSet.add(decypherDisease1);
         diseaseSet.add(decypherDisease2);
         
