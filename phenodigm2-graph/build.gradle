@@ -1,0 +1,7 @@
+description = 'phenodigm2-graph'
+dependencies {
+    compile project(':phenodigm2-core')
+    compile group: 'org.neo4j', name: 'neo4j', version: '2.0.0'
+    compile group: 'org.springframework.data', name: 'spring-data-neo4j-rest', version: '2.3.2.RELEASE'
+    compile group: 'org.neo4j', name: 'neo4j-rest-graphdb', version: '1.9'
+}
