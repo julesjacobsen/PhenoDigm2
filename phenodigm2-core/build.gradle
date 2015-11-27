@@ -1,8 +1,0 @@
-description = 'phenodigm2-core'
-dependencies {
-    compile group: 'org.apache.solr', name: 'solr-solrj', version: '4.4.0'
-    testCompile(group: 'org.apache.solr', name: 'solr-core', version: '4.4.0') {
-        exclude(module: 'slf4j-log4j12')
-        exclude(module: 'log4j')
-    }
-}
