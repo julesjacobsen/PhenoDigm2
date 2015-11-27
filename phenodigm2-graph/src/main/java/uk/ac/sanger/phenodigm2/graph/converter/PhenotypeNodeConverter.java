@@ -36,12 +36,7 @@ public class PhenotypeNodeConverter implements NodeConverter<PhenotypeTerm>{
 //            
 //        }
 
-        PhenotypeTerm term = new PhenotypeTerm();
-        
-        term.setId((String) node.getProperty("termId"));
-        term.setTerm((String) node.getProperty("termName"));
-        
-        return term;
+        return new PhenotypeTerm("termId", "termName");
     }
     
 }
