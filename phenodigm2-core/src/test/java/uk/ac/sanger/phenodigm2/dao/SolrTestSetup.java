@@ -16,11 +16,11 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import java.util.logging.Level;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.SolrParams;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
  */
 public class SolrTestSetup {
 
-    private SolrServer solrServer;
+    private final SolrServer solrServer;
     
     private static final Logger logger = LoggerFactory.getLogger(SolrTestSetup.class);
 
@@ -45,36 +45,40 @@ public class SolrTestSetup {
     private void rebuildCore() {
         logger.info("Rebuilding Solr core");
 
-        ModifiableSolrParams params = new ModifiableSolrParams();
-        params.set("qt", "/dataimport");
-        params.set("command", "full-import");
-        params.set("clean", true);
-        params.set("commit", true);
-        try {
-            solrServer.query(params);
+        ModifiableSolrParams cleanAndImportParams = new ModifiableSolrParams();
+        cleanAndImportParams.set("qt", "/dataimport");
+        cleanAndImportParams.set("command", "full-import");
+        cleanAndImportParams.set("clean", true);
+        cleanAndImportParams.set("commit", true);
 
-        } catch (SolrServerException ex) {
-            logger.error(null, ex);
-        }
+        runSolrQuery(cleanAndImportParams);
         //so the command has been sent - now we need to block anything from trying
         //to access the core untill it's finished indexing the database.
-        try {
-            //this will take about 30 seconds anyway, so let it do it's thing before pestering it to see if its finished.
-            Thread.sleep(30000);
-        } catch (InterruptedException ex) {
-            java.util.logging.Logger.getLogger(SolrTestSetup.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //this will take about 10-20 seconds anyway, so let it do it's thing before pestering it to see if its finished.
+        sleep(10000);
         while (!finishedIndexing()) {
-            try {
-                Thread.sleep(5000);
-                logger.info("Solr still not finished indexing - going to sleep for a few secs.");
-            } catch (InterruptedException ex) {
-                java.util.logging.Logger.getLogger(SolrTestSetup.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            logger.info("Solr still not finished indexing - going to sleep for a few secs.");
+            sleep(5000);
         }
 
         logger.info("DONE! Solr server should be sorted...");
 
+    }
+
+    private QueryResponse runSolrQuery(SolrParams solrParams) {
+        try {
+            return solrServer.query(solrParams);
+        } catch (SolrServerException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            logger.error(null, ex);
+        }
     }
 
     private boolean finishedIndexing() {
@@ -84,22 +88,16 @@ public class SolrTestSetup {
         statusParams.set("qt", "/dataimport");
         statusParams.set("command", "status");
         boolean finished = false;
-        try {
-            QueryResponse response = solrServer.query(statusParams);
-            logger.info("Checking server status...");
-            logger.info("{}", response);
-            String status = (String) response.getResponse().get("status");
-            logger.info("Response status: {}", status);
 
-            if (status.equals("idle")) {
-                finished = true;
-            }
-            if (finished) {
-                logger.info("Server idle - should have finished indexing.");
-            }
+        QueryResponse response = runSolrQuery(statusParams);
+        logger.info("Checking server status...");
+        logger.info("{}", response);
+        String status = (String) response.getResponse().get("status");
+        logger.info("Response status: {}", status);
 
-        } catch (SolrServerException ex) {
-            java.util.logging.Logger.getLogger(SolrTestSetup.class.getName()).log(Level.SEVERE, null, ex);
+        if (status.equals("idle")) {
+            logger.info("Server idle - should have finished indexing.");
+            finished = true;
         }
 
         return finished;

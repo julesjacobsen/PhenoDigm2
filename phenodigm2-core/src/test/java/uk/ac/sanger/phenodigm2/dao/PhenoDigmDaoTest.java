@@ -16,13 +16,8 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -81,9 +76,7 @@ public abstract class PhenoDigmDaoTest {
         pfeifferAlternativeTerms.add("CRANIOFACIAL-SKELETAL-DERMATOLOGIC DYSPLASIA, INCLUDED");
         expectedResult.setAlternativeTerms(pfeifferAlternativeTerms);
         expectedResult.setLocus("10q26.13");
-        List<String> pfeifferClasses = new ArrayList();
-        pfeifferClasses.add("unclassified");
-        expectedResult.setClasses(pfeifferClasses);
+        expectedResult.setClasses(Arrays.asList("unclassified"));
         
         Disease result = instance.getDisease(omimDiseaseId);
         assertEquals(expectedResult, result);
@@ -196,9 +189,7 @@ public abstract class PhenoDigmDaoTest {
     public void testGetDiseasePhenotypeTerms() {
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101200");
         List<PhenotypeTerm> result = instance.getDiseasePhenotypes(diseaseId);
-        PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("HP:0000175");
-        expectedTerm.setTerm("Cleft palate");
+        PhenotypeTerm expectedTerm = new PhenotypeTerm("HP:0000175", "Cleft palate");
         assertTrue(result.contains(expectedTerm));
     }
     
@@ -206,9 +197,7 @@ public abstract class PhenoDigmDaoTest {
     public void testGetMouseModelPhenotypeTerms() {
         String mouseModelId = "114";
         List<PhenotypeTerm> result = instance.getMouseModelPhenotypes(mouseModelId);
-        PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("MP:0000111");
-        expectedTerm.setTerm("cleft palate");
+        PhenotypeTerm expectedTerm = new PhenotypeTerm("MP:0000111", "cleft palate");
         assertTrue(result.contains(expectedTerm));
     }
     
@@ -222,16 +211,9 @@ public abstract class PhenoDigmDaoTest {
         expectedMatch.setIc(8.901661);
         //fused carpal bones (MP:0008915)
         expectedMatch.setLcs("");
-        
-        PhenotypeTerm humanTerm = new PhenotypeTerm();
-        humanTerm.setId("HP:0005048");
-        humanTerm.setTerm("Synostosis of carpal bones");
-        expectedMatch.setHumanPhenotype(humanTerm);
-        
-        PhenotypeTerm mouseTerm = new PhenotypeTerm();
-        mouseTerm.setId("MP:0008915");
-        mouseTerm.setTerm("fused carpal bones");
-        expectedMatch.setMousePhenotype(mouseTerm);
+
+        expectedMatch.setHumanPhenotype(new PhenotypeTerm("HP:0005048", "Synostosis of carpal bones"));
+        expectedMatch.setMousePhenotype(new PhenotypeTerm("MP:0008915", "fused carpal bones"));
         
         PhenotypeMatch matchResult = null;
         for (PhenotypeMatch phenotypeMatch : result) {

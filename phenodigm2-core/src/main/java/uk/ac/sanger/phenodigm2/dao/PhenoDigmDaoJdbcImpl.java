@@ -20,12 +20,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +42,6 @@ import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
- *
  * Disease data access manager implementation.
  *
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
@@ -55,7 +50,7 @@ import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     private static final Logger logger = LoggerFactory.getLogger(PhenoDigmDaoJdbcImpl.class);
-    
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -63,10 +58,10 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     private static OrthologCache orthologCache;
     private static DiseaseCache diseaseCache;
     private static MouseModelCache mouseModelCache;
-    
+
     public PhenoDigmDaoJdbcImpl() {
     }
-  
+
     private void setUpCaches() {
         //don't change the order - the orthologs are needed first off
         setUpOrthologCache();
@@ -81,12 +76,12 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
 //            String sql = "select mgi_gene_id as mgi_gene_id, mgi_gene_symbol as mouse_gene_symbol, human_gene_symbol as human_gene_symbol, hgnc_id as hgnc_id, human_curated, mouse_curated, mgi_predicted, impc_predicted, mgi_mouse, impc_mouse, impc_pheno \n" +
 //                            "from gene_summary;";
-            
+
             String sql = "select mgo.model_gene_id, mgo.model_gene_symbol, ifnull(mgo.hgnc_id, '') as hgnc_gene_id, ifnull(mgo.hgnc_gene_symbol, '') as hgnc_gene_symbol, ifnull(mgo.hgnc_gene_locus,  '') as hgnc_gene_locus "
                     + "from mouse_gene_ortholog mgo";
-         
-            Map<GeneIdentifier, Gene> orthologMap = this.jdbcTemplate.query(sql, new OrthologGeneResultSetExtractor());
-            
+
+            Map<GeneIdentifier, Gene> orthologMap = jdbcTemplate.query(sql, new OrthologGeneResultSetExtractor());
+
             orthologCache = new OrthologCache(orthologMap);
         }
     }
@@ -94,12 +89,12 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     private void setUpDiseaseCache() {
         if (diseaseCache == null) {
             logger.info("Setting up disease cache...");
-            
+
             String sql = "select disease_id, disease_term, disease_alts, ifnull(disease_locus, '') as disease_locus, disease_classes from disease;";
-            
-            Map<String, Disease> diseaseMap = this.jdbcTemplate.query(sql, new DiseaseResultSetExtractor());
+
+            Map<String, Disease> diseaseMap = jdbcTemplate.query(sql, new DiseaseResultSetExtractor());
             logger.info("Made diseases.");
-            
+
             diseaseCache = new DiseaseCache(diseaseMap, new HashMap());
         }
     }
@@ -114,7 +109,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     + "join mouse_model_gene_ortholog mmgo on mmgo.model_id = mm.model_id "
                     + "order by mmgo.model_gene_id;";
 
-            Map<Integer, MouseModel> mouseModels = this.jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
+            Map<Integer, MouseModel> mouseModels = jdbcTemplate.query(sql, new MouseModelResultSetExtractor());
             mouseModelCache = new MouseModelCache(mouseModels);
         }
     }
@@ -123,29 +118,23 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     public Disease getDisease(DiseaseIdentifier diseaseId) {
         return diseaseCache.getDisease(diseaseId.toString());
     }
-    
+
     @Override
     public List<PhenotypeTerm> getDiseasePhenotypes(DiseaseIdentifier diseaseId) {
-        List<PhenotypeTerm> phenotypeList;
         String sql = "select hp.hp_id as id, hp.term as term from hp join disease_hp d on d.hp_id = hp.hp_id where d.disease_id = ?;";
-        
+
         PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(diseaseId.toString(), sql);
 
-        phenotypeList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeResultSetExtractor());
-        
-        return phenotypeList;    
+        return jdbcTemplate.query(prepStatmentCreator, new PhenotypeResultSetExtractor());
     }
-    
+
     @Override
     public List<PhenotypeTerm> getMouseModelPhenotypes(String mouseModelId) {
-        List<PhenotypeTerm> phenotypeList;
         String sql = "select mp.mp_id as id, mp.term as term from mouse_model_mp mm join mp on mp.mp_id = mm.mp_id where mm.model_id = ?;";
-        
+
         PreparedStatementCreator prepStatmentCreator = new SingleValuePreparedStatementCreator(mouseModelId, sql);
 
-        phenotypeList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeResultSetExtractor());
-        
-        return phenotypeList;    
+        return jdbcTemplate.query(prepStatmentCreator, new PhenotypeResultSetExtractor());
     }
 
     @Override
@@ -156,11 +145,11 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 + "join hp on hp.hp_id = phenomap.hp_id "
                 + "join mp on mp.mp_id = phenomap.mp_id "
                 + "where disease_id = ? and model_id = ?;";
-        
+
         PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId.toString(), sql);
-        
-        phenotypeMatchList = this.jdbcTemplate.query(prepStatmentCreator, new PhenotypeMatchesResultSetExtractor());
-        
+
+        phenotypeMatchList = jdbcTemplate.query(prepStatmentCreator, new PhenotypeMatchesResultSetExtractor());
+
         return phenotypeMatchList;
     }
 
@@ -193,22 +182,17 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-        
+
     private static class OrthologGeneResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Gene>> {
-
-        private Map<GeneIdentifier, Gene> resultsMap;
-
-        public OrthologGeneResultSetExtractor() {
-            resultsMap = new HashMap<GeneIdentifier, Gene>();
-        }
 
         @Override
         public Map<GeneIdentifier, Gene> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            final  Map<GeneIdentifier, Gene> resultsMap = new HashMap<>();
             while (rs.next()) {
                 GeneIdentifier mouseGeneIdentifier = new GeneIdentifier(rs.getString("model_gene_symbol"), rs.getString("model_gene_id"));
 //                System.out.println(String.format("Made new Mouse GeneIdentifier: %s %s", mouseGeneIdentifier.getGeneSymbol(), mouseGeneIdentifier.getCompoundIdentifier()));
@@ -225,14 +209,13 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 //there are cases still there is a gene symbol, but we don't have a HGNC geneId
                 else if (hgncGeneId.isEmpty()) {
                     humanGeneIdentifier = new GeneIdentifier(humanGeneSymbol, "HGNC", "");
-                }
-                else {
+                } else {
                     humanGeneIdentifier = new GeneIdentifier(humanGeneSymbol, hgncGeneId);
                 }
 //                System.out.println(String.format("Made new Human GeneIdentifier: %s %s", humanGeneIdentifier.getGeneSymbol(), humanGeneIdentifier.getCompoundIdentifier()));
 
                 Gene geneOrthologs = new Gene(mouseGeneIdentifier, humanGeneIdentifier);
-                              
+
                 resultsMap.put(mouseGeneIdentifier, geneOrthologs);
             }
 //            System.out.println("Made new ortholog map with " + resultsMap.keySet().size() + " orthologs");
@@ -242,14 +225,9 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     private static class DiseaseResultSetExtractor implements ResultSetExtractor<Map<String, Disease>> {
 
-        private Map<String, Disease> diseaseMap;
-
-        public DiseaseResultSetExtractor() {
-            diseaseMap = new TreeMap<String, Disease>();
-        }
-
         @Override
         public Map<String, Disease> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            final Map<String, Disease> diseaseMap = new TreeMap<String, Disease>();
 
             while (rs.next()) {
                 String omimDiseaseId = rs.getString("disease_id");
@@ -260,18 +238,18 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                     String altTerms = rs.getString("disease_alts");
                     //add alternative disease terms - if there are any
                     if (!altTerms.isEmpty()) {
-                        disease.setAlternativeTerms(makeStringListFromDelimitedString(altTerms, "\\|"));
+                        disease.setAlternativeTerms(makeListFromDelimitedString(altTerms, "\\|"));
                     }
                     String locus = rs.getString("disease_locus");
                     //add known disease locus - if there are any
                     if (!locus.isEmpty()) {
                         disease.setLocus(locus);
                     }
-                    
+
                     String classes = rs.getString("disease_classes");
                     //add disease classes - if there are any
                     if (!classes.isEmpty()) {
-                        disease.setClasses(makeStringListFromDelimitedString(classes, ","));
+                        disease.setClasses(makeListFromDelimitedString(classes, ","));
                     }
 
                     diseaseMap.put(disease.getDiseaseId(), disease);
@@ -280,22 +258,18 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
             return diseaseMap;
         }
-    }
 
-    private static List<String> makeStringListFromDelimitedString(String otherTerms, String delimiter) {
-        List<String> alternativeTerms = new ArrayList<String>();
-        String[] altTerms = otherTerms.split(delimiter);
-        for (int i = 0; i < altTerms.length; i++) {
-            alternativeTerms.add(altTerms[i]);
+        private static List<String> makeListFromDelimitedString(String otherTerms, String delimiter) {
+            String[] altTerms = otherTerms.split(delimiter);
+            return Arrays.asList(altTerms);
         }
-        return alternativeTerms;
     }
 
     private class SingleValuePreparedStatementCreator implements PreparedStatementCreator {
 
         private String mgiId;
         private String sql;
-        
+
         public SingleValuePreparedStatementCreator(String mgiId, String sql) {
             this.mgiId = mgiId;
             this.sql = sql;
@@ -307,7 +281,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
             preparedStatement.setString(1, mgiId);
             return preparedStatement;
         }
-        
+
     }
 
     private static class TwoValuePreparedStatementCreator implements PreparedStatementCreator {
@@ -315,13 +289,13 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         private String sql;
         private String diseaseId;
         private String mouseModelId;
-        
+
         public TwoValuePreparedStatementCreator(String diseaseId, String mouseModelId, String sql) {
             this.sql = sql;
             this.diseaseId = diseaseId;
             this.mouseModelId = mouseModelId;
         }
-        
+
         @Override
         public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
@@ -333,14 +307,10 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     private static class MouseModelResultSetExtractor implements ResultSetExtractor<Map<Integer, MouseModel>> {
 
-        private Map<Integer, MouseModel> mouseModelMap;
-
-        public MouseModelResultSetExtractor() {
-            mouseModelMap = new HashMap();
-        }
-
         @Override
         public Map<Integer, MouseModel> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            final Map<Integer, MouseModel> mouseModelMap = new HashMap();
+
             while (rs.next()) {
                 MouseModel mouseModel = new MouseModel();
                 mouseModel.setMgiGeneId(rs.getString("model_gene_id"));
@@ -351,42 +321,36 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 mouseModel.setAlleleIds(rs.getString("allele_ids"));
                 mouseModel.setAllelicCompositionLink(ExternalLinkFactory.buildLink(mouseModel));
                 mouseModel.setPhenotypeTerms(new ArrayList<PhenotypeTerm>());
-                
+
                 mouseModelMap.put(mouseModel.getMgiModelId(), mouseModel);
             }
+
             return mouseModelMap;
         }
     }
-        
-    private static class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
 
-        public PhenotypeResultSetExtractor() {
-        }
+    private static class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
 
         @Override
         public List<PhenotypeTerm> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            List<PhenotypeTerm> phenotypes = new ArrayList<PhenotypeTerm>();
-        
-            while(rs.next()) {
-                PhenotypeTerm term = new PhenotypeTerm();
-                term.setId(rs.getString("id"));
-                term.setTerm(rs.getString("term"));
-                phenotypes.add(term);
+            List<PhenotypeTerm> phenotypes = new ArrayList<>();
+
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String term = rs.getString("term");
+                phenotypes.add(new PhenotypeTerm(id, term));
             }
-            
+
             return phenotypes;
         }
     }
-        
+
     private static class PhenotypeMatchesResultSetExtractor implements ResultSetExtractor<List<PhenotypeMatch>> {
-                
-        public PhenotypeMatchesResultSetExtractor() {
-        }
 
         @Override
         public List<PhenotypeMatch> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            List<PhenotypeMatch> results = new ArrayList<PhenotypeMatch>();
-            
+            List<PhenotypeMatch> results = new ArrayList<>();
+
             while (rs.next()) {
                 PhenotypeMatch phenoMatch = new PhenotypeMatch();
                 phenoMatch.setSimJ(rs.getDouble("simJ"));
@@ -395,18 +359,15 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
                 //TODO: There are only around 20K PhenotypeTerms so these might
                 //be best pulled from a cache as they are static objects from 
                 //the HPO (human phenotype ontology) and MP (mammalian phenotype ontology)
-                
-                PhenotypeTerm mouseTerm = new PhenotypeTerm();
-                mouseTerm.setId(rs.getString("mp_term_id"));
-                mouseTerm.setTerm(rs.getString("mp_term"));
-                phenoMatch.setMousePhenotype(mouseTerm);
-                
-                PhenotypeTerm humanTerm = new PhenotypeTerm();
-                humanTerm.setId(rs.getString("hp_term_id"));
-                humanTerm.setTerm(rs.getString("hp_term"));
-                phenoMatch.setHumanPhenotype(humanTerm);
-                
-                
+
+                String mpId = rs.getString("mp_term_id");
+                String mpTerm = rs.getString("mp_term");
+                phenoMatch.setMousePhenotype(new PhenotypeTerm(mpId, mpTerm));
+
+                String hpId = rs.getString("hp_term_id");
+                String hpTerm = rs.getString("hp_term");
+                phenoMatch.setHumanPhenotype(new PhenotypeTerm(hpId, hpTerm));
+
                 results.add(phenoMatch);
             }
             return results;

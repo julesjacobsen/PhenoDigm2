@@ -33,18 +33,29 @@ public class ExternalLinkFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ExternalLinkFactory.class);
 
-    private static final String MGI = "MGI";
-    private static final String IMPC = "IMPC";
-    
-    private enum URL_PATTERNS {
+    protected enum MouseHrefTags {
 
         MGI_URL("<a href=\"http://informatics.jax.org/accession/%s\">%s</a>"),
-        IMPC_URL("<a href=\"http://www.mousephenotype.org/data/genes/%s\">%s</a>");
+        IMPC_URL("<a href=\"http://www.mousephenotype.org/data/genes/%s\">%s</a>"),
+        UNKNOWN_URL("<a href=%s>%s</a>");
 
         private final String urlPattern;
 
-        private URL_PATTERNS(String urlPattern) {
+        MouseHrefTags(String urlPattern) {
             this.urlPattern = urlPattern;
+        }
+
+        static String getHrefTag(String resource) {
+            //find out what source of the model is for building the URL.
+            switch (resource) {
+                case "MGI":
+                    return MGI_URL.toString();
+                case "MGP": //MGP is the legacy source name
+                case "IMPC": //IMPC is the new shiny one
+                    return IMPC_URL.toString();
+                default:
+                    return UNKNOWN_URL.toString();
+            }
         }
 
         @Override
@@ -79,9 +90,6 @@ public class ExternalLinkFactory {
      */
     protected static String buildLink(String geneId, String source, String allelicComposition, String alleleIds) {
 
-        //we're going to make a list of alleles
-        List<Allele> alleleList = new ArrayList<>();
-
         List<String> alleleSymbols = makeAlleleSymbols(allelicComposition);
 
         //find out if the alleles are homozygous
@@ -92,22 +100,10 @@ public class ExternalLinkFactory {
 
         //so now all the data should be in order we should be able to safely build the alleles
         //and add them to the alleleList
+        List<Allele> alleleList = new ArrayList<>();
         for (int i = 0; i < alleleSymbols.size(); i++) {
             Allele allele = new Allele(source, geneId, alleleSymbols.get(i), alleleIdentifiers.get(i));
             alleleList.add(allele);
-        }
-
-        if (logger.isDebugEnabled()) {
-            String zygosity = "heterozygote";
-            if (homozygous) {
-                zygosity = "homozygote";
-            }
-            logger.info("{} {} is a {} with {} alleles:", geneId, allelicComposition, zygosity, alleleList.size());
-            for (Allele allele : alleleList) {
-                logger.info("{}", allele);
-                logger.info(buildAlleleLink(allele));
-            }
-            logger.info("");
         }
 
         //hopefully there should be some alleles by now
@@ -182,30 +178,16 @@ public class ExternalLinkFactory {
     }
 
     protected static String buildAlleleLink(Allele allele) {
-        return buildAlleleLink(allele.getGeneId(), allele.getSource(), allele.getAlleleSymbol(), allele.getAlleleId());
-    }
-
-    protected static String buildAlleleLink(String geneId, String source, String alleleSymbol, String alleleId) {
-        String urlPattern = "";
-
-        //find out what source of the model is for building the URL.
-        switch (source) {
-            case MGI:
-                urlPattern = URL_PATTERNS.MGI_URL.toString();
-                break;
-            case "MGP": //MGP is the legacy source name
-            case IMPC: //IMPC is the new shiny one
-                urlPattern = URL_PATTERNS.IMPC_URL.toString();
-                break;
-        }
+        String alleleId = allele.getAlleleId();
 
         if (alleleId == null || alleleId.isEmpty()) {
-            alleleId = geneId;
+            alleleId = allele.getGeneId();
         }
 
-        return String.format(urlPattern, alleleId, formatAllelicCompositionHtml(alleleSymbol));
-
+        String urlPattern = MouseHrefTags.getHrefTag(allele.getSource());
+        return String.format(urlPattern, alleleId, formatAllelicCompositionHtml(allele.getAlleleSymbol()));
     }
+
 
     /**
      * Returns an HTML formatted allelic composition by replacing all instances

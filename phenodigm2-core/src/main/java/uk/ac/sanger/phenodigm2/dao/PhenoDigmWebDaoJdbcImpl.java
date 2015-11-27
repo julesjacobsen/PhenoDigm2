@@ -258,15 +258,9 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
     private static class DiseaseToGeneAssociationSummariesResultSetExtractor implements ResultSetExtractor<List<GeneAssociationSummary>> {
 
-        List<GeneAssociationSummary> results;
-
-        public DiseaseToGeneAssociationSummariesResultSetExtractor() {
-            
-        }
-
         @Override
         public List<GeneAssociationSummary> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            results = new ArrayList<GeneAssociationSummary>();
+            List<GeneAssociationSummary> results = new ArrayList<GeneAssociationSummary>();
             
             while (rs.next()) {
                 //make the gene identifier
@@ -295,15 +289,10 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
     private static class GeneToDiseaseAssociationSummariesResultSetExtractor implements ResultSetExtractor<List<DiseaseAssociationSummary>> {
 
-        List<DiseaseAssociationSummary> results;
-
-        public GeneToDiseaseAssociationSummariesResultSetExtractor() {
-            results = new ArrayList<DiseaseAssociationSummary>();
-        }
-
         @Override
         public List<DiseaseAssociationSummary> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            
+            final List<DiseaseAssociationSummary> results = new ArrayList<>();
+
             while (rs.next()) {
                 ///make the Disease details                
                 DiseaseIdentifier diseaseId = new DiseaseIdentifier(rs.getString("disease_id"));
@@ -327,9 +316,6 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
     }
 
     private static class DiseaseGeneAssociationDetailResultSetExtractor implements ResultSetExtractor<DiseaseGeneAssociationDetail> {
-
-        public DiseaseGeneAssociationDetailResultSetExtractor() {
-        }
 
         @Override
         public DiseaseGeneAssociationDetail extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -382,9 +368,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     logger.debug("Made new {}", diseaseAssociation);
                 }
                 //make the MP terms and attach to the diseaseAssociation (each row)
-                PhenotypeTerm term = new PhenotypeTerm();
-                term.setId(rs.getString("mp_id"));
-                term.setTerm(rs.getString("term"));
+                PhenotypeTerm term = new PhenotypeTerm(rs.getString("mp_id"), rs.getString("term"));
                 if (modelPhenotypes != null) {
                     modelPhenotypes.add(term);
                 }
@@ -405,17 +389,12 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
     private static class DiseasePhenotypesResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
 
-        public DiseasePhenotypesResultSetExtractor() {
-        }
-
         @Override
         public List<PhenotypeTerm> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            List<PhenotypeTerm> phenotypes = new ArrayList<PhenotypeTerm>();
+            List<PhenotypeTerm> phenotypes = new ArrayList<>();
         
             while(rs.next()) {
-                PhenotypeTerm term = new PhenotypeTerm();
-                term.setId(rs.getString("term_id"));
-                term.setTerm(rs.getString("term"));
+                PhenotypeTerm term = new PhenotypeTerm(rs.getString("term_id"), rs.getString("term"));
                 phenotypes.add(term);
             }
             
@@ -425,9 +404,6 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
 
     
     private static class DiseaseResultSetExtractor implements ResultSetExtractor<Disease> {
-
-        public DiseaseResultSetExtractor() {
-        }
 
         @Override
         public Disease extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -452,9 +428,6 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
     }
 
     private static class GeneResultSetExtractor implements ResultSetExtractor<Gene> {
-
-        public GeneResultSetExtractor() {           
-        }
 
         @Override
         public Gene extractData(ResultSet rs) throws SQLException, DataAccessException {

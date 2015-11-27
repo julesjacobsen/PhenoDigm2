@@ -462,15 +462,15 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     }
 
     private PhenotypeTerm makePhenotypeTerm(String string) {
-        PhenotypeTerm phenotype = new PhenotypeTerm();
         String[] splitString = string.split("_");
+        String id = "";
+        String term = "";
         if (splitString.length == 2) {
-            phenotype.setId(splitString[0]);
-            phenotype.setTerm(splitString[1]);
+            id = splitString[0];
+            term = splitString[1];
         } else {
             logger.warn("makePhenotypeTerm Parsing Error: '{}' should be of format MP:1234_Term", string);
         }
-
-        return phenotype;
+        return new PhenotypeTerm(id, term);
     }
 }

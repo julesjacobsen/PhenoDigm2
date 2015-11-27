@@ -260,7 +260,14 @@ public class ExternalLinkFactoryTest {
         //bound to happen somewhere
         String alleleId = null;
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:102492\">mt-Rnr2<sup>m1Dwa</sup></a>";
-        String result = ExternalLinkFactory.buildAlleleLink(geneId, source, allele, alleleId);
+
+        if (alleleId == null || alleleId.isEmpty()) {
+            alleleId = geneId;
+        }
+
+        String urlPattern = ExternalLinkFactory.MouseHrefTags.getHrefTag(source);
+
+        String result = String.format(urlPattern, alleleId, ExternalLinkFactory.formatAllelicCompositionHtml(allele));
         assertEquals(expResult, result);
     }
     
@@ -275,7 +282,14 @@ public class ExternalLinkFactoryTest {
         //bound to happen somewhere
         String alleleId = "MGI:3783752";
         String expResult = "<a href=\"http://informatics.jax.org/accession/MGI:3783752\">mt-Rnr2<sup>m1Dwa</sup></a>";
-        String result = ExternalLinkFactory.buildAlleleLink(geneId, source, allele, alleleId);
+
+        if (alleleId == null || alleleId.isEmpty()) {
+            alleleId = geneId;
+        }
+
+        String urlPattern = ExternalLinkFactory.MouseHrefTags.getHrefTag(source);
+
+        String result = String.format(urlPattern, alleleId, ExternalLinkFactory.formatAllelicCompositionHtml(allele));
         assertEquals(expResult, result);
     }
     

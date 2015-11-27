@@ -10,7 +10,7 @@ package uk.ac.sanger.phenodigm2.model;
  */
 public class GeneIdentifier extends ExternalIdentifier implements Comparable<GeneIdentifier>{
     
-    private String geneSymbol;
+    private final String geneSymbol;
     
     public GeneIdentifier(String geneSymbol, String databaseCode, String databaseAcc) {
         super(databaseCode, databaseAcc);
@@ -31,10 +31,6 @@ public class GeneIdentifier extends ExternalIdentifier implements Comparable<Gen
 
     public String getGeneSymbol() {
         return geneSymbol;
-    }
-
-    public void setGeneSymbol(String geneSymbol) {
-        this.geneSymbol = geneSymbol;
     }
 
     /**

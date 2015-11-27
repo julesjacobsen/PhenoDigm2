@@ -34,7 +34,7 @@ public class ExternalIdentifier {
     private String databaseAcc;
     private String externalUri;
 
-    private static enum ExternalLink {
+    private enum ExternalLink {
         MGI("MGI", "http://www.informatics.jax.org/accession/MGI:"),
         HGNC("HGNC", "http://www.genenames.org/data/hgnc_data.php?hgnc_id="),
         OMIM("OMIM", "http://omim.org/entry/"),
