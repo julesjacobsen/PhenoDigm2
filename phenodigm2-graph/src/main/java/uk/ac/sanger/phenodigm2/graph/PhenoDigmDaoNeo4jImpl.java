@@ -29,7 +29,6 @@ import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
-import org.neo4j.rest.graphdb.util.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
 
     public PhenoDigmDaoNeo4jImpl(RestGraphDatabase graphDatabaseService) {
         this.graphDatabaseService = graphDatabaseService;
-        RestAPI restAPI = ((RestGraphDatabase) graphDatabaseService).getRestAPI();
+        RestAPI restAPI = graphDatabaseService.getRestAPI();
         queryEngine = new RestCypherQueryEngine(restAPI);
     }
     
@@ -77,7 +76,7 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
 //            String sql = "select distinct h2mo.*, d.*  from disease d left join disease_genes og on og.disease_id = d.disease_id left join human2mouse_orthologs h2mo on og.omim_gene_id = h2mo.omim_gene_id where d.type = 'disease';";
         String cypher = "MATCH (disease:Disease) RETURN disease;";
         
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
+        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(graphDatabaseService.getRestAPI());
         Iterator<Node> result = queryEngine.query(cypher, null).to(Node.class).iterator();;
 
         Set<Disease> returnSet = new TreeSet<Disease>();
@@ -98,7 +97,7 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
     public Set<Gene> getAllGenes() {
         
         String cypher = "MATCH (mouseGene:Gene) - [:IS_ORTHOLOG_OF] - humanGene  RETURN mouseGene.geneSymbol, mouseGene.geneId, humanGene.geneSymbol, humanGene.geneId;";
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
+        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(graphDatabaseService.getRestAPI());
         Iterator<Map<String, Object>> results = queryEngine.query(cypher, null).iterator();
 
         Set<Gene> returnSet = new TreeSet<Gene>();
@@ -126,7 +125,7 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
                 + "WHERE disease.diseaseId = {diseaseId} "
                 + "RETURN phenotype";
 
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
+        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(graphDatabaseService.getRestAPI());
         Iterator<Node> result = queryEngine.query(cypher, MapUtil.map("diseaseId", diseaseId)).to(Node.class).iterator();
         
         
@@ -163,7 +162,7 @@ public class PhenoDigmDaoNeo4jImpl implements PhenoDigmDao {
         
         String cypher = "START gene=node:node_auto_index(geneId = {geneId}) MATCH gene -[:IS_ORTHOLOG_OF]- orthologGene RETURN orthologGene.geneSymbol, orthologGene.geneId;";
         
-        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(((RestGraphDatabase) graphDatabaseService).getRestAPI());
+        RestCypherQueryEngine queryEngine = new RestCypherQueryEngine(graphDatabaseService.getRestAPI());
         Iterator<Map<String, Object>> results = queryEngine.query(cypher, MapUtil.map("geneId", geneIdentifier.getCompoundIdentifier())).iterator();
         
         Gene gene = null;

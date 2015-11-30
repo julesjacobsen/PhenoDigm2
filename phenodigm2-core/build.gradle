@@ -1,7 +1,9 @@
 description = 'phenodigm2-core'
 dependencies {
-    compile group: 'org.apache.solr', name: 'solr-solrj', version: '4.4.0'
-    testCompile(group: 'org.apache.solr', name: 'solr-core', version: '4.4.0') {
+    compile 'org.springframework:spring-jdbc'
+    compile 'org.apache.solr:solr-solrj'
+    testCompile('org.apache.solr:solr-core') {
+        exclude(module: 'commons-logging')
         exclude(module: 'slf4j-log4j12')
         exclude(module: 'log4j')
     }

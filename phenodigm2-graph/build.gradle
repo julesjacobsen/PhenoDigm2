@@ -1,8 +1,13 @@
 
 description = 'phenodigm2-graph'
+
+repositories {
+    maven { url "http://m2.neo4j.org/content/repositories/releases/" }
+}
+
 dependencies {
   compile project(':phenodigm2-core')
-    compile group: 'org.neo4j', name: 'neo4j', version:'2.0.0'
-    compile group: 'org.springframework.data', name: 'spring-data-neo4j-rest', version:'2.3.2.RELEASE'
-    compile group: 'org.neo4j', name: 'neo4j-rest-graphdb', version:'1.9'
+    compile 'org.neo4j:neo4j'
+    compile 'org.springframework.data:spring-data-neo4j-rest:3.4.0.RELEASE'
+    compile 'org.neo4j:neo4j-rest-graphdb:1.9'
 }
