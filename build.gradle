@@ -20,7 +20,7 @@ buildscript {
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'maven'
+//    apply plugin: 'maven'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
 
@@ -31,7 +31,7 @@ allprojects {
 subprojects {
 
     sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    targetCompatibility = 1.7
 
     apply plugin: 'io.spring.dependency-management'
 
@@ -62,8 +62,55 @@ subprojects {
         testCompile 'org.springframework:spring-test'
         testCompile 'com.h2database:h2'
         testCompile 'org.flywaydb:flyway-core'
+        testCompile 'org.apache.solr:solr-core'
         testCompile 'javax.servlet:javax.servlet-api'
     }
+}
+
+/**
+ * Creates a solr directory
+ * @param dir
+ * @return
+ */
+def initSolrCore(File dir) {
+    ext.resourceDir = '/src/main/resources/solr/'
+//Configures the home directory of Solr. Set the preferred directory path here.
+
+    ext.solrHome = dir.toPath().resolve('solr').toFile()
+    println(solrHome)
+    copy {
+        from resourceDir + 'solr.xml'
+        into solrHome
+    }
+
+    ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
+    copy {
+        from resourceDir + 'core.properties'
+        into coreDir
+    }
+
+    ext.coreConfDir = coreDir.toPath().resolve('conf').toFile()
+    copy {
+        from resourceDir + 'conf'
+        from resourceDir + 'schema.xml'
+        from resourceDir + 'solrconfig.xml'
+        from resourceDir + 'phenodigm-data-config.xml'
+        into coreConfDir
+    }
+
+    ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
+//    copy {
+//        from getDependencyByName('org.apache.solr:solr-core')
+//        from getDependencyByName('com.h2database:h2')
+//        from getDependencyByName('mysql:mysql-connector-java')
+//        into coreLibDir
+//    }
+}
 
 
+
+//TODO: make this return the jar of the dependency
+def getDependencyByName(String dependencyName) {
+    println 'copying ' + dependencyName
+    return dependencyName
 }

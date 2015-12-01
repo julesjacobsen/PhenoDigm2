@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.sanger.phenodigm2.dao;
+package uk.ac.sanger.phenodigm2.config;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -34,15 +34,12 @@ public class SolrTestSetup {
     
     private static final Logger logger = LoggerFactory.getLogger(SolrTestSetup.class);
 
-    public SolrTestSetup(SolrServer solrServer, boolean rebuildCore) {
-        logger.info("Setting up solr core for testing");
+    public SolrTestSetup(SolrServer solrServer) {
         this.solrServer = solrServer;
-        if (rebuildCore) {
-            rebuildCore();
-        }
+        logger.info("Setting up solr core for testing");
     }
 
-    private void rebuildCore() {
+    public void rebuildCore() {
         logger.info("Rebuilding Solr core");
 
         ModifiableSolrParams cleanAndImportParams = new ModifiableSolrParams();

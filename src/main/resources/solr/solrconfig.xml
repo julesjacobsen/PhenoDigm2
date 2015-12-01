@@ -1279,7 +1279,7 @@
     -->
   </requestHandler>
 
-<updateRequestProcessorChain name="uuid">
+  <updateRequestProcessorChain name="uuid">
       <processor class="solr.UUIDUpdateProcessorFactory">
           <str name="fieldName">id</str>
       </processor>
@@ -1288,7 +1288,7 @@
   
   <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
     <lst name="defaults">
-      <str name="config">${solr.core.data.config}</str>
+      <str name="config">phenodigm-data-config.xml</str>
       <str name="update.chain">uuid</str>
     </lst>
   </requestHandler>

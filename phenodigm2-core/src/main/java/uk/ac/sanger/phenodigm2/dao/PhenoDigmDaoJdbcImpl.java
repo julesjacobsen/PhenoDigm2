@@ -59,10 +59,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
     private static DiseaseCache diseaseCache;
     private static MouseModelCache mouseModelCache;
 
-    public PhenoDigmDaoJdbcImpl() {
-    }
-
-    private void setUpCaches() {
+    public void initCaches() {
         //don't change the order - the orthologs are needed first off
         setUpOrthologCache();
         setUpDiseaseCache();
