@@ -30,7 +30,7 @@ allprojects {
 
 subprojects {
 
-    sourceCompatibility = 1.8
+    sourceCompatibility = 1.7
     targetCompatibility = 1.7
 
     apply plugin: 'io.spring.dependency-management'
@@ -42,7 +42,6 @@ subprojects {
         maven { url "http://repo.maven.apache.org/maven2" }
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
-        maven { url "http://m2.neo4j.org/content/repositories/releases/" }
     }
 
     dependencyManagement {
