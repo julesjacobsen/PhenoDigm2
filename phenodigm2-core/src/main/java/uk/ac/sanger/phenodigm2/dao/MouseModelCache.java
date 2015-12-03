@@ -26,10 +26,10 @@ import uk.ac.sanger.phenodigm2.model.MouseModel;
  */
 class MouseModelCache {
     
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MouseModelCache.class);
 
-    private static Map<Integer, MouseModel> mouseModelMap;
-    private static Map<String, Set<MouseModel>> mgiGeneIdToModelsMap;
+    private final Map<Integer, MouseModel> mouseModelMap;
+    private final Map<String, Set<MouseModel>> mgiGeneIdToModelsMap;
     
     /**
      * 
@@ -37,11 +37,11 @@ class MouseModelCache {
      */
     protected MouseModelCache(Map<Integer, MouseModel> mouseModels) {
         mouseModelMap = mouseModels;
+        mgiGeneIdToModelsMap = new HashMap();
         init();
     }
 
     private void init() {
-        mgiGeneIdToModelsMap = new HashMap();
         for (MouseModel mouseModel : mouseModelMap.values()) {
             String mgiGeneId = mouseModel.getMgiGeneId();
             if (mgiGeneIdToModelsMap.containsKey(mgiGeneId)) {

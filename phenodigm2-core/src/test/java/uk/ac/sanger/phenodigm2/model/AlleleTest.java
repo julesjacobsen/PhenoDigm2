@@ -36,31 +36,21 @@ public class AlleleTest {
     
     @Before
     public void setUp() {
-        instance = new Allele();
+        instance = new Allele(source, geneId, alleleSymbol, alleleId);
     }
-    
-    @Test
-    public void testGetSetSource() {
-        instance.setSource(source);
-        assertEquals(source, instance.getSource());
-    }
-
     
     @Test
     public void testGetSetGeneId() {
-        instance.setGeneId(geneId);
         assertEquals(geneId, instance.getGeneId());
     }
 
     @Test
     public void testGetSetAlleleSymbol() {
-        instance.setAlleleSymbol(alleleSymbol);
         assertEquals(alleleSymbol, instance.getAlleleSymbol());
     }
 
     @Test
     public void testGetSetAlleleId() {
-        instance.setAlleleId(alleleId);
         assertEquals(alleleId, instance.getAlleleId());
     }
 
@@ -74,12 +64,6 @@ public class AlleleTest {
 
     @Test
     public void testToString() {
-
-        instance.setSource(source);
-        instance.setGeneId(geneId);
-        instance.setAlleleSymbol(alleleSymbol);
-        instance.setAlleleId(alleleId);
-
         String expected = "Allele{source=" + source + ", geneId=" + geneId + ", alleleId=" + alleleId + ", alleleSymbol=" + alleleSymbol + '}';
         assertEquals(expected, instance.toString());
     }

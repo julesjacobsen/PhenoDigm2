@@ -37,10 +37,10 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 class DiseaseCache {
     
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(DiseaseCache.class);
     
     private final Map<String, Disease> diseaseIdToDiseaseMap;    
-    private Map<String, Set<Disease>> hgncGeneIdToDiseaseMap;
+    private final Map<String, Set<Disease>> hgncGeneIdToDiseaseMap;
 
     protected DiseaseCache(Map<String, Disease> diseaseIdToDiseaseMap, Map<String, Set<Disease>> hgncGeneIdToDiseasesMap) {
         this.diseaseIdToDiseaseMap = diseaseIdToDiseaseMap;

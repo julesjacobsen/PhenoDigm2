@@ -30,9 +30,8 @@ public class ExternalIdentifier {
     
     private static final Logger logger = LoggerFactory.getLogger(ExternalIdentifier.class);
     
-    private String databaseCode;
-    private String databaseAcc;
-    private String externalUri;
+    private final String databaseCode;
+    private final String databaseAcc;
 
     private enum ExternalLink {
         MGI("MGI", "http://www.informatics.jax.org/accession/MGI:"),
@@ -111,16 +110,8 @@ public class ExternalIdentifier {
         return databaseCode;
     }
 
-    public void setDatabaseCode(String databaseCode) {
-        this.databaseCode = databaseCode;
-    }
-
     public String getDatabaseAcc() {
         return databaseAcc;
-    }
-
-    public void setDatabaseAcc(String databaseAcc) {
-        this.databaseAcc = databaseAcc;
     }
 
     public String getExternalUri() {
@@ -132,10 +123,6 @@ public class ExternalIdentifier {
         return String.format("%s%s", externalLink.getLink(), this.databaseAcc);
     }
 
-    public void setExternalUri(String externalUri) {
-        this.externalUri = externalUri;
-    }
-
     /**
      * Returns the 'full' identifier of a gene Id. In the case of an MGI gene Id
      * this will be 'MGI:95522'. 
@@ -145,6 +132,7 @@ public class ExternalIdentifier {
     public String getCompoundIdentifier() {
         return String.format("%s:%s", databaseCode, databaseAcc);
     }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -170,7 +158,6 @@ public class ExternalIdentifier {
         }
         return true;
     }
-    
 
     @Override
     public String toString() {

@@ -349,12 +349,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         }
 
         //build the DiseaseGeneAssociationDetail from the component parts
-        DiseaseGeneAssociationDetail diseaseGeneAssociationDetail = new DiseaseGeneAssociationDetail(diseaseId);
-        diseaseGeneAssociationDetail.setDiseasePhenotypes(getDiseasePhenotypes(diseaseId));
-        diseaseGeneAssociationDetail.setGene(getGene(geneId));
-        diseaseGeneAssociationDetail.setDiseaseAssociations(diseaseAssociationSummaryList);
-
-        return diseaseGeneAssociationDetail;
+        return new DiseaseGeneAssociationDetail(diseaseId, getDiseasePhenotypes(diseaseId), getGene(geneId), diseaseAssociationSummaryList);
     }
 
     /**

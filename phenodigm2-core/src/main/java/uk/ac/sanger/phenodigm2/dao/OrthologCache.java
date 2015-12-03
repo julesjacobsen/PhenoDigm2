@@ -20,13 +20,11 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 class OrthologCache {
     
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(OrthologCache.class);
 
-    
     //access is usually to get human orthologs of a mouse gene identifier via MGI id
-    private static Map<GeneIdentifier, Gene> mouseToHumanOrthologsMap;
-    
-    private static Map<String, GeneIdentifier> mgiIdToGeneIdentifierMap;
+    private final Map<GeneIdentifier, Gene> mouseToHumanOrthologsMap;
+    private final Map<String, GeneIdentifier> mgiIdToGeneIdentifierMap;
     
     /**
      * Requires a Map of MGI geneId to OMIM geneId. i.e. Mouse to Human gene identifiers.
@@ -34,12 +32,11 @@ class OrthologCache {
      */
     protected OrthologCache(Map<GeneIdentifier, Gene> mouseToHumanOrthologs){
         mouseToHumanOrthologsMap = mouseToHumanOrthologs;
+        mgiIdToGeneIdentifierMap = new HashMap<>();
         init();
     }
-    
+
     private void init() {
-        mgiIdToGeneIdentifierMap = new HashMap<String, GeneIdentifier>();
-        
         for (GeneIdentifier mouseGeneId : mouseToHumanOrthologsMap.keySet()) {
             mgiIdToGeneIdentifierMap.put(mouseGeneId.getCompoundIdentifier(), mouseGeneId);
         }
@@ -67,8 +64,7 @@ class OrthologCache {
         
         return getHumanOrthologOfMouseGene(mouseGeneIdentifier);
     }
-    
-    
+
     /**
      * 
      * @param mouseGeneIdentifier

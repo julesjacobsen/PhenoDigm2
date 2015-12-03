@@ -63,6 +63,7 @@ subprojects {
         testCompile 'org.flywaydb:flyway-core'
         testCompile 'org.apache.solr:solr-core'
         testCompile 'javax.servlet:javax.servlet-api'
+        testCompile 'org.apache.solr:solr-dataimporthandler:4.4.0'
     }
 }
 
@@ -71,12 +72,12 @@ subprojects {
  * @param dir
  * @return
  */
-def initSolrCore(File dir) {
+task initSolrCore(type: Sync) {
     ext.resourceDir = '/src/main/resources/solr/'
 //Configures the home directory of Solr. Set the preferred directory path here.
 
-    ext.solrHome = dir.toPath().resolve('solr').toFile()
-    println(solrHome)
+    ext.solrHome = buildDir.toPath().resolve('solr').toFile()
+    println("Solr home: $solrHome")
     copy {
         from resourceDir + 'solr.xml'
         into solrHome
@@ -84,6 +85,7 @@ def initSolrCore(File dir) {
 
     ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
     copy {
+        println("Copying core.properties to $coreDir")
         from resourceDir + 'core.properties'
         into coreDir
     }
@@ -98,18 +100,8 @@ def initSolrCore(File dir) {
     }
 
     ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
-//    copy {
-//        from getDependencyByName('org.apache.solr:solr-core')
-//        from getDependencyByName('com.h2database:h2')
-//        from getDependencyByName('mysql:mysql-connector-java')
-//        into coreLibDir
-//    }
-}
-
-
-
-//TODO: make this return the jar of the dependency
-def getDependencyByName(String dependencyName) {
-    println 'copying ' + dependencyName
-    return dependencyName
+    copy {
+        from configurations.testCompile
+        into coreLibDir
+    }
 }

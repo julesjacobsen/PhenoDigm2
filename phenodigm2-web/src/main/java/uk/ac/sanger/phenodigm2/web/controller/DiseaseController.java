@@ -2,12 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.sanger.phenodigm2.controller;
+package uk.ac.sanger.phenodigm2.web.controller;
 
-import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.slf4j.Logger;
@@ -21,6 +19,7 @@ import uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDao;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.web.AssociationSummary;
+import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
 /**
  *
@@ -33,7 +32,7 @@ public class DiseaseController {
 
     @Autowired
     private PhenoDigmWebDao phenoDigmDao;
-    private double rawScoreCutoff;
+    private double rawScoreCutoff = 1.97;
 
     public double getRawScoreCutoff() {
         return rawScoreCutoff;

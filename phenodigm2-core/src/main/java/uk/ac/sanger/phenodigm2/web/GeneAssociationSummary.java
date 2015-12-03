@@ -25,9 +25,9 @@ import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
  */
 public class GeneAssociationSummary {
     
-    private GeneIdentifier hgncGeneIdentifier;
-    private GeneIdentifier modelGeneIdentifier;
-    private AssociationSummary associationSummary;
+    private final GeneIdentifier hgncGeneIdentifier;
+    private final GeneIdentifier modelGeneIdentifier;
+    private final AssociationSummary associationSummary;
 
     public GeneAssociationSummary(GeneIdentifier hgncGeneIdentifier, GeneIdentifier modelGeneIdentifier, AssociationSummary associationSummary) {
         this.hgncGeneIdentifier = hgncGeneIdentifier;
@@ -39,27 +39,14 @@ public class GeneAssociationSummary {
         return hgncGeneIdentifier;
     }
 
-    public void setHgncGeneIdentifier(GeneIdentifier hgncGeneIdentifier) {
-        this.hgncGeneIdentifier = hgncGeneIdentifier;
-    }
-
     public GeneIdentifier getModelGeneIdentifier() {
         return modelGeneIdentifier;
-    }
-
-    public void setModelGeneIdentifier(GeneIdentifier modelGeneIdentifier) {
-        this.modelGeneIdentifier = modelGeneIdentifier;
     }
 
     public AssociationSummary getAssociationSummary() {
         return associationSummary;
     }
 
-    public void setAssociationSummary(AssociationSummary associationSummary) {
-        this.associationSummary = associationSummary;
-    }
-
-    
     @Override
     public String toString() {
         return String.format("GeneAssociationSummary{%s %s %s}", hgncGeneIdentifier, modelGeneIdentifier, associationSummary);

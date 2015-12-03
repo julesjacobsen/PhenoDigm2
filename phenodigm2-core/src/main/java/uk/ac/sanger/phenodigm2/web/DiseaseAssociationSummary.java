@@ -25,9 +25,9 @@ import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
  */
 public class DiseaseAssociationSummary {
     
-    private DiseaseIdentifier diseaseId;
-    private String diseaseTerm;
-    private AssociationSummary associationSummary;
+    private final DiseaseIdentifier diseaseId;
+    private final String diseaseTerm;
+    private final AssociationSummary associationSummary;
     
     public DiseaseAssociationSummary(DiseaseIdentifier diseaseId, String diseaseTerm, AssociationSummary associationSummary) {
         this.associationSummary = associationSummary;
@@ -39,24 +39,12 @@ public class DiseaseAssociationSummary {
         return diseaseId;
     }
 
-    public void setDiseaseIdentifier(DiseaseIdentifier diseaseId) {
-        this.diseaseId = diseaseId;
-    }
-
     public String getDiseaseTerm() {
         return diseaseTerm;
     }
 
-    public void setDiseaseTerm(String diseaseTerm) {
-        this.diseaseTerm = diseaseTerm;
-    }
-
     public AssociationSummary getAssociationSummary() {
         return associationSummary;
-    }
-
-    public void setAssociationSummary(AssociationSummary associationSummary) {
-        this.associationSummary = associationSummary;
     }
 
     @Override

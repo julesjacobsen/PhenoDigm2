@@ -42,10 +42,4 @@ public interface PhenoDigmDao {
     
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, Integer mouseModelId);
 
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff);
-
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff);
-
-    public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId);
-
 }

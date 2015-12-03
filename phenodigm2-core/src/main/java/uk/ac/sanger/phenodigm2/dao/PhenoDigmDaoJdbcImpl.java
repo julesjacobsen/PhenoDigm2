@@ -136,18 +136,15 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     @Override
     public List<PhenotypeMatch> getPhenotypeMatches(String diseaseId, Integer mouseModelId) {
-        List<PhenotypeMatch> phenotypeMatchList;
         String sql = "select phenomap.disease_id as disease, phenomap.model_id as model_id, phenomap.ic as ic, phenomap.simJ as simJ, phenomap.mp_id as mp_term_id, mp.term as mp_term, phenomap.hp_id as hp_term_id, hp.term as hp_term, phenomap.lcs as lcs "
                 + "from mouse_disease_model_association_detail phenomap "
                 + "join hp on hp.hp_id = phenomap.hp_id "
                 + "join mp on mp.mp_id = phenomap.mp_id "
                 + "where disease_id = ? and model_id = ?;";
 
-        PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId.toString(), sql);
+//        PreparedStatementCreator prepStatmentCreator = new TwoValuePreparedStatementCreator(diseaseId, mouseModelId.toString(), sql);
 
-        phenotypeMatchList = jdbcTemplate.query(prepStatmentCreator, new PhenotypeMatchesResultSetExtractor());
-
-        return phenotypeMatchList;
+        return jdbcTemplate.query(sql, new Object[]{diseaseId, mouseModelId.toString()}, new PhenotypeMatchesResultSetExtractor());
     }
 
     @Override
@@ -170,22 +167,8 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         return orthologCache.getGenes();
     }
 
-    @Override
-    public Map<Disease, List<GeneAssociationSummary>> getDiseaseToGeneAssociationSummaries(DiseaseIdentifier diseaseId, double minScoreCutoff) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
-    @Override
-    public Map<Gene, List<DiseaseAssociationSummary>> getGeneToDiseaseAssociationSummaries(GeneIdentifier geneId, double minScoreCutoff) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public DiseaseGeneAssociationDetail getDiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, GeneIdentifier geneId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private static class OrthologGeneResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Gene>> {
+    private class OrthologGeneResultSetExtractor implements ResultSetExtractor<Map<GeneIdentifier, Gene>> {
 
         @Override
         public Map<GeneIdentifier, Gene> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -220,7 +203,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    private static class DiseaseResultSetExtractor implements ResultSetExtractor<Map<String, Disease>> {
+    private class DiseaseResultSetExtractor implements ResultSetExtractor<Map<String, Disease>> {
 
         @Override
         public Map<String, Disease> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -256,7 +239,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
             return diseaseMap;
         }
 
-        private static List<String> makeListFromDelimitedString(String otherTerms, String delimiter) {
+        private List<String> makeListFromDelimitedString(String otherTerms, String delimiter) {
             String[] altTerms = otherTerms.split(delimiter);
             return Arrays.asList(altTerms);
         }
@@ -281,28 +264,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
 
     }
 
-    private static class TwoValuePreparedStatementCreator implements PreparedStatementCreator {
-
-        private String sql;
-        private String diseaseId;
-        private String mouseModelId;
-
-        public TwoValuePreparedStatementCreator(String diseaseId, String mouseModelId, String sql) {
-            this.sql = sql;
-            this.diseaseId = diseaseId;
-            this.mouseModelId = mouseModelId;
-        }
-
-        @Override
-        public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, diseaseId);
-            preparedStatement.setString(2, mouseModelId);
-            return preparedStatement;
-        }
-    }
-
-    private static class MouseModelResultSetExtractor implements ResultSetExtractor<Map<Integer, MouseModel>> {
+    private class MouseModelResultSetExtractor implements ResultSetExtractor<Map<Integer, MouseModel>> {
 
         @Override
         public Map<Integer, MouseModel> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -326,7 +288,7 @@ public class PhenoDigmDaoJdbcImpl implements PhenoDigmDao {
         }
     }
 
-    private static class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
+    private class PhenotypeResultSetExtractor implements ResultSetExtractor<List<PhenotypeTerm>> {
 
         @Override
         public List<PhenotypeTerm> extractData(ResultSet rs) throws SQLException, DataAccessException {

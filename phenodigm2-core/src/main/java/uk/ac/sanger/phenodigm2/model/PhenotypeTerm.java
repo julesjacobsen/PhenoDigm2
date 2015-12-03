@@ -13,7 +13,6 @@ public class PhenotypeTerm {
     private final String id;
     private final String term;
         
-    //do we need an HPO/MP Enum too? I don't think so.
     public PhenotypeTerm(String id, String term) {
         this.id = id;
         this.term = term;
