@@ -3,6 +3,7 @@ buildscript {
         dependencyManagementPluginVersion = '0.5.3.RELEASE'
         springBootVersion = '1.3.0.RC1'
     }
+
     repositories {
         jcenter()
         mavenCentral()
@@ -67,41 +68,44 @@ subprojects {
     }
 }
 
-/**
- * Creates a solr directory
- * @param dir
- * @return
- */
-task initSolrCore(type: Sync) {
-    ext.resourceDir = '/src/main/resources/solr/'
-//Configures the home directory of Solr. Set the preferred directory path here.
-
-    ext.solrHome = buildDir.toPath().resolve('solr').toFile()
-    println("Solr home: $solrHome")
-    copy {
-        from resourceDir + 'solr.xml'
-        into solrHome
-    }
-
-    ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
-    copy {
-        println("Copying core.properties to $coreDir")
-        from resourceDir + 'core.properties'
-        into coreDir
-    }
-
-    ext.coreConfDir = coreDir.toPath().resolve('conf').toFile()
-    copy {
-        from resourceDir + 'conf'
-        from resourceDir + 'schema.xml'
-        from resourceDir + 'solrconfig.xml'
-        from resourceDir + 'phenodigm-data-config.xml'
-        into coreConfDir
-    }
-
-    ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
-    copy {
-        from configurations.testCompile
-        into coreLibDir
-    }
-}
+//task initSolrCore {
+//    description 'Copies the minimal solr core files from the solr resources directory to the target directory.'
+//
+//    ext.destinationDir = buildDir
+//
+//    ext.resourceDir = '../src/main/resources/solr/'
+////Configures the home directory of Solr. Set the preferred directory path here.
+//    ext.solrHome = destinationDir.toPath().resolve('solr').toFile()
+//
+//    println("Copying Solr core to: $solrHome")
+//    inputs.file resourceDir
+//    outputs.dir solrHome
+//    doLast {
+//        copy {
+//            from resourceDir + 'solr.xml'
+//            into solrHome
+//        }
+//
+//        ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
+//        copy {
+//            println("Copying core.properties to $coreDir")
+//            from resourceDir + 'core.properties'
+//            into coreDir
+//        }
+//
+//        ext.coreConfDir = coreDir.toPath().resolve('conf').toFile()
+//        copy {
+//            from resourceDir + 'conf'
+//            from resourceDir + 'schema.xml'
+//            from resourceDir + 'solrconfig.xml'
+//            from resourceDir + 'phenodigm-data-config.xml'
+//            into coreConfDir
+//        }
+//
+//        ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
+//        copy {
+//            from configurations.testCompile
+//            into coreLibDir
+//        }
+//    }
+//}
