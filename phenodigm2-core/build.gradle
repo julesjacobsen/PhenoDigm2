@@ -15,40 +15,31 @@ task initSolrCore {
 //Configures the home directory of Solr. Set the preferred directory path here.
     ext.solrHome = destinationDir.toPath().resolve('solr').toFile()
 
-    inputs.file resourceDir
-    outputs.dir solrHome
     doLast {
         println("Copying Solr core to: $solrHome")
         copy {
-            from resourceDir + 'solr.xml'
+            from "$solrResourceDir/solr.xml"
             into solrHome
         }
 
-        ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
+        ext.coreDir = "$solrHome/phenodigm"
         copy {
             println("Copying core.properties to $coreDir")
-            from resourceDir + 'core.properties'
+            from "$solrResourceDir/core.properties"
             into coreDir
         }
 
-        ext.coreConfDir = coreDir.toPath().resolve('conf').toFile()
         copy {
-            from resourceDir + 'conf'
-            from resourceDir + 'schema.xml'
-            from resourceDir + 'solrconfig.xml'
-            from resourceDir + 'phenodigm-data-config.xml'
-            into coreConfDir
+            from "$solrResourceDir/conf"
+            from "$solrResourceDir/schema.xml"
+            from "$solrResourceDir/solrconfig.xml"
+            from "$solrResourceDir/phenodigm-data-config.xml"
+            into "$coreDir/conf"
         }
 
-        ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
         copy {
             from configurations.testCompile
-            into coreLibDir
+            into "$coreDir/lib"
         }
     }
-}
-
-task solrCoreInit(dependsOn: test) {
-    println(buildDir)
-    initSolrCore.execute()
 }

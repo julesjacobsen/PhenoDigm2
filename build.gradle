@@ -27,6 +27,8 @@ allprojects {
 
     group = 'uk.ac.sanger'
     version = '2.0.0'
+
+    ext.solrResourceDir = "$rootDir/src/main/resources/solr"
 }
 
 subprojects {
@@ -67,45 +69,3 @@ subprojects {
         testCompile 'org.apache.solr:solr-dataimporthandler:4.4.0'
     }
 }
-
-//task initSolrCore {
-//    description 'Copies the minimal solr core files from the solr resources directory to the target directory.'
-//
-//    ext.destinationDir = buildDir
-//
-//    ext.resourceDir = '../src/main/resources/solr/'
-////Configures the home directory of Solr. Set the preferred directory path here.
-//    ext.solrHome = destinationDir.toPath().resolve('solr').toFile()
-//
-//    println("Copying Solr core to: $solrHome")
-//    inputs.file resourceDir
-//    outputs.dir solrHome
-//    doLast {
-//        copy {
-//            from resourceDir + 'solr.xml'
-//            into solrHome
-//        }
-//
-//        ext.coreDir = solrHome.toPath().resolve('phenodigm').toFile()
-//        copy {
-//            println("Copying core.properties to $coreDir")
-//            from resourceDir + 'core.properties'
-//            into coreDir
-//        }
-//
-//        ext.coreConfDir = coreDir.toPath().resolve('conf').toFile()
-//        copy {
-//            from resourceDir + 'conf'
-//            from resourceDir + 'schema.xml'
-//            from resourceDir + 'solrconfig.xml'
-//            from resourceDir + 'phenodigm-data-config.xml'
-//            into coreConfDir
-//        }
-//
-//        ext.coreLibDir = coreDir.toPath().resolve('lib').toFile()
-//        copy {
-//            from configurations.testCompile
-//            into coreLibDir
-//        }
-//    }
-//}
