@@ -415,7 +415,6 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
             for (SolrDocument solrDocument : resultsDocumentList) {
-                MouseModel model = new MouseModel();
 
                 Integer modelId = (Integer) solrDocument.getFieldValue("model_id");
                 String modelGeneId = (String) solrDocument.getFieldValue("marker_accession");
@@ -437,14 +436,17 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                     }
                 }
                 //make the model
+                MouseModel model = new MouseModel();
                 model.setMgiModelId(modelId);
                 model.setMgiGeneId(modelGeneId);
                 model.setSource(source);
                 model.setGeneticBackground(geneticBackground);
+
                 model.setAllelicComposition(allelicComposition);
                 model.setAlleleIds(setAlleleIds);
-                model.setPhenotypeTerms(phenotypeTerms);
                 model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
+
+                model.setPhenotypeTerms(phenotypeTerms);
 
                 logger.debug("Made {}", model);
                 modelMap.put(model.getMgiModelId(), model);

@@ -25,7 +25,8 @@ public class MouseModelTest {
     
     private MouseModel mgiHomozygote;
     private MouseModel mgiHeterozygote;
-    
+    private MouseModel miRna;
+
     public MouseModelTest() {
     }
     
@@ -43,8 +44,8 @@ public class MouseModelTest {
         mgiHomozygote.setMgiGeneId("MGI:1234");
         mgiHomozygote.setMgiModelId(4321);
         mgiHomozygote.setSource("MGI");
-        mgiHomozygote.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
         mgiHomozygote.setGeneticBackground("involves: 129S6/SvEvTac * C57BL/6");
+        mgiHomozygote.setAllelicComposition("Fgf9<tm1Dor>/Fgf9<tm1Dor>");
         mgiHomozygote.setAlleleIds("MGI:2135961");
         mgiHomozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2135961\">Fgf9<sup>tm1Dor</sup></a>");
         
@@ -52,10 +53,19 @@ public class MouseModelTest {
         mgiHeterozygote.setMgiGeneId("MGI:1233");
         mgiHeterozygote.setMgiModelId(888);
         mgiHeterozygote.setSource("IMPC");
-        mgiHeterozygote.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
         mgiHeterozygote.setGeneticBackground("involves: 129S4/SvJaeSor * C57BL/6J");
+        mgiHeterozygote.setAllelicComposition("Pitx2<tm1Jfm>/Pitx2<tm2Jfm>");
         mgiHeterozygote.setAlleleIds("MGI:2136269|MGI:2136268");
         mgiHeterozygote.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2136268\">Pitx2<sup>tm1Jfm</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
+
+        miRna = new MouseModel();
+        miRna.setMgiGeneId("MGI:1233");
+        miRna.setMgiModelId(888);
+        miRna.setSource("MGI");
+        miRna.setGeneticBackground("C57BL/6N");
+        miRna.setAllelicComposition("Mir141<sup>tm1(mirKO)Wtsi</sup>/+");
+        miRna.setAlleleIds("MGI:2676826");
+        miRna.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2676826\">Mir141<sup>tm1(mirKO)Wtsi</a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
     }
     
     @After

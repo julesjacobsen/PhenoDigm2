@@ -18,8 +18,9 @@ public class MouseModel implements Comparable<MouseModel> {
     //source is the centre who did the phenotyping of the model.
     //MGI, MGP, IMPC, EUROPHENOME
     private String source;
-    private String allelicComposition;    
     private String geneticBackground;
+
+    private String allelicComposition;
     private String alleleIds;
     //link out to MGI - this is fiddly, so it's stored here for ease of reference
     private String allelicCompositionLink;

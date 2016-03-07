@@ -29,9 +29,9 @@ public class AlleleTest {
     private Allele instance;
     
     private final String source = "SOURCE";
-    private final String geneId = "Gene1";
-    private final String alleleSymbol = "Aa/Bb";
-    private final String alleleId = "12345";
+    private final String geneId = "MGI:99999";
+    private final String alleleSymbol = "Aa<Tm1.23>";
+    private final String alleleId = "MGI:12345";
 
     
     @Before
