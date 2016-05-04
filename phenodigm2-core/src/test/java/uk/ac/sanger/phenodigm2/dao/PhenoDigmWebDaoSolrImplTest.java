@@ -16,6 +16,7 @@
  */
 package uk.ac.sanger.phenodigm2.dao;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +30,7 @@ import uk.ac.sanger.phenodigm2.config.SolrTestConfig;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SolrTestConfig.class})
+@Ignore
 public class PhenoDigmWebDaoSolrImplTest extends PhenoDigmWebDaoTest {
 
     public PhenoDigmWebDaoSolrImplTest() {
