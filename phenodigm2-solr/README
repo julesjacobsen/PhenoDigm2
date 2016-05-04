@@ -1,9 +1,0 @@
-This will deploy a Solr 4.4 core and run it in a Tomcat container. It's based on
-the example provided with Solr. 
-
-Configuration:
-
-* Set the desired values of the solr.* properties at the top of the POM.
-* Edit the META-INF/context.xml so that "solr/home" environment variable points to
-the ${solr.home}/${solr.core.directory}
-* Change src/main/resources/*.xml to fit your needs.

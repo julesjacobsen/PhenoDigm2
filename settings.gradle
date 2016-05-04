@@ -1,6 +1,4 @@
 rootProject.name = 'phenodigm2'
 include ':phenodigm2-core'
-include ':phenodigm2-solr'
 
 project(':phenodigm2-core').projectDir = "$rootDir/phenodigm2-core" as File
-project(':phenodigm2-solr').projectDir = "$rootDir/phenodigm2-solr" as File

@@ -1,6 +1,0 @@
-apply plugin: 'war'
-
-description = 'phenodigm2-solr'
-dependencies {
-    compile 'org.apache.solr:solr-core'
-}

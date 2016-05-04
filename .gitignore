@@ -1,7 +1,4 @@
 # Project specific bits
-/phenodigm2-solr/target/
-/phenodigm2-solr/overlays/
-/phenodigm2-db/target/
 
 #Java stuff
 *.class
