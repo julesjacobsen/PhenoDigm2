@@ -1,0 +1,4 @@
+rootProject.name = 'phenodigm2'
+include ':phenodigm2-core'
+
+project(':phenodigm2-core').projectDir = "$rootDir/phenodigm2-core" as File

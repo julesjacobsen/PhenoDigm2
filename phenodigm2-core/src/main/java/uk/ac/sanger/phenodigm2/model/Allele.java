@@ -19,18 +19,15 @@ package uk.ac.sanger.phenodigm2.model;
 import java.util.Objects;
 
 /**
- * Bean for holding allele data.
+ * Class for holding allele data.
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class Allele {
 
-    private String source;
-    private String geneId;
-    private String alleleSymbol;
-    private String alleleId;
-
-    public Allele() {
-    }
+    private final String source;
+    private final String geneId;
+    private final String alleleSymbol;
+    private final String alleleId;
 
     public Allele(String source, String geneId, String alleleSymbol, String alleleId) {
         this.source = source;
@@ -43,32 +40,16 @@ public class Allele {
         return source;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
     public String getGeneId() {
         return geneId;
-    }
-
-    public void setGeneId(String geneId) {
-        this.geneId = geneId;
     }
 
     public String getAlleleSymbol() {
         return alleleSymbol;
     }
 
-    public void setAlleleSymbol(String alleleSymbol) {
-        this.alleleSymbol = alleleSymbol;
-    }
-
     public String getAlleleId() {
         return alleleId;
-    }
-
-    public void setAlleleId(String alleleId) {
-        this.alleleId = alleleId;
     }
 
     @Override

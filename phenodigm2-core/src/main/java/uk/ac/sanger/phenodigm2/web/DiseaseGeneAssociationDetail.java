@@ -31,12 +31,15 @@ import uk.ac.sanger.phenodigm2.model.PhenotypeTerm;
 public class DiseaseGeneAssociationDetail {
     
     private final DiseaseIdentifier diseaseId;
-    private Gene gene;
-    private List<PhenotypeTerm> diseasePhenotypes;
-    private List<DiseaseModelAssociation> diseaseAssociations;
+    private final Gene gene;
+    private final List<PhenotypeTerm> diseasePhenotypes;
+    private final List<DiseaseModelAssociation> diseaseAssociations;
 
-    public DiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId) {
+    public DiseaseGeneAssociationDetail(DiseaseIdentifier diseaseId, List<PhenotypeTerm> diseasePhenotypes, Gene gene, List<DiseaseModelAssociation> diseaseAssociations) {
         this.diseaseId = diseaseId;
+        this.gene = gene;
+        this.diseasePhenotypes = diseasePhenotypes;
+        this.diseaseAssociations = diseaseAssociations;
     }
 
     public DiseaseIdentifier getDiseaseId() {
@@ -47,24 +50,12 @@ public class DiseaseGeneAssociationDetail {
         return gene;
     }
 
-    public void setGene(Gene gene) {
-        this.gene = gene;
-    }
-    
     public List<PhenotypeTerm> getDiseasePhenotypes() {
         return diseasePhenotypes;
     }
 
-    public void setDiseasePhenotypes(List<PhenotypeTerm> diseasePhenotypes) {
-        this.diseasePhenotypes = diseasePhenotypes;
-    }
-
     public List<DiseaseModelAssociation> getDiseaseAssociations() {
         return diseaseAssociations;
-    }
-
-    public void setDiseaseAssociations(List<DiseaseModelAssociation> diseaseAssociations) {
-        this.diseaseAssociations = diseaseAssociations;
     }
     
 }

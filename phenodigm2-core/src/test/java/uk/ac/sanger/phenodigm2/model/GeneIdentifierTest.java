@@ -27,9 +27,6 @@ import static org.junit.Assert.*;
  * @author Jules Jacobsen <jules.jacobsen@sanger.ac.uk>
  */
 public class GeneIdentifierTest {
-    
-    public GeneIdentifierTest() {
-    }
 
     /**
      * Test of constructor for class GeneIdentifier.

@@ -30,33 +30,16 @@ import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
  */
 public class DiseaseAssociationSummaryTest {
     
-    DiseaseAssociationSummary instance;
-    DiseaseIdentifier diseaseIdentifier;
-    String diseaseTerm;
-    AssociationSummary summary; 
+    private final DiseaseAssociationSummary instance;
+    private final DiseaseIdentifier diseaseIdentifier;
+    private final String diseaseTerm;
+    private final AssociationSummary summary;
     
     public DiseaseAssociationSummaryTest() {
         diseaseIdentifier = new DiseaseIdentifier("OMIM:12345");
         diseaseTerm = "Wibble-wobble syndrome";
         summary = new AssociationSummary(true, true, true, 89.34, 87.65);
         instance = new DiseaseAssociationSummary(diseaseIdentifier, diseaseTerm, summary);
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-        
-    }
-    
-    @After
-    public void tearDown() {
     }
 
     /**

@@ -24,7 +24,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoTest.logger;
+
+import uk.ac.sanger.phenodigm2.config.JdbcTestConfig;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
@@ -34,7 +35,7 @@ import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
  * @author jj8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jdbc-test-context.xml"})
+@ContextConfiguration(classes = {JdbcTestConfig.class})
 public class PhenoDigmWebDaoJdbcImplTest extends PhenoDigmWebDaoTest {
     
     public PhenoDigmWebDaoJdbcImplTest() {

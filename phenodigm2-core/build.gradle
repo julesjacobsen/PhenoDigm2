@@ -1,0 +1,45 @@
+description = 'phenodigm2-core'
+
+dependencies {
+    compile 'org.springframework:spring-jdbc'
+    compile 'org.apache.solr:solr-solrj'
+    testCompile 'org.apache.solr:solr-core'
+}
+
+task initSolrCore {
+    description 'Copies the minimal solr core files from the solr resources directory to the target directory.'
+
+    ext.destinationDir = buildDir
+
+    ext.solrResourceDir = 'src/main/resources/solr/'
+//Configures the home directory of Solr. Set the preferred directory path here.
+    ext.solrHome = destinationDir.toPath().resolve('solr').toFile()
+
+    doLast {
+        println("Copying Solr core to: $solrHome")
+        copy {
+            from "$solrResourceDir/solr.xml"
+            into solrHome
+        }
+
+        ext.coreDir = "$solrHome/phenodigm"
+        copy {
+            println("Copying $solrResourceDir/core.properties to $coreDir")
+            from "$solrResourceDir/core.properties"
+            into coreDir
+        }
+
+        copy {
+            from "$solrResourceDir/conf"
+            from "$solrResourceDir/schema.xml"
+            from "$solrResourceDir/solrconfig.xml"
+            from "$solrResourceDir/phenodigm-data-config.xml"
+            into "$coreDir/conf"
+        }
+
+        copy {
+            from configurations.testCompile
+            into "$coreDir/lib"
+        }
+    }
+}

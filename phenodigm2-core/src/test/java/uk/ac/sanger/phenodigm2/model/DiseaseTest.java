@@ -6,6 +6,7 @@
 package uk.ac.sanger.phenodigm2.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,25 +21,6 @@ import static org.junit.Assert.*;
  */
 public class DiseaseTest {
     
-    public DiseaseTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test constructor, of class Disease.
      */
@@ -135,8 +117,7 @@ public class DiseaseTest {
     @Test
     public void testGetSetPhenotypeTerms() {
         Disease instance = new Disease();
-        List<PhenotypeTerm> expResult = new ArrayList<PhenotypeTerm>();
-        expResult.add(new PhenotypeTerm());
+        List<PhenotypeTerm> expResult = Arrays.asList(new PhenotypeTerm("ID", "term"));
         instance.setPhenotypeTerms(expResult);
         List<PhenotypeTerm> result = instance.getPhenotypeTerms();
         assertEquals(expResult, result);

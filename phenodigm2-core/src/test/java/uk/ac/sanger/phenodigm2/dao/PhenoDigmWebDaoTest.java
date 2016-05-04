@@ -117,9 +117,7 @@ public abstract class PhenoDigmWebDaoTest {
     public void testGetDiseasePhenotypes() {
         DiseaseIdentifier diseaseId = new DiseaseIdentifier("OMIM:101200");
         List<PhenotypeTerm> result = instance.getDiseasePhenotypes(diseaseId);
-        PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("HP:0000175");
-        expectedTerm.setTerm("Cleft palate");
+        PhenotypeTerm expectedTerm = new PhenotypeTerm("HP:0000175", "Cleft palate");
         assertTrue(result.contains(expectedTerm));
         assertTrue(result.size() >= 75);
     }
@@ -246,9 +244,7 @@ public abstract class PhenoDigmWebDaoTest {
         assertEquals("<a href=\"http://informatics.jax.org/accession/MGI:2153811\">Fgfr2<sup>tm1.1Dsn</sup></a>/<a href=\"http://informatics.jax.org/accession/MGI:2153811\">Fgfr2<sup>tm1.1Dsn</sup></a>", expectedModel.getAllelicCompositionLink());
 
         //test the mouseModel phenotypes
-        PhenotypeTerm expectedTerm = new PhenotypeTerm();
-        expectedTerm.setId("MP:0000111");
-        expectedTerm.setTerm("cleft palate");
+        PhenotypeTerm expectedTerm = new PhenotypeTerm("MP:0000111", "cleft palate");
 
         List<PhenotypeTerm> resultList = expectedModel.getPhenotypeTerms();
 

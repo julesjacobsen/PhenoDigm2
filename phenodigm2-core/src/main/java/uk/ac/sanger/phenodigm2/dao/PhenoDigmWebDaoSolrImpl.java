@@ -32,7 +32,6 @@ import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
-import uk.ac.sanger.phenodigm2.model.ExternalIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -349,12 +348,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         }
 
         //build the DiseaseGeneAssociationDetail from the component parts
-        DiseaseGeneAssociationDetail diseaseGeneAssociationDetail = new DiseaseGeneAssociationDetail(diseaseId);
-        diseaseGeneAssociationDetail.setDiseasePhenotypes(getDiseasePhenotypes(diseaseId));
-        diseaseGeneAssociationDetail.setGene(getGene(geneId));
-        diseaseGeneAssociationDetail.setDiseaseAssociations(diseaseAssociationSummaryList);
-
-        return diseaseGeneAssociationDetail;
+        return new DiseaseGeneAssociationDetail(diseaseId, getDiseasePhenotypes(diseaseId), getGene(geneId), diseaseAssociationSummaryList);
     }
 
     /**
@@ -420,7 +414,6 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
         try {
             resultsDocumentList = solrServer.query(solrQuery).getResults();
             for (SolrDocument solrDocument : resultsDocumentList) {
-                MouseModel model = new MouseModel();
 
                 Integer modelId = (Integer) solrDocument.getFieldValue("model_id");
                 String modelGeneId = (String) solrDocument.getFieldValue("marker_accession");
@@ -442,14 +435,17 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
                     }
                 }
                 //make the model
+                MouseModel model = new MouseModel();
                 model.setMgiModelId(modelId);
                 model.setMgiGeneId(modelGeneId);
                 model.setSource(source);
                 model.setGeneticBackground(geneticBackground);
+
                 model.setAllelicComposition(allelicComposition);
                 model.setAlleleIds(setAlleleIds);
+                model.setAllelicCompositionLink(ExternalLinkBuilder.buildLink(model));
+
                 model.setPhenotypeTerms(phenotypeTerms);
-                model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
 
                 logger.debug("Made {}", model);
                 modelMap.put(model.getMgiModelId(), model);
@@ -462,15 +458,15 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
     }
 
     private PhenotypeTerm makePhenotypeTerm(String string) {
-        PhenotypeTerm phenotype = new PhenotypeTerm();
         String[] splitString = string.split("_");
+        String id = "";
+        String term = "";
         if (splitString.length == 2) {
-            phenotype.setId(splitString[0]);
-            phenotype.setTerm(splitString[1]);
+            id = splitString[0];
+            term = splitString[1];
         } else {
             logger.warn("makePhenotypeTerm Parsing Error: '{}' should be of format MP:1234_Term", string);
         }
-
-        return phenotype;
+        return new PhenotypeTerm(id, term);
     }
 }

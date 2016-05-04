@@ -29,38 +29,28 @@ public class AlleleTest {
     private Allele instance;
     
     private final String source = "SOURCE";
-    private final String geneId = "Gene1";
-    private final String alleleSymbol = "Aa/Bb";
-    private final String alleleId = "12345";
+    private final String geneId = "MGI:99999";
+    private final String alleleSymbol = "Aa<Tm1.23>";
+    private final String alleleId = "MGI:12345";
 
     
     @Before
     public void setUp() {
-        instance = new Allele();
+        instance = new Allele(source, geneId, alleleSymbol, alleleId);
     }
-    
-    @Test
-    public void testGetSetSource() {
-        instance.setSource(source);
-        assertEquals(source, instance.getSource());
-    }
-
     
     @Test
     public void testGetSetGeneId() {
-        instance.setGeneId(geneId);
         assertEquals(geneId, instance.getGeneId());
     }
 
     @Test
     public void testGetSetAlleleSymbol() {
-        instance.setAlleleSymbol(alleleSymbol);
         assertEquals(alleleSymbol, instance.getAlleleSymbol());
     }
 
     @Test
     public void testGetSetAlleleId() {
-        instance.setAlleleId(alleleId);
         assertEquals(alleleId, instance.getAlleleId());
     }
 
@@ -74,12 +64,6 @@ public class AlleleTest {
 
     @Test
     public void testToString() {
-
-        instance.setSource(source);
-        instance.setGeneId(geneId);
-        instance.setAlleleSymbol(alleleSymbol);
-        instance.setAlleleId(alleleId);
-
         String expected = "Allele{source=" + source + ", geneId=" + geneId + ", alleleId=" + alleleId + ", alleleSymbol=" + alleleSymbol + '}';
         assertEquals(expected, instance.toString());
     }
