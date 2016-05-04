@@ -26,17 +26,6 @@ public class MouseModelTest {
     private MouseModel mgiHomozygote;
     private MouseModel mgiHeterozygote;
     private MouseModel miRna;
-
-    public MouseModelTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
     
     @Before
     public void setUp() {
@@ -66,10 +55,6 @@ public class MouseModelTest {
         miRna.setAllelicComposition("Mir141<sup>tm1(mirKO)Wtsi</sup>/+");
         miRna.setAlleleIds("MGI:2676826");
         miRna.setAllelicCompositionLink("<a href=\"http://informatics.jax.org/accession/MGI:2676826\">Mir141<sup>tm1(mirKO)Wtsi</a>/<a href=\"http://informatics.jax.org/accession/MGI:2136269\">Pitx2<sup>tm2Jfm</sup></a>");
-    }
-    
-    @After
-    public void tearDown() {
     }
 
     /**

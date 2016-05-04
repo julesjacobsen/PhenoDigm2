@@ -33,9 +33,6 @@ public class DiseaseModelAssociationTest {
     DiseaseModelAssociation second;
     DiseaseModelAssociation third;
 
-    public DiseaseModelAssociationTest() {
-    }
-    
     @Before
     public void setUp() {
         first = new DiseaseModelAssociation();
