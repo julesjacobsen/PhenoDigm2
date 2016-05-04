@@ -36,18 +36,7 @@ public class ExternalLinkFactoryTest {
     //IMPC/MGP models
     MouseModel impcHomozygote;
     MouseModel impcHeterozygote;
-    
-    public ExternalLinkFactoryTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+    //TODO: Test making Alleles
     @Before
     public void setUp() {
         mgiHomozygote = new MouseModel();
@@ -87,10 +76,6 @@ public class ExternalLinkFactoryTest {
         impcHeterozygote.setAllelicCompositionLink("<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>tm1Brd</sup></a>/<a href=\"http://www.mousephenotype.org/data/genes/MGI:97874\">Rb1<sup>+</sup></a>");
         
     
-    }
-    
-    @After
-    public void tearDown() {
     }
 
     /**
