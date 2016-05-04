@@ -42,22 +42,6 @@ public class GeneAssociationSummaryTest {
         summary = new AssociationSummary(true, true, true, 89.00, 78.01);
         instance = new GeneAssociationSummary(humanGeneIdentifier, mouseGeneIdentifier, summary);
     }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of getHumanGeneIdentifier method, of class GeneAssociationSummary.
