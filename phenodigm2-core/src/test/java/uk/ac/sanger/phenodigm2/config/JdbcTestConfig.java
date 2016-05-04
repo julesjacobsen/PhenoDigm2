@@ -6,7 +6,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import uk.ac.sanger.phenodigm2.dao.PhenoDigmDaoJdbcImpl;
 import uk.ac.sanger.phenodigm2.dao.PhenoDigmWebDaoJdbcImpl;
 
 import javax.sql.DataSource;
@@ -46,12 +45,6 @@ public class JdbcTestConfig {
         flyway.setSchemas("PHENODIGM2");
         flyway.migrate();
         return flyway;
-    }
-
-    @Bean
-    public PhenoDigmDaoJdbcImpl phenoDigmDaoJdbcImpl() {
-        flyway();
-        return new PhenoDigmDaoJdbcImpl();
     }
 
     @Bean
