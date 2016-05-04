@@ -32,7 +32,6 @@ import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.Disease;
 import uk.ac.sanger.phenodigm2.model.DiseaseIdentifier;
 import uk.ac.sanger.phenodigm2.model.DiseaseModelAssociation;
-import uk.ac.sanger.phenodigm2.model.ExternalIdentifier;
 import uk.ac.sanger.phenodigm2.model.Gene;
 import uk.ac.sanger.phenodigm2.model.GeneIdentifier;
 import uk.ac.sanger.phenodigm2.model.MouseModel;
@@ -444,7 +443,7 @@ public class PhenoDigmWebDaoSolrImpl implements PhenoDigmWebDao {
 
                 model.setAllelicComposition(allelicComposition);
                 model.setAlleleIds(setAlleleIds);
-                model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
+                model.setAllelicCompositionLink(ExternalLinkBuilder.buildLink(model));
 
                 model.setPhenotypeTerms(phenotypeTerms);
 

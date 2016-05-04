@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import uk.ac.sanger.phenodigm2.model.*;
@@ -30,8 +29,6 @@ import uk.ac.sanger.phenodigm2.web.DiseaseAssociationSummary;
 import uk.ac.sanger.phenodigm2.web.DiseaseGeneAssociationDetail;
 import uk.ac.sanger.phenodigm2.web.GeneAssociationSummary;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -255,7 +252,7 @@ public class PhenoDigmWebDaoJdbcImpl implements PhenoDigmWebDao {
                     model.setGeneticBackground(rs.getString("genetic_background"));
                     model.setMgiGeneId(rs.getString("model_gene_id"));
                     model.setSource(rs.getString("source"));
-                    model.setAllelicCompositionLink(ExternalLinkFactory.buildLink(model));
+                    model.setAllelicCompositionLink(ExternalLinkBuilder.buildLink(model));
 
                     modelPhenotypes = new ArrayList();
                     model.setPhenotypeTerms(modelPhenotypes);
