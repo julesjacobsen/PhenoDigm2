@@ -7,17 +7,3 @@ Configuration:
 * Edit the META-INF/context.xml so that "solr/home" environment variable points to
 the ${solr.home}/${solr.core.directory}
 * Change src/main/resources/*.xml to fit your needs.
-
-Run:
-
-mvn install will copy the files to the correct path. 
-mvn package will copy and then run Solr in Tomcat.
-
-In Netbeans just right-click the project icon and select 'run'. 
-
-Acknowledgements:
-
-Props go to Petri Kainulainen (https://github.com/pkainulainen) and his blog 
-article for doing much of the heavy-lifting on which this project is based:
-  
-http://www.petrikainulainen.net/programming/maven/running-solr-with-maven/
